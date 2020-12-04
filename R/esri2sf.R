@@ -8,8 +8,8 @@
 #' @param token string for authentication token (if needed).
 #' @param geomType string specifying the layer geometry ('esriGeometryPolygon' or 'esriGeometryPoint' or 'esriGeometryPolyline' - if `NULL`, will try to be inferred from the server)
 #' @param crs coordinate reference system (see [sf::st_sf()]).
-#' @param bbox bbox class object from [sf::st_bbox()]. Must use the same coordinate reference system as the service layer.
-#'
+#' @param envelope sf class object to use as a spatial filter for the ArcGIS service. Will be transformed with [sf::st_transform()] to match coordinate reference system of the service layer.
+#' @param bbox bbox class object from [sf::st_bbox()]. Must use the same coordinate reference system as the service layer. If a bbox is provided, the envelope parameter will be ignored.
 #' @param ... additional named parameters to pass to the query. ex) "resultRecordCount = 3"
 #' @return sf dataframe (`esri2sf`) or tibble dataframe (`esri2sf`).
 #'
@@ -32,7 +32,7 @@
 #'
 #' @export
 
-esri2sf <- function(url, outFields = c("*"), where = "1=1", bbox = NULL, token = "",
+esri2sf <- function(url, outFields = c("*"), where = "1=1", envelope = NULL, bbox = NULL, token = "",
   geomType = NULL, crs = 4326, ...) {
   layerInfo <- jsonlite::fromJSON(content(POST(url, query = list(f = "json",
     token = token), encode = "form", config = config(ssl_verifypeer = FALSE)),
@@ -44,7 +44,19 @@ esri2sf <- function(url, outFields = c("*"), where = "1=1", bbox = NULL, token =
 
     geomType <- layerInfo$geometryType
   }
+
   print(geomType)
+
+  if (is.null(bbox)) {
+    if (st_crs(envelope)$input != paste0("EPSG:",layerInfo$fullExtent$spatialReference$latestWkid)) {
+      bbox <- st_bbox(st_transform(envelope, layerInfo$fullExtent$spatialReference$latestWkid))
+    } else {
+      bbox <- st_bbox(envelope)
+    }
+  } else if (class(bbox) == "bbox") {
+    bbox <- paste0(unlist(as.list(bbox), use.names=FALSE), collapse = ",")
+  }
+
   queryUrl <- paste(url, "query", sep = "/")
   esriFeatures <- getEsriFeatures(queryUrl, outFields, where, bbox, token, ...)
   esri2sfGeom(esriFeatures, geomType, crs)
@@ -52,7 +64,7 @@ esri2sf <- function(url, outFields = c("*"), where = "1=1", bbox = NULL, token =
 
 #' @describeIn esri2sf Retrieve table object (no spatial data).
 #' @export
-esri2df <- function(url, outFields = c("*"), where = "1=1", bbox = NULL, token = "", ...) {
+esri2df <- function(url, outFields = c("*"), where = "1=1", token = "", ...) {
   layerInfo <- fromJSON(content(
     POST(url,
         query = list(f = "json", token = token),
@@ -64,6 +76,6 @@ esri2df <- function(url, outFields = c("*"), where = "1=1", bbox = NULL, token =
   if (layerInfo$type != "Table") stop("Layer type for URL is not 'Table'.")
 
   queryUrl <- paste(url, "query", sep = "/")
-  esriFeatures <- getEsriFeatures(queryUrl, outFields, where, bbox, token)  #, ...)
+  esriFeatures <- getEsriFeatures(queryUrl, outFields, where, token)  #, ...)
   getEsriTable(esriFeatures)
 }

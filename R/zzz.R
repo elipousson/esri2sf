@@ -41,10 +41,6 @@ generateOAuthToken <- function(clientId, clientSecret, expiration = 5000) {
 
 getObjectIds <- function(queryUrl, where, bbox, token = "", ...) {
 
-  if (!is.null(bbox)) {
-    bbox <- paste0(unlist(as.list(bbox), use.names=FALSE), collapse = ",")
-  }
-
   # create Simple Features from ArcGIS servers json response
   query <- list(where = where, geometryType = "esriGeometryEnvelope", geometry = bbox, returnIdsOnly = "true", token = token, f = "json",
     ...)
