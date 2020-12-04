@@ -47,18 +47,21 @@ esri2sf <- function(url, outFields = c("*"), where = "1=1", envelope = NULL, bbo
 
   print(geomType)
 
-  latestWkid <- paste0("EPSG:",layerInfo$fullExtent$spatialReference$latestWkid)
-  print(paste0("Coordinate Reference System: ", latestWkid))
+  if (is.null(layerInfo$extent$spatialReference$latestWkid) && !is.null(envelope))
+    stop("latestWkid is NULL and the appropriate coordinate reference system for the envelope could not be inferred from server.")
 
-  if (is.null(bbox)) {
-    if (st_crs(envelope)$input != latestWkid) {
-      bbox <- st_bbox(st_transform(envelope, layerInfo$fullExtent$spatialReference$latestWkid))
-    } else {
-      bbox <- st_bbox(envelope)
-    }
+  if (!is.null(layerInfo$extent$spatialReference$latestWkid))
+    print(paste0("Coordinate Reference System: ", layerInfo$extent$spatialReference$latestWkid))
+
+  if (!is.null(envelope)) {
+      if ((st_crs(envelope)$input != layerInfo$extent$spatialReference$latestWkid) && !is.null(layerInfo$extent$spatialReference$latestWkid)) {
+        bbox <- st_bbox(st_transform(envelope, layerInfo$extent$spatialReference$latestWkid))
+      } else {
+        bbox <- st_bbox(envelope)
+      }
   } else if (class(bbox) == "bbox") {
     bbox <- paste0(unlist(as.list(bbox), use.names=FALSE), collapse = ",")
-  } else {
+  } else if (!is.null(bbox)) {
     stop("The provided bbox must be a class bbox object. The bbox must match the coordinate reference system of the server layer.")
   }
 
