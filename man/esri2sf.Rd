@@ -9,6 +9,7 @@ esri2sf(
   url,
   outFields = c("*"),
   where = "1=1",
+  envelope = NULL,
   bbox = NULL,
   token = "",
   geomType = NULL,
@@ -16,7 +17,7 @@ esri2sf(
   ...
 )
 
-esri2df(url, outFields = c("*"), where = "1=1", bbox = NULL, token = "", ...)
+esri2df(url, outFields = c("*"), where = "1=1", token = "", ...)
 }
 \arguments{
 \item{url}{character string for service url, e.g. \url{https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/}.}
@@ -25,7 +26,9 @@ esri2df(url, outFields = c("*"), where = "1=1", bbox = NULL, token = "", ...)
 
 \item{where}{string for where condition. Default is \code{1=1} for all rows.}
 
-\item{bbox}{bbox class object from \code{\link[sf:st_bbox]{sf::st_bbox()}}. Must use the same coordinate reference system as the service layer.}
+\item{envelope}{sf class object to use as a spatial filter for the ArcGIS service. Will be transformed with \code{\link[sf:st_transform]{sf::st_transform()}} to match coordinate reference system of the service layer.}
+
+\item{bbox}{bbox class object from \code{\link[sf:st_bbox]{sf::st_bbox()}}. Must use the same coordinate reference system as the service layer. If a bbox is provided, the envelope parameter will be ignored.}
 
 \item{token}{string for authentication token (if needed).}
 
