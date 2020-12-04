@@ -46,6 +46,7 @@ esri2sf <- function(url, outFields = c("*"), where = "1=1", envelope = NULL, bbo
   }
 
   print(geomType)
+  print("Coordinate Reference System: ", paste0("EPSG:",layerInfo$fullExtent$spatialReference$latestWkid))
 
   if (is.null(bbox)) {
     if (st_crs(envelope)$input != paste0("EPSG:",layerInfo$fullExtent$spatialReference$latestWkid)) {
@@ -55,6 +56,8 @@ esri2sf <- function(url, outFields = c("*"), where = "1=1", envelope = NULL, bbo
     }
   } else if (class(bbox) == "bbox") {
     bbox <- paste0(unlist(as.list(bbox), use.names=FALSE), collapse = ",")
+  } else {
+    stop("The provided bbox must be a class bbox object. The bbox must match the coordinate reference system of the server layer.")
   }
 
   queryUrl <- paste(url, "query", sep = "/")
