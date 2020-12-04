@@ -59,7 +59,9 @@ esri2sf <- function(url, outFields = c("*"), where = "1=1", envelope = NULL, bbo
       } else {
         bbox <- st_bbox(envelope)
       }
-  } else if (class(bbox) == "bbox") {
+  }
+
+  if (class(bbox) == "bbox") {
     bbox <- paste0(unlist(as.list(bbox), use.names=FALSE), collapse = ",")
   } else if (!is.null(bbox)) {
     stop("The provided bbox must be a class bbox object. The bbox must match the coordinate reference system of the server layer.")
