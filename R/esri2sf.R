@@ -46,10 +46,12 @@ esri2sf <- function(url, outFields = c("*"), where = "1=1", envelope = NULL, bbo
   }
 
   print(geomType)
-  print("Coordinate Reference System: ", paste0("EPSG:",layerInfo$fullExtent$spatialReference$latestWkid))
+
+  latestWkid <- paste0("EPSG:",layerInfo$fullExtent$spatialReference$latestWkid)
+  print(paste0("Coordinate Reference System: ", latestWkid))
 
   if (is.null(bbox)) {
-    if (st_crs(envelope)$input != paste0("EPSG:",layerInfo$fullExtent$spatialReference$latestWkid)) {
+    if (st_crs(envelope)$input != latestWkid) {
       bbox <- st_bbox(st_transform(envelope, layerInfo$fullExtent$spatialReference$latestWkid))
     } else {
       bbox <- st_bbox(envelope)
