@@ -12,23 +12,23 @@
 \alias{esriUrl_parseUrl}
 \title{Validate or parse the parts of a ESRI REST Server URL}
 \usage{
-esriUrl_isValid(url, token = "", displayReason = FALSE)
+esriUrl_isValid(url, token = NULL, displayReason = FALSE)
 
-esriUrl_isValidRoot(url, token = "", displayReason = FALSE)
+esriUrl_isValidRoot(url, token = NULL, displayReason = FALSE)
 
-esriUrl_isValidFolder(url, token = "", displayReason = FALSE)
+esriUrl_isValidFolder(url, token = NULL, displayReason = FALSE)
 
-esriUrl_isValidService(url, token = "", displayReason = FALSE)
+esriUrl_isValidService(url, token = NULL, displayReason = FALSE)
 
-esriUrl_isValidID(url, token = "", displayReason = FALSE)
+esriUrl_isValidID(url, token = NULL, displayReason = FALSE)
 
-esriUrl_isValidFeature(url, token = "", displayReason = FALSE)
+esriUrl_isValidFeature(url, token = NULL, displayReason = FALSE)
 
-esriUrl_ServerUrl(url, token = "")
+esriUrl_ServerUrl(url, token = NULL)
 
-esriUrl_serviceUrl(url, token = "")
+esriUrl_serviceUrl(url, token = NULL)
 
-esriUrl_parseUrl(url, token = "")
+esriUrl_parseUrl(url, token = NULL)
 }
 \arguments{
 \item{url}{The url for a Map/Feature server or for a layer/table in a
@@ -58,26 +58,38 @@ And having these rules:
 \item The scheme: \verb{https://} or \verb{http://} part is optional
 \item The \code{host} part is the domain of the url.
 \item The \code{instance}  is the first subpage after the domain in the url.
-\item The \verb{/rest/services} is the second and third subpage in the url. These are standard for all ESRI REST Services.
-\item The \code{folderPath} part is optional and indicates the file structure in the REST Service. It consists of all subpages between \verb{/rest/services/} and the \code{serviceName} part (if available).
-\item The \code{serviceName} part is the last subpage betore the \verb{<serviceType>} in the url.
-\item The \code{serviceType} specifies the type of service. Currently this package works to manage the following serviceTypes: 'MapServer', 'FeatureServer', 'GPServer', 'GeocodeServer', 'GeometryServer', 'ImageServer'.
-\item The \code{featureID} is optional and specifies the layer or table in the map service.
+\item The \verb{/rest/services} is the second and third subpage in the url. These are
+standard for all ESRI REST Services.
+\item The \code{folderPath} part is optional and indicates the file structure in the
+REST Service. It consists of all subpages between \verb{/rest/services/} and the
+\code{serviceName} part (if available).
+\item The \code{serviceName} part is the last subpage betore the \verb{<serviceType>} in
+the url.
+\item The \code{serviceType} specifies the type of service. Currently this package
+works to manage the following serviceTypes: 'MapServer', 'FeatureServer',
+'GPServer', 'GeocodeServer', 'GeometryServer', 'ImageServer'.
+\item The \code{featureID} is optional and specifies the layer or table in the map
+service.
 }
 }
 \section{Functions}{
 \itemize{
-\item \code{esriUrl_isValid}: Check if url is valid for an ESRI REST Service. General to include potential layer id too.
+\item \code{esriUrl_isValid}: Check if url is valid for an ESRI REST Service. General
+to include potential layer id too.
 
-\item \code{esriUrl_isValidRoot}: Check if url is valid for the root of an ESRI REST Server.
+\item \code{esriUrl_isValidRoot}: Check if url is valid for the root of an ESRI REST
+Server.
 
-\item \code{esriUrl_isValidFolder}: Check if url is valid for a folder of an ESRI REST Server.
+\item \code{esriUrl_isValidFolder}: Check if url is valid for a folder of an ESRI REST
+Server.
 
-\item \code{esriUrl_isValidService}: Check if url is valid for a Service of an ESRI REST Server. No feature ID.
+\item \code{esriUrl_isValidService}: Check if url is valid for a Service of an ESRI REST
+Server. No feature ID.
 
 \item \code{esriUrl_isValidID}: DEPRECATED Use esriUrl_isValidFeature
 
-\item \code{esriUrl_isValidFeature}: Check if url is valid for a feature of an ESRI REST Service.
+\item \code{esriUrl_isValidFeature}: Check if url is valid for a feature of an ESRI REST
+Service.
 
 \item \code{esriUrl_ServerUrl}: DEPRECATED Use esriUrl_serviceUrl
 

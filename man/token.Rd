@@ -6,29 +6,45 @@
 \title{Create authorization tokens}
 \usage{
 generateToken(
-  server,
+  server = NULL,
+  url = NULL,
   uid,
-  pwd = "",
-  type = c("tokens", "admin"),
-  expiration = 5000
+  pwd = NULL,
+  type = NULL,
+  client = "requestip",
+  expiration = 5000,
+  referer = NULL,
+  ip = NULL,
+  ...
 )
 
-generateOAuthToken(clientId, clientSecret, expiration = 5000)
+generateOAuthToken(clientId, clientSecret, expiration = 5000, ...)
 }
 \arguments{
-\item{server}{The ArcGIS REST Server you want to connect to: \verb{https://\\<host\\>:\\<port\\>}}
+\item{server}{The ArcGIS REST Server you want to connect to:
+\verb{https://\\<host\\>:\\<port\\>}}
 
-\item{uid}{The user id of the account used to create the token connection to
-the server}
+\item{url}{The url to connect to using
+\verb{https://\\<url\\>/sharing/generateToken}.}
+
+\item{uid}{The user id (username) of the account used to create the token
+connection to the server}
 
 \item{pwd}{The password of the account used to create the token connection to
-the server. If left blank, you will be prompted for the password.}
+the server. If \code{NULL}, you will be prompted for the password.}
 
 \item{type}{Either 'tokens' or 'admin'. Specify the endpoint you use to
-create the token. Defaults to 'tokens'.}
+create the token. Defaults to 'tokens' if server is provided.}
+
+\item{client}{"requestip" (default), "referer", or "ip"}
 
 \item{expiration}{Set an expiration limit on the token in minutes. Max
 expiration date may be controlled by the server.}
+
+\item{referer, ip}{Additional parameters required if client is "referer" or
+"ip"}
+
+\item{...}{Additional parameters passed to \code{\link[=esriRequest]{esriRequest()}}}
 
 \item{clientId}{Client ID}
 
@@ -42,14 +58,19 @@ Generate tokens for accessing credentialed ArcGIS REST Servers.
 
 \code{generateToken()} can create a token from the public token endpoint
 \verb{https://<host>:\\<port\\>/\\<site\\>/tokens/generateToken} or the admin endpoint
-\verb{https://\\<host\\>:\\<port\\>/\\<site\\>/admin/generateToken} for ArcGIS REST Servers. See
-\verb{https://developers.arcgis.com/rest/services-reference/enterprise/generate-token.htm} or
-\verb{https://developers.arcgis.com/rest/services-reference/enterprise/generate-admin-token.htm}
+\verb{https://\\<host\\>:\\<port\\>/\\<site\\>/admin/generateToken} for ArcGIS REST
+Servers. See \url{https://developers.arcgis.com/rest/services-reference/enterprise/generate-token.htm}
+or \url{https://developers.arcgis.com/rest/services-reference/enterprise/generate-admin-token.htm}
 respectively for more information.
+
+If \code{server} is \code{NULL} and \code{url} is provided the endpoint is
+\verb{https://\\<url\\>/sharing/generateToken}. See
+\url{https://developers.arcgis.com/rest/users-groups-and-items/generate-token.htm}
+for more information.
 
 \code{generateOAuthToken()} can create an OAuth token for ArcGIS Online Services.
 See \verb{https://developers.arcgis.com/documentation/core-concepts/security-and-authentication/accessing-arcgis-online-services/}
-or \verb{https://developers.arcgis.com/documentation/mapping-apis-and-services/security/oauth-2.0/}
+or \url{https://developers.arcgis.com/documentation/mapping-apis-and-services/security/oauth-2.0/}
 for more information.
 }
 \section{Functions}{

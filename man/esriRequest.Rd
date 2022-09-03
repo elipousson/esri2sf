@@ -15,6 +15,7 @@ esriRequest(
   .cache = FALSE,
   .max_seconds = 3,
   .is_error = TRUE,
+  .body_form = FALSE,
   ...
 )
 }
