@@ -21,6 +21,7 @@
 #'   [httr2::req_error] function. If `TRUE`, the request does not use
 #'   [httr2::req_error].
 #' @param ... Additional parameters passed to [httr2::req_url_query]
+#' @export
 #' @importFrom httr2 request req_url_path_append req_url_query req_body_form
 #'   req_user_agent req_cache req_retry req_error resp_body_json req_perform
 #' @importFrom cli cli_warn
@@ -34,8 +35,8 @@ esriRequest <- function(url,
                         .cache = FALSE,
                         .max_seconds = 3,
                         .is_error = TRUE,
+                        .body_form = FALSE,
                         ...) {
-
   # Create request based on url
   req <- httr2::request(url)
 
@@ -49,7 +50,7 @@ esriRequest <- function(url,
     token <- ""
   }
 
-  # Add f, format, outFields, and additional query parameters if provided
+  # Add f, format, and any additional query parameters
   req <-
     httr2::req_url_query(
       req,
@@ -59,25 +60,26 @@ esriRequest <- function(url,
       ...
     )
 
-  req_ids_added <-
-    httr2::req_url_query(
-      req,
-      objectIds = objectIds
-    )
-
-  # If url is more than 2048 characters long, add the query to the
-  # body of the request
-  if (nchar(req_ids_added$url) > 2048) {
-    req <- httr2::req_body_form(
-      req,
-      f = f,
-      format = format,
-      token = token,
-      objectIds = objectIds,
-      ...
-    )
-  } else {
-    req <- req_ids_added
+  if (!is.null(objectIds)) {
+    # Add objectIds
+    req <-
+      req_object_ids(
+        req,
+        objectIds = objectIds,
+        f = f,
+        format = format,
+        token = token,
+        objectIds = objectIds,
+        ...
+      )
+  } else if (.body_form) {
+    req <-
+      httr2::req_body_form(
+        req,
+        f = f,
+        format = format,
+        ...
+      )
   }
 
   req <-
@@ -131,4 +133,38 @@ esriRequest <- function(url,
 
   # Otherwise perform the request
   httr2::req_perform(req = req)
+}
+
+#' Helper function to check if url with objectIds exceeds max length and use
+#' form request if needed
+#'
+#' @noRd
+req_object_ids <- function(req,
+                           f = NULL,
+                           format = NULL,
+                           objectIds = NULL,
+                           token = NULL,
+                           ...) {
+  req_ids <-
+    httr2::req_url_query(
+      req,
+      objectIds = objectIds
+    )
+
+  # If url is more than 2048 characters long, add the query to the
+  # body of the request
+  if (nchar(req_ids$url) > 2048) {
+    return(
+      httr2::req_body_form(
+        req,
+        f = f,
+        format = format,
+        token = token,
+        objectIds = objectIds,
+        ...
+      )
+    )
+  }
+
+  req_ids
 }
