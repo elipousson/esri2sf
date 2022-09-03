@@ -1,79 +1,87 @@
-serviceTypes <- c("MapServer", "FeatureServer", "GPServer", "GeocodeServer", "GeometryServer", "ImageServer")
+serviceTypes <- c("MapServer", "FeatureServer", "GPServer", "GeocodeServer",
+                  "GeometryServer", "ImageServer")
 
-esriUrl_isValidType <- function(url, token = "", type = c(NA_character_, "Root", "Folder", "Service", "Feature"), displayReason = FALSE, returnType = FALSE) {
-  type <- match.arg(type)
+esriUrl_isValidType <- function(url,
+                                token = NULL,
+                                type = NULL,
+                                displayReason = FALSE,
+                                returnType = FALSE,
+                                call = parent.frame()) {
+  servicesUrl <- grepl("/rest/services", url)
+  servicesUrl_types <- c("root", "folder", "service", "feature", "content")
 
-  # Add query parameters
-  query <- list(
-    f = "json",
-    token = token
-  )
+  siteUrl <- grepl(".html?", url)
+  siteUrl_types <- c("search", "item", "group", "user", "app")
 
-  # check url succeeds
-  urlError <- tryCatch(
-    {
-      httr::http_error(httr::POST(url, body = query))
-    },
-    error = function(cond) {
-      TRUE
-    }
-  )
-
-  if (!grepl("/rest/services", url)) {
-    reason <- "'/rest/services' not found in the url."
-    out <- FALSE
-  } else if (urlError) {
-    reason <- "Could not access url with {httr}."
-    out <- FALSE
-  } else if ("error" %in% names(jsonlite::fromJSON(httr::content(httr::POST(url, body = query), as = "text")))) {
-    error <- jsonlite::fromJSON(httr::content(httr::POST(url, body = query), as = "text"))[["error"]]
-    reason <- paste0("Error code: ", error[["code"]], "\nMessage: ", error[["message"]])
-    out <- FALSE
-    if (grepl("Invalid URL", reason)) {
-      url_encoded <- utils::URLencode(url)
-      if (!("error" %in% names(jsonlite::fromJSON(httr::content(httr::POST(url_encoded, body = query), as = "text"))))) {
-        reason <- "Invalid URL: Check encoding of supplied URL."
-      }
-    }
-  } else {
-    out <- TRUE
+  if (!is.null(type)) {
+    type <- match.arg(tolower(type), c(servicesUrl_types, siteUrl_types))
+  } else if (identical(type, NA_character_)) {
+    type <- NULL
   }
 
-  if (out) {
+  isType <- NA
+
+  if (servicesUrl) {
+    layerInfo <- esrimeta(url, token = token)
     isType <- c(
-      "Root" = grepl("/rest/services/?$", url),
-      "Folder" = "folders" %in% names(jsonlite::fromJSON(httr::content(httr::POST(url, body = query), as = "text"))),
-      "Service" = grepl(paste0("/(", paste0(serviceTypes, collapse = "|"), ")/?$"), url),
-      "Feature" = grepl(paste0("/(", paste0(serviceTypes, collapse = "|"), ")/[[:digit:]]+/?$"), url)
+      "root" = grepl("/rest/services/?$", url),
+      "folder" = ("folders" %in% names(layerInfo)),
+      "service" = (grepl(paste0("/(", paste0(serviceTypes, collapse = "|"), ")/?$"), url)),
+      "feature" = (grepl(paste0("/(", paste0(serviceTypes, collapse = "|"), ")/[[:digit:]]+/?$"), url)),
+      "content" = grepl("/content/", url),
+      setNames(rep_len(FALSE, length(siteUrl_types)), siteUrl_types)
     )
+  } else if (siteUrl) {
+    isType <- c(
+      "search" = grepl("/home/search\\.html\\?q=", url),
+      "item" = grepl("/home/item\\.html\\?id=", url),
+      "group" = grepl("/home/group\\.html\\?id=", url),
+      "user" = grepl("/home/user\\.html\\?user=", url),
+      "app" = grepl("/index\\.html\\?appid=", url),
+      setNames(rep_len(FALSE, length(servicesUrl_types)), servicesUrl_types)
+    )
+  }
 
-    if (!is.na(type) && !(type %in% names(which(isType))) && !returnType) {
-      if (type == "Root") {
-        reason <- "Url does not end in '/rest/services'."
-      } else if (type == "Folder") {
-        reason <- "Url is not a 'Folder' endpoint."
-      } else if (type == "Service") {
-        reason <- "Url does not end in a '/MapServer' or '/FeatureServer'."
-      } else if (type == "Feature") {
-        reason <- "Url does not end in a feature ID."
-      }
-      out <- FALSE
-    } else {
-      out <- TRUE
+  url_types <- names(which(isType))
+  out <- FALSE
+
+  if (!is.null(type)) {
+    out <- type %in% url_types
+  } else if (!is.null(url_types)) {
+    out <- !identical(url_types, character(0)) | servicesUrl
+  }
+
+  if (!out && displayReason) {
+    if (!is.null(type) && !returnType) {
+      reason <-
+        switch(type,
+          "root" = "A {.val {type}} type {.arg url} must end in '/rest/services':",
+          "folder" = "A {.val {type}} type {.arg url} must be a 'Folder' endpoint:",
+          "service" = "A {.val {type}} type {.arg url} must end in one of the supported service types ({serviceTypes}):",
+          "feature" = "A {.val {type}} type {.arg url} must end in a feature ID:",
+          "content" = "A {.val {type}} type {.arg url} must include '/content/':",
+          "search" = "A {.val {type}} type {.arg url} must include '/home/search.html?q=':",
+          "item" = "A {.val {type}} type {.arg url} must include '/home/item.html?id=':",
+          "group" = "A {.val {type}} type {.arg url} must include '/home/group.html?id=':",
+          "user" = "A {.val {type}} type {.arg url} must include '/home/user.html?user=':",
+          "app" = "A {.val {type}} type {.arg url} must include '/index.html?appid=':"
+        )
+
+      cli::cli_inform(c("!" = reason, " " = "{.url {url}}"), call = parent.frame())
     }
+
+    cli::cli_inform(c("!" = "Invalid {.arg url}: {.url {url}}"), call = parent.frame())
   }
 
-  if (!out & displayReason) {
-    message(paste0("Url is not a valid ESRI Service Url.\n", reason))
+  if (returnType) {
+    if (is.null(type)) {
+      return(NA_character_)
+    }
+
+    return(names(isType[which(isType)[1]]))
   }
 
-  if (out & returnType) {
-    out <- names(isType[which(isType)[1]])
-  } else if (!out & returnType) {
-    out <- NA_character_
-  }
-
-  return(out)
+  out
 }
 
 #' @title Validate or parse the parts of a ESRI REST Server URL
@@ -91,11 +99,18 @@ esriUrl_isValidType <- function(url, token = "", type = c(NA_character_, "Root",
 #'  * The scheme: `https://` or `http://` part is optional
 #'  * The `host` part is the domain of the url.
 #'  * The `instance`  is the first subpage after the domain in the url.
-#'  * The `/rest/services` is the second and third subpage in the url. These are standard for all ESRI REST Services.
-#'  * The `folderPath` part is optional and indicates the file structure in the REST Service. It consists of all subpages between `/rest/services/` and the `serviceName` part (if available).
-#'  * The `serviceName` part is the last subpage betore the `<serviceType>` in the url.
-#'  * The `serviceType` specifies the type of service. Currently this package works to manage the following serviceTypes: 'MapServer', 'FeatureServer', 'GPServer', 'GeocodeServer', 'GeometryServer', 'ImageServer'.
-#'  * The `featureID` is optional and specifies the layer or table in the map service.
+#'  * The `/rest/services` is the second and third subpage in the url. These are
+#'  standard for all ESRI REST Services.
+#'  * The `folderPath` part is optional and indicates the file structure in the
+#'  REST Service. It consists of all subpages between `/rest/services/` and the
+#'  `serviceName` part (if available).
+#'  * The `serviceName` part is the last subpage betore the `<serviceType>` in
+#'  the url.
+#'  * The `serviceType` specifies the type of service. Currently this package
+#'  works to manage the following serviceTypes: 'MapServer', 'FeatureServer',
+#'  'GPServer', 'GeocodeServer', 'GeometryServer', 'ImageServer'.
+#'  * The `featureID` is optional and specifies the layer or table in the map
+#'  service.
 #'
 #'
 #' @param url The url for a Map/Feature server or for a layer/table in a
@@ -106,76 +121,76 @@ esriUrl_isValidType <- function(url, token = "", type = c(NA_character_, "Root",
 #' @return Character string of the request part of the url.
 
 
-#' @describeIn esriUrl Check if url is valid for an ESRI REST Service. General to include potential layer id too.
+#' @describeIn esriUrl Check if url is valid for an ESRI REST Service. General
+#'   to include potential layer id too.
 #' @export
-esriUrl_isValid <- function(url, token = "", displayReason = FALSE) {
-  out <- esriUrl_isValidType(url = url, token = token, type = NA_character_, displayReason = displayReason, returnType = FALSE)
-
-  return(out)
+esriUrl_isValid <- function(url, token = NULL, displayReason = FALSE) {
+  esriUrl_isValidType(url = url, token = token, type = NULL,
+                      displayReason = displayReason, returnType = FALSE)
 }
 
-#' @describeIn esriUrl Check if url is valid for the root of an ESRI REST Server.
+#' @describeIn esriUrl Check if url is valid for the root of an ESRI REST
+#'   Server.
 #' @export
-esriUrl_isValidRoot <- function(url, token = "", displayReason = FALSE) {
-  out <- esriUrl_isValidType(url = url, token = token, type = "Root", displayReason = displayReason, returnType = FALSE)
-
-  return(out)
+esriUrl_isValidRoot <- function(url, token = NULL, displayReason = FALSE) {
+  esriUrl_isValidType(url = url, token = token, type = "root",
+                      displayReason = displayReason, returnType = FALSE)
 }
 
-#' @describeIn esriUrl Check if url is valid for a folder of an ESRI REST Server.
+#' @describeIn esriUrl Check if url is valid for a folder of an ESRI REST
+#'   Server.
 #' @export
-esriUrl_isValidFolder <- function(url, token = "", displayReason = FALSE) {
-  out <- esriUrl_isValidType(url = url, token = token, type = "Folder", displayReason = displayReason, returnType = FALSE)
-
-  return(out)
+esriUrl_isValidFolder <- function(url, token = NULL, displayReason = FALSE) {
+  esriUrl_isValidType(url = url, token = token, type = "folder",
+                      displayReason = displayReason, returnType = FALSE)
 }
 
-#' @describeIn esriUrl Check if url is valid for a Service of an ESRI REST Server. No feature ID.
+#' @describeIn esriUrl Check if url is valid for a Service of an ESRI REST
+#'   Server. No feature ID.
 #' @export
-esriUrl_isValidService <- function(url, token = "", displayReason = FALSE) {
-  out <- esriUrl_isValidType(url = url, token = token, type = "Service", displayReason = displayReason, returnType = FALSE)
-
-  return(out)
+esriUrl_isValidService <- function(url, token = NULL, displayReason = FALSE) {
+  esriUrl_isValidType(url = url, token = token, type = "service",
+                      displayReason = displayReason, returnType = FALSE)
 }
 
 #' @describeIn esriUrl DEPRECATED Use esriUrl_isValidFeature
 #' @export
-esriUrl_isValidID <- function(url, token = "", displayReason = FALSE) {
+esriUrl_isValidID <- function(url, token = NULL, displayReason = FALSE) {
   .Deprecated("esriUrl_isValidFeature")
-  out <- esriUrl_isValidFeature(url, token = token, displayReason = displayReason)
-
-  return(out)
+  esriUrl_isValidFeature(url, token = token,
+                         displayReason = displayReason)
 }
 
-#' @describeIn esriUrl Check if url is valid for a feature of an ESRI REST Service.
+#' @describeIn esriUrl Check if url is valid for a feature of an ESRI REST
+#'   Service.
 #' @export
-esriUrl_isValidFeature <- function(url, token = "", displayReason = FALSE) {
-  out <- esriUrl_isValidType(url = url, token = token, type = "Feature", displayReason = displayReason, returnType = FALSE)
-
-  return(out)
+esriUrl_isValidFeature <- function(url, token = NULL, displayReason = FALSE) {
+  esriUrl_isValidType(url = url, token = token, type = "feature",
+                      displayReason = displayReason, returnType = FALSE)
 }
 
 
 #' @describeIn esriUrl DEPRECATED Use esriUrl_serviceUrl
 #' @export
-esriUrl_ServerUrl <- function(url, token = "") {
+esriUrl_ServerUrl <- function(url, token = NULL) {
   .Deprecated("esriUrl_serviceUrl")
   esriUrl_serviceUrl(url, token)
 }
 
 #' @describeIn esriUrl Retrieve Map/Feature Server URL
 #' @export
-esriUrl_serviceUrl <- function(url, token = "") {
+esriUrl_serviceUrl <- function(url, token = NULL) {
   # Cut off layerID if present
   urlNoLayerID <- sub("/[[:digit:]]+/?$|/$", "", url)
 
   # make sure url is valid service and error otherwise
   tryCatch(
     {
-      esriUrl_isValidService(url = urlNoLayerID, token = token, displayReason = TRUE)
+      esriUrl_isValidService(url = urlNoLayerID, token = token,
+                              displayReason = TRUE)
     },
     message = function(m) {
-      stop(m$message)
+      cli::cli_abort(m$message)
     }
   )
 
@@ -184,34 +199,36 @@ esriUrl_serviceUrl <- function(url, token = "") {
 
 #' @describeIn esriUrl Parse Url into parts.
 #' @export
-esriUrl_parseUrl <- function(url, token = "") {
+esriUrl_parseUrl <- function(url, token = NULL) {
   # make sure url is valid and error otherwise
   tryCatch(
     {
       esriUrl_isValid(url = url, token = token, displayReason = TRUE)
     },
     message = function(m) {
-      stop(m$message)
+      cli::cli_abort(m$message)
     }
   )
+
   scheme <- regmatches(url, regexpr("^https://|^http://", url))
   host <- unlist(strsplit(sub(scheme, "", url), "/"))[1]
   instance <- sub("/rest/services.*", "", sub(paste0(".*", host, "/"), "", url))
 
   # Find type of URL
-  urlType <- esriUrl_isValidType(url, token = token, type = NA_character_, displayReason = FALSE, returnType = TRUE)
+  urlType <- esriUrl_isValidType(url, token = token, type = NULL,
+                                 displayReason = FALSE, returnType = TRUE)
 
-  if (urlType == "Root") {
+  if (urlType == "root") {
     folderPath <- ""
     serviceName <- ""
     serviceType <- ""
     featureID <- integer(0)
-  } else if (urlType == "Folder") {
+  } else if (urlType == "folder") {
     folderPath <- sub("/$", "", sub(".*/rest/services/", "", url))
     serviceName <- ""
     serviceType <- ""
     featureID <- integer(0)
-  } else if (urlType %in% c("Service", "Feature")) {
+  } else if (urlType %in% c("service", "feature")) {
     folderService <- unlist(strsplit(sub(paste0("/(", paste0(serviceTypes, collapse = "|"), ").*"), "", sub(".*/rest/services/", "", url)), "/"))
     if (length(folderService) > 1) {
       folderPath <- paste0(folderService[-length(folderService)], collapse = "/")
@@ -221,9 +238,9 @@ esriUrl_parseUrl <- function(url, token = "") {
     serviceSplit <- unlist(strsplit(sub(paste0("/(", paste0(serviceTypes, collapse = "|"), ").*"), "", url), "/"))
     serviceName <- serviceSplit[length(serviceSplit)]
     serviceType <- gsub("/", "", regmatches(url, regexpr(paste0("/(", paste0(serviceTypes, collapse = "|"), ")/?"), url)))
-    if (urlType == "Service") {
+    if (urlType == "service") {
       featureID <- integer(0)
-    } else if (urlType == "Feature") {
+    } else if (urlType == "feature") {
       featureID <- as.integer(gsub("/", "", regmatches(url, regexpr("/[0-9]+/?$", url))))
     }
   }
