@@ -40,8 +40,9 @@
 #' }
 #' @rdname esrisearch
 #' @export
+#' @importFrom cli cli_abort cli_warn cli_inform
 #' @importFrom httr2 resp_body_json
-#' @importFrom dplyr as_tibble
+#' @importFrom dplyr as_tibble mutate across
 esrisearch <- function(query = NULL,
                        bbox = NULL,
                        url = NULL,
