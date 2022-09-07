@@ -51,7 +51,7 @@ esrisearch <- function(query = NULL,
                        sort = NULL,
                        desc = FALSE) {
   if (is.null(query) && is.null(bbox)) {
-    cli_abort(
+    cli::cli_abort(
       "{.arg q} or {.arg bbox} must be provided."
     )
   }
@@ -64,13 +64,13 @@ esrisearch <- function(query = NULL,
   if (is.null(url)) {
     url <- "https://www.arcgis.com"
   } else if (!is_url(url)) {
-    cli_abort(
+    cli::cli_abort(
       "{.arg url} must be a valid url and {.val {url}} is not."
     )
   }
 
   if (num > 100 | num < 1) {
-    cli_warn(
+    cli::cli_warn(
       "{.arg num} must be a positive number between 1 and 100,
       not {.val {num}}.",
       " " = "Setting {.arg num} to default value {.val 50}.",
@@ -81,7 +81,7 @@ esrisearch <- function(query = NULL,
   }
 
   if (start < 1) {
-    cli_warn(
+    cli::cli_warn(
       "{.arg num} must be a positive number.",
       " " = "Setting {.arg start} to default value {.val 1}."
     )
@@ -140,7 +140,7 @@ esrisearch <- function(query = NULL,
     msg <- "Search completed with provided {.arg bbox} at {.url {url}}."
   }
 
-  cli_inform(
+  cli::cli_inform(
     c(
       "v" = "Search completed for {.val {resp$query}} at {.url {url}}.",
       " " = "Returning {.val {num}} results ({.val {resp$start}} to
@@ -182,14 +182,14 @@ is_url <- function(x) {
 #' @noRd
 check_category_filter <- function(category_filter) {
   if (!is.character(category_filter)) {
-    cli_abort(
+    cli::cli_abort(
       "{.arg category_filter} must be a character vector.",
       "i" = "{.arg category_filter} is {.cls {class(category_filter)}}."
     )
   }
 
   if (length(category_filter) > 3) {
-    cli_abort(
+    cli::cli_abort(
       "{.arg category_filter} must have length 3 or less.",
       "i" = "{.arg category_filter} is length {.val {length(category_filter)}}."
     )
