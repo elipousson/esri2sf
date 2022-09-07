@@ -291,7 +291,8 @@ esri2df <- function(url,
 
   if (!is.null(layerInfo$type) && layerInfo$type != "Table") {
     cli::cli_warn(
-      "The provided layer {.var {layerInfo$name}} is not a {.val 'table'}."
+      "The layer {.var {layerInfo$name}} must be a {.val 'Table'} service to
+      use {.fn esri2df}."
     )
 
     cli::cli_rule("Trying to download layer with {.fn esri2sf}")
@@ -452,7 +453,7 @@ sf2geometry <- function(x, geometryType = NULL, layerCRS = NULL) {
 #' @importFrom sf st_bbox
 bbox2geometry <- function(bbox) {
   # convert sf class bbox to bbox class
-  if (inherits(bbox, "sf")) {
+  if (inherits(bbox, "sf") | inherits(bbox, "sfc")) {
     bbox <- sf::st_bbox(bbox)
   }
 
