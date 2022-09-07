@@ -69,7 +69,6 @@ esriRequest <- function(url,
         f = f,
         format = format,
         token = token,
-        objectIds = objectIds,
         ...
       )
   } else if (.body_form) {
