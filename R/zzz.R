@@ -1,3 +1,6 @@
+# @staticimports pkg:stringstatic
+#  str_extract
+
 #' Get object ids
 #'
 #' @noRd
