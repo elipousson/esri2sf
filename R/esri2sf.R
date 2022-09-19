@@ -2,8 +2,10 @@
 #'
 #' These functions are the interface to the user.
 #'
-#' @param url character string for service url, e.g.
-#'   <https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/>.
+#' @param url A service url, e.g.
+#'   <https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/>
+#'    or an ArcGIS Online item url if the item contains a single feature or
+#'   table layer.
 #'
 #' @param outFields vector of fields you want to include. default is `NULL` for
 #'   all fields.
@@ -95,6 +97,14 @@ esri2sf <- function(url,
     )
   }
 
+  if (esriUrl_isValidType(url, type = "item")) {
+    url <-
+      convert_esriUrl(
+        url = url, token = token,
+        from = "item", to = "feature"
+      )
+  }
+
   layerInfo <- esrimeta(url = url, token = token)
 
   cli::cli_inform(
@@ -107,7 +117,8 @@ esri2sf <- function(url,
     cli::cli_abort(
       c("The {.arg url} must be for a
         {.val {cli::cli_vec(layerTypes, style = list(vec_last = ' or '))}}.",
-        "i" = "The provided {.arg url} is a {.val {layerInfo$type}} service.")
+        "i" = "The provided {.arg url} is a {.val {layerInfo$type}} service."
+      )
     )
   }
 
@@ -275,7 +286,7 @@ esri2df <- function(url,
   if (quiet) {
     return(
       suppressMessages(
-        esri2sf(
+        esri2df(
           url = url,
           outFields = outFields,
           where = where,
@@ -285,6 +296,14 @@ esri2df <- function(url,
         )
       )
     )
+  }
+
+  if (esriUrl_isValidType(url, type = "item")) {
+    url <-
+      convert_esriUrl(
+        url = url, token = token,
+        from = "item", to = "feature"
+      )
   }
 
   layerInfo <- esrimeta(url = url, token = token)
@@ -361,7 +380,6 @@ esrimeta <- function(url, token = NULL, fields = FALSE, ...) {
 #' @importFrom sf st_crs
 #' @importFrom cli cli_abort
 getLayerCRS <- function(spatialReference, layerCRS = NULL) {
-
   # Get the layer CRS from the layer spatial reference
   if ("latestWkid" %in% names(spatialReference)) {
     layerCRS <- spatialReference$latestWkid
@@ -378,8 +396,8 @@ getLayerCRS <- function(spatialReference, layerCRS = NULL) {
 
   if (is.null(layerCRS)) {
     cli::cli_abort(
-      "Valid layer coordinate reference system can't be found.",
-      "*" = "Check that the layer at the url has a spatial reference."
+      "A valid layer coordinate reference system can't be found.",
+      "*" = "Check that the layer at the {.arg url} has a spatial reference."
     )
   }
 
