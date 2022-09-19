@@ -87,7 +87,8 @@ esriInfo <- function(url, info = NULL, format = NULL, token = NULL, ...) {
 
     if (!requireNamespace("magick", quietly = TRUE)) {
       cli::cli_abort(
-        "The {.pkg magick} package must be installed when {.arg info} is set to {.val thumbnail}."
+        "The {.pkg magick} package must be installed when {.arg info}
+        is set to {.val thumbnail}."
       )
     }
 
@@ -101,6 +102,14 @@ esriInfo <- function(url, info = NULL, format = NULL, token = NULL, ...) {
 #' @noRd
 #' @importFrom sf st_bbox
 extent2bbox <- function(x, crs = 4326) {
+  if (is.list(x)) {
+    x <- vapply(unlist(x), as.numeric, 1)
+  }
+
+  if (any(is.na(c(x[["xmin"]], x[["ymin"]], x[["xmax"]], x[["ymax"]])))) {
+    return(NULL)
+  }
+
   sf::st_bbox(
     c(
       xmin = x[["xmin"]],
