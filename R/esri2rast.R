@@ -24,13 +24,11 @@ esri2rast <- function(url,
 
   layerInfo <- esrimeta(url = url, token = token)
 
-  layerCRS <- getLayerCRS(spatialReference = layerInfo$extent$spatialReference)
+  layerCRS <- getLayerCRS(layerInfo$extent$spatialReference)
 
-  if (sf::st_crs(bbox) != sf::st_crs(layerCRS)) {
-    bbox <- sf::st_transform(bbox, layerCRS)
-  }
+  bbox_ext <- bbox_transform(bbox, layerCRS)
 
-  esriEnvelope <-
+  bbox <-
     sf2geometry(
       x = bbox,
       geometryType = "esriEnvelope",
@@ -40,15 +38,17 @@ esri2rast <- function(url,
   format <-
     match.arg(
       tolower(format),
-      c("jpgpng", "png", "png8", "png24", "jpg", "bmp",
-        "gif", "tiff", "png32", "bip", "bsq", "lerc")
+      c(
+        "jpgpng", "png", "png8", "png24", "jpg", "bmp",
+        "gif", "tiff", "png32", "bip", "bsq", "lerc"
+      )
     )
 
   req <-
     esriRequest(
       url = url,
       append = "exportImage",
-      bbox = esriEnvelope,
+      bbox = bbox,
       format = format,
       f = "image",
       adjustAspectRatio = adjustAspectRatio,
@@ -56,9 +56,20 @@ esri2rast <- function(url,
       ...
     )
 
-  ras <- terra::rast(req$url)
+  ras <- terra::set.ext(terra::rast(req$url), as.numeric(bbox_ext))
 
-  terra::ext(ras) <- as.numeric(bbox)
+  terra::set.crs(ras, layerCRS)
+}
 
-  ras
+#' @noRd
+bbox_transform <- function(x, crs = NULL) {
+  if (is.null(crs)) {
+    return(sf::st_bbox(x))
+  }
+
+  if (inherits(x, "bbox")) {
+    x <- sf::st_as_sfc(x)
+  }
+
+  sf::st_bbox(sf::st_transform(x, crs))
 }
