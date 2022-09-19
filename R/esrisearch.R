@@ -53,7 +53,7 @@ esrisearch <- function(query = NULL,
                        desc = FALSE) {
   if (is.null(query) && is.null(bbox)) {
     cli::cli_abort(
-      "{.arg q} or {.arg bbox} must be provided."
+      "{.arg query} or {.arg bbox} must be provided."
     )
   }
 
@@ -143,7 +143,7 @@ esrisearch <- function(query = NULL,
 
   cli::cli_inform(
     c(
-      "v" = "Search completed for {.val {resp$query}} at {.url {url}}.",
+      "v" = msg,
       " " = "Returning {.val {num}} results ({.val {resp$start}} to
       {.val {resp$nextStart - 1}}) out of {total} total."
     )
