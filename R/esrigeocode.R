@@ -97,7 +97,6 @@ esrigeocode <- function(url,
     )
 
   if (operation == "findAddressCandidates") {
-
     candidates <- resp[["candidates"]]
 
     if (nrow(candidates) == 0) {
