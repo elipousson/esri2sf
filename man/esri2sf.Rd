@@ -33,8 +33,10 @@ esri2df(
 )
 }
 \arguments{
-\item{url}{character string for service url, e.g.
-\url{https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/}.}
+\item{url}{A service url, e.g.
+\url{https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/}
+or an ArcGIS Online item url if the item contains a single feature or
+table layer.}
 
 \item{outFields}{vector of fields you want to include. default is \code{NULL} for
 all fields.}
