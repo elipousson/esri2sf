@@ -52,11 +52,10 @@ generateToken <- function(server = NULL,
                           referer = NULL,
                           ip = NULL,
                           ...) {
-
   # generate auth token from GIS server
   if (is.null(pwd)) {
     cli::cli_inform(
-    "Please provide a password to create the token connection to the server."
+      "Please provide a password to create the token connection to the server."
     )
     pwd <- readline(prompt = "> ")
   }
@@ -65,8 +64,12 @@ generateToken <- function(server = NULL,
     url <- server
     type <- match.arg(type, c("tokens", "admin"))
     append <- paste("arcgis", type, "generateToken", sep = "/")
+    format <- "json"
+    f <- NULL
   } else if (!is.null(url)) {
     append <- "sharing/generateToken"
+    format <- NULL
+    f <- "json"
   } else {
     cli::cli_abort("{.arg server} or {.arg url} must be provided.")
   }
@@ -83,7 +86,8 @@ generateToken <- function(server = NULL,
       client = client,
       referer = referer,
       ip = ip,
-      f = "json",
+      f = f,
+      format = format,
       ...
     )
 
