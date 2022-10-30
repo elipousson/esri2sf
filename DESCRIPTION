@@ -19,7 +19,6 @@ Depends:
 Imports:
     cli,
     dplyr,
-    httr,
     httr2,
     jsonlite,
     sf (>= 1.0.1),
@@ -39,4 +38,4 @@ VignetteBuilder:
 Config/testthat/edition: 3
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.0.9000
+RoxygenNote: 7.2.1
