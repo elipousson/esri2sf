@@ -17,7 +17,9 @@ knitr::opts_chunk$set(
 
 <!-- badges: start -->
 
-[![CRAN status](https://www.r-pkg.org/badges/version/esri2sf)](https://CRAN.R-project.org/package=esri2sf) [![Project Status: Active -- The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![CRAN status](https://www.r-pkg.org/badges/version/esri2sf)](https://CRAN.R-project.org/package=esri2sf)
+[![Project Status: Active -- The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 <!-- badges: end -->
 
@@ -33,10 +35,10 @@ The geometry is returned as a [FeatureSet object](https://developers.arcgis.com/
 
 ## Install
 
-Use [pak](https://pak.r-lib.org/) to install this package from GitHub:
+Use [pak](https://pak.r-lib.org/) to install this fork of the esri2sf package from GitHub:
 
 ``` r
-pak::pkg_install("yonghah/esri2sf")
+pak::pkg_install("elipousson/esri2sf")
 ```
 
 ## How to use esri2sf

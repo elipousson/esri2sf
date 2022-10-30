@@ -45,10 +45,11 @@ object and combined with the attribute data to return an sf data frame.
 
 ## Install
 
-Use [pak](https://pak.r-lib.org/) to install this package from GitHub:
+Use [pak](https://pak.r-lib.org/) to install this fork of the esri2sf
+package from GitHub:
 
 ``` r
-pak::pkg_install("yonghah/esri2sf")
+pak::pkg_install("elipousson/esri2sf")
 ```
 
 ## How to use esri2sf
