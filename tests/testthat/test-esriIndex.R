@@ -1,5 +1,5 @@
 test_that("esriIndex works", {
-  sample_url <- "http://sampleserver1.arcgisonline.com/ArcGIS/rest/services"
+  sample_url <- "https://sampleserver6.arcgisonline.com/arcgis/rest/services"
 
   expect_s3_class(
     esriIndex(
@@ -8,11 +8,13 @@ test_that("esriIndex works", {
     "data.frame"
   )
 
+  # NOTE: This will fail if ESRI changes the number of services on the sample
+  # server
   expect_equal(
     nrow(esriIndex(
       url = sample_url
     )),
-    11
+    75
   )
 
   expect_s3_class(

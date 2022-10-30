@@ -2,28 +2,28 @@
 
     Code
       esriUrl_parseUrl(
-        "https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3")
+        "https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/3")
     Output
       $url
-      [1] "https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3"
+      [1] "https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/3"
       
       $scheme
       [1] "https://"
       
       $host
-      [1] "sampleserver1.arcgisonline.com"
+      [1] "sampleserver6.arcgisonline.com"
       
       $instance
-      [1] "ArcGIS"
+      [1] "arcgis"
       
       $restIndicator
       [1] "rest/services"
       
       $folderPath
-      [1] "Demographics"
+      [1] ""
       
       $serviceName
-      [1] "ESRI_Census_USA"
+      [1] "Census"
       
       $serviceType
       [1] "MapServer"
@@ -36,28 +36,28 @@
 
     Code
       esriUrl_parseUrl(
-        "https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer")
+        "https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer")
     Output
       $url
-      [1] "https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer"
+      [1] "https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer"
       
       $scheme
       [1] "https://"
       
       $host
-      [1] "sampleserver1.arcgisonline.com"
+      [1] "sampleserver6.arcgisonline.com"
       
       $instance
-      [1] "ArcGIS"
+      [1] "arcgis"
       
       $restIndicator
       [1] "rest/services"
       
       $folderPath
-      [1] "Demographics"
+      [1] ""
       
       $serviceName
-      [1] "ESRI_Census_USA"
+      [1] "Census"
       
       $serviceType
       [1] "MapServer"
@@ -69,50 +69,16 @@
 ---
 
     Code
-      esriUrl_parseUrl(
-        "https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics")
+      esriUrl_parseUrl("https://sampleserver6.arcgisonline.com/ArcGIS/rest/services")
     Output
       $url
-      [1] "https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics"
+      [1] "https://sampleserver6.arcgisonline.com/ArcGIS/rest/services"
       
       $scheme
       [1] "https://"
       
       $host
-      [1] "sampleserver1.arcgisonline.com"
-      
-      $instance
-      [1] "ArcGIS"
-      
-      $restIndicator
-      [1] "rest/services"
-      
-      $folderPath
-      [1] "Demographics"
-      
-      $serviceName
-      [1] ""
-      
-      $serviceType
-      [1] ""
-      
-      $featureID
-      integer(0)
-      
-
----
-
-    Code
-      esriUrl_parseUrl("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services")
-    Output
-      $url
-      [1] "https://sampleserver1.arcgisonline.com/ArcGIS/rest/services"
-      
-      $scheme
-      [1] "https://"
-      
-      $host
-      [1] "sampleserver1.arcgisonline.com"
+      [1] "sampleserver6.arcgisonline.com"
       
       $instance
       [1] "ArcGIS"
