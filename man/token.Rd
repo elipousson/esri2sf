@@ -75,8 +75,8 @@ for more information.
 }
 \section{Functions}{
 \itemize{
-\item \code{generateToken}: Create ArcGIS REST Service Token
+\item \code{generateToken()}: Create ArcGIS REST Service Token
 
-\item \code{generateOAuthToken}: Create ArcGIS OAuth Token
+\item \code{generateOAuthToken()}: Create ArcGIS OAuth Token
+
 }}
-

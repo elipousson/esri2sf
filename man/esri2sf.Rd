@@ -3,7 +3,7 @@
 \name{esri2sf}
 \alias{esri2sf}
 \alias{esri2df}
-\title{Import data from ESRI's ArcGIS Server}
+\title{Get data or metadata from an ArcGIS MapServer or FeatureServer}
 \usage{
 esri2sf(
   url,
@@ -34,7 +34,7 @@ esri2df(
 }
 \arguments{
 \item{url}{A service url, e.g.
-\url{https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/}
+\url{https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/2}
 or an ArcGIS Online item url if the item contains a single feature or
 table layer.}
 
@@ -44,9 +44,9 @@ all fields.}
 \item{where}{string for where condition. Default is \code{NULL} (equivalent to
 \code{1=1}) to return all rows.}
 
-\item{geometry}{An \code{sf} or \code{bbox} object. Currently, \code{sf} objects with a single
-POINT feature are supported. All other \code{sf} objects are converted to \code{bbox}
-objects.}
+\item{geometry}{An \code{sf} or \code{bbox} object. Currently, \code{sf} objects with a
+single POINT feature are supported. All other \code{sf} objects are converted to
+\code{bbox} objects.}
 
 \item{bbox}{bbox class object from \code{\link[sf:st_bbox]{sf::st_bbox()}} or a simple feature object
 that can be converted to a bounding box.}
@@ -55,9 +55,9 @@ that can be converted to a bounding box.}
 
 \item{crs}{coordinate reference system (see \code{\link[sf:sf]{sf::st_sf()}}). Should either be
 \code{NULL} or a CRS that can be handled by GDAL through sf::st_sf(). Default is
-\code{getOption("esri2sf.crs", 4326)} which sets the CRS to EPSG:4326 if no option
-is set. If CRS is \code{NULL} feature is returned with the same CRS that the
-layer is hosted as in the Feature/Map Server.}
+\code{getOption("esri2sf.crs", 4326)} which sets the CRS to EPSG:4326 if no
+option is set. If CRS is \code{NULL} feature is returned with the same CRS that
+the layer is hosted as in the Feature/Map Server.}
 
 \item{progress}{Show progress bar from \code{\link[cli:cli_progress_along]{cli::cli_progress_along()}} if \code{TRUE}.
 Default \code{FALSE}.}
@@ -73,8 +73,11 @@ performing the query; defaults to \code{NULL} (equivalent to
 "esriSpatialRelEnvelopeIntersects", "esriSpatialRelIndexIntersects",
 "esriSpatialRelOverlaps", "esriSpatialRelTouches", "esriSpatialRelWithin"}
 
-\item{replaceDomainInfo}{If \code{TRUE}, add domain information to the return data frame.
-Default \code{FALSE}.}
+\item{replaceDomainInfo}{If \code{TRUE}, add domain information to the return data
+frame. Default \code{FALSE}.}
+
+\item{quiet}{If \code{TRUE}, use \code{\link[=suppressMessages]{suppressMessages()}} to prevent the printing of
+messages about the requested layer. Defaults to \code{FALSE}.}
 
 \item{...}{additional named parameters to pass to the query. (e.g.
 \code{"resultRecordCount = 3"}). See the \href{https://developers.arcgis.com/rest/services-reference/enterprise/query-map-service-layer-.htm}{ArcGIS REST APIs documentation}
@@ -89,22 +92,21 @@ These functions are the interface to the user.
 }
 \section{Functions}{
 \itemize{
-\item \code{esri2sf}: Retrieve spatial object
+\item \code{esri2sf()}: Retrieve spatial object
 
-\item \code{esri2df}: Retrieve table object (no spatial data).
+\item \code{esri2df()}: Retrieve table object (no spatial data).
+
 }}
-
 \note{
 When accessing services with multiple layers, the layer number must be
 specified at the end of the service url (e.g.,
-\url{https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3}).
+\url{https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/2}).
 #' The list of layers and their respective id numbers can be found by viewing
-the service's url in a web browser and viewing the "Layers" heading (e.g.,
-\url{https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/#mapLayerList}).
+the service's url in a web browser and viewing the "Layers" heading.
 }
 \examples{
-baseURL <- "https://sampleserver1.arcgisonline.com/ArcGIS/rest/"
-url <- paste0(baseURL, "services/Demographics/ESRI_Census_USA/MapServer/3")
+baseURL <- "https://sampleserver6.arcgisonline.com/arcgis/rest/"
+url <- paste0(baseURL, "services/Census/MapServer/2")
 outFields <- c("POP2007", "POP2000")
 where <- "STATE_NAME = 'Michigan'"
 df <- esri2sf(url, outFields = outFields, where = where)

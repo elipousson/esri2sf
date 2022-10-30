@@ -74,27 +74,27 @@ service.
 }
 \section{Functions}{
 \itemize{
-\item \code{esriUrl_isValid}: Check if url is valid for an ESRI REST Service. General
+\item \code{esriUrl_isValid()}: Check if url is valid for an ESRI REST Service. General
 to include potential layer id too.
 
-\item \code{esriUrl_isValidRoot}: Check if url is valid for the root of an ESRI REST
+\item \code{esriUrl_isValidRoot()}: Check if url is valid for the root of an ESRI REST
 Server.
 
-\item \code{esriUrl_isValidFolder}: Check if url is valid for a folder of an ESRI REST
+\item \code{esriUrl_isValidFolder()}: Check if url is valid for a folder of an ESRI REST
 Server.
 
-\item \code{esriUrl_isValidService}: Check if url is valid for a Service of an ESRI REST
+\item \code{esriUrl_isValidService()}: Check if url is valid for a Service of an ESRI REST
 Server. No feature ID.
 
-\item \code{esriUrl_isValidID}: DEPRECATED Use esriUrl_isValidFeature
+\item \code{esriUrl_isValidID()}: DEPRECATED Use esriUrl_isValidFeature
 
-\item \code{esriUrl_isValidFeature}: Check if url is valid for a feature of an ESRI REST
+\item \code{esriUrl_isValidFeature()}: Check if url is valid for a feature of an ESRI REST
 Service.
 
-\item \code{esriUrl_ServerUrl}: DEPRECATED Use esriUrl_serviceUrl
+\item \code{esriUrl_ServerUrl()}: DEPRECATED Use esriUrl_serviceUrl
 
-\item \code{esriUrl_serviceUrl}: Retrieve Map/Feature Server URL
+\item \code{esriUrl_serviceUrl()}: Retrieve Map/Feature Server URL
 
-\item \code{esriUrl_parseUrl}: Parse Url into parts.
+\item \code{esriUrl_parseUrl()}: Parse Url into parts.
+
 }}
-
