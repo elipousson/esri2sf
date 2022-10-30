@@ -49,8 +49,13 @@ return the response. If \code{FALSE}, return the request.}
 \link[httr2:req_error]{httr2::req_error} function. If \code{TRUE}, the request does not use
 \link[httr2:req_error]{httr2::req_error}.}
 
+\item{.body_form}{If objectIds is \code{NULL} and .body_form is \code{TRUE}, generate
+the request using \code{\link[httr2:req_body]{httr2::req_body_form()}}. Defaults to \code{FALSE}.}
+
 \item{...}{Additional parameters passed to \link[httr2:req_url]{httr2::req_url_query}}
 }
 \description{
-Use httr2 to create a request for the ArcGIS REST API
+This function is primarily useful for the development of new functions to
+access the ArcGIS REST API. Most users do not need to use this function
+directly.
 }

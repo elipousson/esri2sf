@@ -1,5 +1,9 @@
 #' Use httr2 to create a request for the ArcGIS REST API
 #'
+#' This function is primarily useful for the development of new functions to
+#' access the ArcGIS REST API. Most users do not need to use this function
+#' directly.
+#'
 #' @param url A folder, service, or layer URL that can be used with the ArcGIS
 #'   REST API.
 #' @param append String to append to url using [httr2::req_url_path_append];
@@ -20,6 +24,8 @@
 #' @param .is_error If `FALSE`, .is_error is passed to the is_error parameter of
 #'   [httr2::req_error] function. If `TRUE`, the request does not use
 #'   [httr2::req_error].
+#' @param .body_form If objectIds is `NULL` and .body_form is `TRUE`, generate
+#'   the request using [httr2::req_body_form()]. Defaults to `FALSE`.
 #' @param ... Additional parameters passed to [httr2::req_url_query]
 #' @export
 #' @importFrom httr2 request req_url_path_append req_url_query req_body_form
