@@ -3,12 +3,21 @@ serviceTypes <- c(
   "GeometryServer", "ImageServer"
 )
 
+#' Is the ESRI url a valid type?
+#'
+#' Confirms if the url is an ESRI URL and optionally returns the URL type or, if
+#' it is not valid, the reason the url appears to be invalid.
+#'
+#' @noRd
+#' @importFrom stats setNames
+#' @importFrom cli cli_inform
 esriUrl_isValidType <- function(url,
                                 token = NULL,
                                 type = NULL,
                                 displayReason = FALSE,
                                 returnType = FALSE,
-                                call = parent.frame()) {
+                                call = .envir,
+                                .envir = parent.frame()) {
   servicesUrl <- grepl("/rest/services", url)
   servicesUrl_types <- c("root", "folder", "service", "feature", "content")
 
@@ -31,7 +40,7 @@ esriUrl_isValidType <- function(url,
       "service" = (grepl(paste0("/(", paste0(serviceTypes, collapse = "|"), ")/?$"), url)),
       "feature" = (grepl(paste0("/(", paste0(serviceTypes, collapse = "|"), ")/[[:digit:]]+/?$"), url)),
       "content" = grepl("/content/", url),
-      setNames(rep_len(FALSE, length(siteUrl_types)), siteUrl_types)
+      stats::setNames(rep_len(FALSE, length(siteUrl_types)), siteUrl_types)
     )
   } else if (siteUrl) {
     isType <- c(
@@ -40,7 +49,7 @@ esriUrl_isValidType <- function(url,
       "group" = grepl("/home/group\\.html\\?id=", url),
       "user" = grepl("/home/user\\.html\\?user=", url),
       "app" = grepl("/index\\.html\\?appid=", url),
-      setNames(rep_len(FALSE, length(servicesUrl_types)), servicesUrl_types)
+      stats::setNames(rep_len(FALSE, length(servicesUrl_types)), servicesUrl_types)
     )
   }
 
@@ -48,7 +57,7 @@ esriUrl_isValidType <- function(url,
   out <- FALSE
 
   if (!is.null(type)) {
-    out <- type %in% url_types
+    out <- any(type %in% url_types)
   } else if (!is.null(url_types)) {
     out <- !identical(url_types, character(0)) | servicesUrl
   }
@@ -69,14 +78,20 @@ esriUrl_isValidType <- function(url,
           "app" = "A {.val {type}} type {.arg url} must include '/index.html?appid=':"
         )
 
-      cli::cli_inform(c("!" = reason, " " = "{.url {url}}"), call = parent.frame())
+      cli::cli_inform(c("!" = reason, " " = "{.url {url}}"),
+        call = call,
+        .envir = .envir
+      )
     }
 
-    cli::cli_inform(c("!" = "Invalid {.arg url}: {.url {url}}"), call = parent.frame())
+    cli::cli_inform(c("!" = "Invalid {.arg url}: {.url {url}}"),
+      call = call,
+      .envir = .envir
+    )
   }
 
   if (returnType) {
-    if (is.null(type)) {
+    if (!out && is.null(type)) {
       return(NA_character_)
     }
 
