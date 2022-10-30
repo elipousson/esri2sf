@@ -230,7 +230,7 @@ esriIndexLayers <- function(url,
   index <-
     dplyr::bind_cols(
       index,
-      "url" = paste0(url, "/", index$id),
+      "url" = paste0(gsub("/$", "", url), "/", index$id),
       "folderPath" = folderPath,
       "serviceName" = serviceName
     )
