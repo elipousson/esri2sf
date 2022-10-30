@@ -79,7 +79,7 @@ plot(df)
 You can filter rows as well by providing a `where` condition in standardized SQL (SQL-92) that is applied to non-spatial attributes. See[ the ArcGIS documentation](https://enterprise.arcgis.com/en/portal/latest/use/calculate-fields.htm#ESRI_SECTION1_28F344E2E80C410A98D443FF301DF989) for more information on supported operators and functions.
 
 ```{r polygon}
-url <- "https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3"
+url <- "https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/2"
 
 mi <- esri2sf(
   url,
@@ -97,7 +97,7 @@ plot(mi)
 You can download non-spatial tables of the 'Table' layer type using `esri2df()`.
 
 ```{r tables}
-df <- esri2df("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/WaterTemplate/WaterDistributionInventoryReport/MapServer/5", objectIds = paste(1:50, collapse = ","))
+df <- esri2df("https://sampleserver6.arcgisonline.com/arcgis/rest/services/SF311/MapServer/1", objectIds = paste(22696727:22696777, collapse = ","))
 
 df
 ```
@@ -129,7 +129,7 @@ When specifying the CRS parameter, any transformation that happens will be done 
 By default, `esri2sf()` will transform any data to WGS 1984 (EPSG:4326), but it may be safer to set `crs = NULL` which will return the data in the same CRS as the host service. You can also set an alternate default crs using `options`, e.g. `options("esri2sf.crs", 3857)`.
 
 ```{r}
-url <- "https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3"
+url <- "https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/2"
 where <- "STATE_NAME = 'Michigan'"
 outFields <- c("POP2000", "pop2007", "POP00_SQMI", "POP07_SQMI")
 
@@ -174,7 +174,7 @@ coord_diff(df2, df3)
 The `esriRequest()` function has also made it easier to build new functions for ArcGIS REST API services. `esriCatalog()` uses the [Catalog endpoint](https://developers.arcgis.com/rest/services-reference/enterprise/catalog.htm) to return a list of folders and layers.
 
 ```{r}
-url <- "https://sampleserver1.arcgisonline.com/ArcGIS/rest/services"
+url <- "https://sampleserver6.arcgisonline.com/ArcGIS/rest/services"
 
 esriCatalog(url)
 ```
@@ -199,4 +199,11 @@ url <- "https://geodata.baltimorecity.gov/egis/rest/services/Locator/EGISComposi
 esrigeocode(url, address = "100 HOLLIDAY STREET")
 ```
 
+## Related packages and projects
 
+- [{arcgisbinding}](https://github.com/R-ArcGIS/r-bridge) and the [R-ArcGIS Bridge](https://www.esri.com/en-us/arcgis/products/r-arcgis-bridge/overview)
+- [{geosapi}](https://github.com/eblondel/geosapi): GeoServer REST API R Interface
+- [{aarapir}](https://github.com/mps9506/aarapir): Access ArcGIS online API enpoints with R
+- [Geocoding Addresses with the ArcGIS REST API (Stanford Affiliates Only)](https://github.com/cengel/ArcGIS_geocoding)
+- [{RPyGeo}](https://github.com/r-spatial/RPyGeo)
+- [All things R Spatial](https://arc2r.github.io/book/): An introduction to spatial R for ArcGIS users ([repo](https://github.com/arc2r/book))

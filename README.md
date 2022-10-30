@@ -69,14 +69,14 @@ url <- "https://services.arcgis.com/V6ZHFr6zdgNZuVG0/arcgis/rest/services/Landsc
 
 df <- esri2sf(url)
 #> ✔ Downloading "Landscape_Trees" from
-#>   <https://services.arcgis.com/V6ZHFr6zdgNZuVG0/arcgis/rest/services/Landscape_Trees/FeatureServer/0>
+#>   <]8;;https://services.arcgis.com/V6ZHFr6zdgNZuVG0/arcgis/rest/services/Landscape_Trees/FeatureServer/0https://services.arcgis.com/V6ZHFr6zdgNZuVG0/arcgis/rest/services/Landscape_Trees/FeatureServer/0]8;;>
 #> Layer type: "Feature Layer"
 #> 
 #> Geometry type: "esriGeometryPoint"
 #> 
-#> Service Coordinate Reference System: "EPSG:3857"
+#> Service CRS: "EPSG:3857"
 #> 
-#> Output Coordinate Reference System: "EPSG:4326"
+#> Output CRS: "EPSG:4326"
 
 plot(df)
 #> Warning: plotting the first 9 out of 56 attributes; use max.plot = 56 to plot
@@ -147,14 +147,14 @@ esrimeta(url, fields = TRUE)
 
 df <- esri2sf(url, outFields = c("AADT", "DFLG"))
 #> ✔ Downloading "Florida_Annual_Average_Daily_Traffic" from
-#>   <https://services.arcgis.com/V6ZHFr6zdgNZuVG0/arcgis/rest/services/Florida_Annual_Average_Daily_Traffic/FeatureServer/0>
+#>   <]8;;https://services.arcgis.com/V6ZHFr6zdgNZuVG0/arcgis/rest/services/Florida_Annual_Average_Daily_Traffic/FeatureServer/0https://services.arcgis.com/V6ZHFr6zdgNZuVG0/arcgis/rest/services/Florida_Annual_Average_Daily_Traffic/FeatureServer/0]8;;>
 #> Layer type: "Feature Layer"
 #> 
 #> Geometry type: "esriGeometryPolyline"
 #> 
-#> Service Coordinate Reference System: "EPSG:3857"
+#> Service CRS: "EPSG:3857"
 #> 
-#> Output Coordinate Reference System: "EPSG:4326"
+#> Output CRS: "EPSG:4326"
 
 plot(df)
 ```
@@ -172,22 +172,22 @@ documentation](https://enterprise.arcgis.com/en/portal/latest/use/calculate-fiel
 for more information on supported operators and functions.
 
 ``` r
-url <- "https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3"
+url <- "https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/2"
 
 mi <- esri2sf(
   url,
   where = "STATE_NAME = 'Michigan'",
   outFields = c("POP2000", "pop2007", "POP00_SQMI", "POP07_SQMI")
 )
-#> ✔ Downloading "Coarse Counties" from
-#>   <https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3>
+#> ✔ Downloading "Detailed Counties" from
+#>   <]8;;https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/2https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/2]8;;>
 #> Layer type: "Feature Layer"
 #> 
 #> Geometry type: "esriGeometryPolygon"
 #> 
-#> Service Coordinate Reference System: "EPSG:4269"
+#> Service CRS: "EPSG:4269"
 #> 
-#> Output Coordinate Reference System: "EPSG:4326"
+#> Output CRS: "EPSG:4326"
 
 plot(mi)
 ```
@@ -202,26 +202,26 @@ You can download non-spatial tables of the ‘Table’ layer type using
 `esri2df()`.
 
 ``` r
-df <- esri2df("https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/WaterTemplate/WaterDistributionInventoryReport/MapServer/5", objectIds = paste(1:50, collapse = ","))
-#> ✔ Downloading "AssetCondition"
+df <- esri2df("https://sampleserver6.arcgisonline.com/arcgis/rest/services/SF311/MapServer/1", objectIds = paste(22696727:22696777, collapse = ","))
+#> ✔ Downloading "SF_Crime_Incidents"
 #> Layer type: "Table"
 
 df
-#> # A tibble: 50 × 6
-#>    OBJECTID FACILITYID FCLASS ASSETCOND CONDDATE REPLSCORE
-#>       <int> <chr>      <chr>  <lgl>     <lgl>        <int>
-#>  1        1 1          wMain  NA        NA               0
-#>  2        2 2          wMain  NA        NA              45
-#>  3        3 3          wMain  NA        NA              45
-#>  4        4 4          wMain  NA        NA              45
-#>  5        5 5          wMain  NA        NA              15
-#>  6        6 6          wMain  NA        NA              15
-#>  7        7 1          wMain  NA        NA               0
-#>  8        8 2          wMain  NA        NA              45
-#>  9        9 3          wMain  NA        NA              45
-#> 10       10 4          wMain  NA        NA              45
-#> # … with 40 more rows
-#> # ℹ Use `print(n = ...)` to see more rows
+#> # A tibble: 51 × 10
+#>    objectid incidn…¹ categ…² descr…³ dayof…⁴ date_ time  pddis…⁵ resol…⁶ datet…⁷
+#>       <int> <chr>    <chr>   <chr>   <chr>   <chr> <chr> <chr>   <chr>     <dbl>
+#>  1 22696727 0960696… LARCEN… GRAND … Sunday  08/1… 21:00 INGLES… NONE    1.25e12
+#>  2 22696728 0960697… LARCEN… GRAND … Saturd… 08/1… 18:00 INGLES… NONE    1.25e12
+#>  3 22696729 0960697… LARCEN… GRAND … Monday  08/1… 09:00 CENTRAL NONE    1.25e12
+#>  4 22696730 0960697… LARCEN… GRAND … Thursd… 08/1… 18:30 CENTRAL NONE    1.25e12
+#>  5 22696731 0960697… LARCEN… GRAND … Saturd… 08/1… 15:00 CENTRAL NONE    1.25e12
+#>  6 22696732 0960697… LARCEN… GRAND … Saturd… 08/1… 14:30 CENTRAL NONE    1.25e12
+#>  7 22696733 0960697… LARCEN… GRAND … Saturd… 08/1… 19:30 CENTRAL NONE    1.25e12
+#>  8 22696734 0960698… LARCEN… GRAND … Saturd… 08/1… 21:00 CENTRAL NONE    1.25e12
+#>  9 22696735 0960698… LARCEN… GRAND … Sunday  08/1… 10:45 CENTRAL NONE    1.25e12
+#> 10 22696736 0960698… VANDAL… MALICI… Sunday  08/1… 13:25 CENTRAL NONE    1.25e12
+#> # … with 41 more rows, and abbreviated variable names ¹​incidntnum, ²​category,
+#> #   ³​descript, ⁴​dayofweek, ⁵​pddistrict, ⁶​resolution, ⁷​datetime
 ```
 
 In some cases, tables may include coordinates as numeric attribute
@@ -233,17 +233,18 @@ box filter condition using the following format:
 bbox <- sf::st_bbox(mi)
 coords <- c("longitude", "latitude")
 
-where <- paste0(c(
-  sprintf("(%s >= %s)", coords[1], bbox$xmin),
-  sprintf("(%s <= %s)", coords[1], bbox$xmax),
-  sprintf("(%s >= %s)", coords[2], bbox$ymin),
-  sprintf("(%s <= %s)", coords[2], bbox$ymax)
-),
-collapse = " AND "
+where <- paste0(
+  c(
+    sprintf("(%s >= %s)", coords[1], bbox$xmin),
+    sprintf("(%s <= %s)", coords[1], bbox$xmax),
+    sprintf("(%s >= %s)", coords[2], bbox$ymin),
+    sprintf("(%s <= %s)", coords[2], bbox$ymax)
+  ),
+  collapse = " AND "
 )
 
 where
-#> [1] "(longitude >= -90.4081998349311) AND (longitude <= -82.419835847249) AND (latitude >= 41.6974947570863) AND (latitude <= 48.1737952928041)"
+#> [1] "(longitude >= -90.4181359945804) AND (longitude <= -82.4183959883841) AND (latitude >= 41.6960880241431) AND (latitude <= 48.1895339877034)"
 ```
 
 ### Using the `crs` parameter
@@ -261,67 +262,67 @@ the same CRS as the host service. You can also set an alternate default
 crs using `options`, e.g. `options("esri2sf.crs", 3857)`.
 
 ``` r
-url <- "https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3"
+url <- "https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/2"
 where <- "STATE_NAME = 'Michigan'"
 outFields <- c("POP2000", "pop2007", "POP00_SQMI", "POP07_SQMI")
 
 # default crs = 4326
 esri2sf(url, where = where, outFields = outFields)
-#> ✔ Downloading "Coarse Counties" from
-#>   <https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3>
+#> ✔ Downloading "Detailed Counties" from
+#>   <]8;;https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/2https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/2]8;;>
 #> Layer type: "Feature Layer"
 #> 
 #> Geometry type: "esriGeometryPolygon"
 #> 
-#> Service Coordinate Reference System: "EPSG:4269"
+#> Service CRS: "EPSG:4269"
 #> 
-#> Output Coordinate Reference System: "EPSG:4326"
+#> Output CRS: "EPSG:4326"
 #> Simple feature collection with 83 features and 4 fields
 #> Geometry type: MULTIPOLYGON
 #> Dimension:     XY
-#> Bounding box:  xmin: -90.4082 ymin: 41.69749 xmax: -82.41984 ymax: 48.1738
+#> Bounding box:  xmin: -90.41814 ymin: 41.69609 xmax: -82.4184 ymax: 48.18953
 #> Geodetic CRS:  WGS 84
 #> First 10 features:
 #>    POP2000 POP2007 POP00_SQMI POP07_SQMI                          geoms
-#> 1     2301    2324        4.1        4.2 MULTIPOLYGON (((-88.49753 4...
-#> 2    36016   36791       34.6       35.3 MULTIPOLYGON (((-88.50068 4...
-#> 3     7818    7444        5.9        5.6 MULTIPOLYGON (((-88.98743 4...
-#> 4     8746    8760        9.5        9.5 MULTIPOLYGON (((-88.67172 4...
-#> 5    64634   64904       34.6       34.7 MULTIPOLYGON (((-87.6137 45...
-#> 6    17370   17057       15.2       14.9 MULTIPOLYGON (((-88.9853 46...
-#> 7     7024    7159        7.6        7.7 MULTIPOLYGON (((-85.85923 4...
-#> 8     9862   10188       10.5       10.9 MULTIPOLYGON (((-87.11047 4...
-#> 9     8903    8781        7.3        7.2 MULTIPOLYGON (((-86.45828 4...
-#> 10   13138   12750       10.8       10.5 MULTIPOLYGON (((-88.9252 46...
+#> 1    11719   11941       16.9       17.2 MULTIPOLYGON (((-83.88856 4...
+#> 2     9862   10188       10.5       10.9 MULTIPOLYGON (((-86.64985 4...
+#> 3   105665  116417      125.4      138.2 MULTIPOLYGON (((-86.2447 42...
+#> 4    31314   30120       52.8       50.8 MULTIPOLYGON (((-83.88972 4...
+#> 5    23110   25435       44.0       48.5 MULTIPOLYGON (((-85.38891 4...
+#> 6    17269   17912       47.0       48.7 MULTIPOLYGON (((-84.16662 4...
+#> 7     8746    8760        9.5        9.5 MULTIPOLYGON (((-88.64074 4...
+#> 8    56755   60956       98.3      105.6 MULTIPOLYGON (((-85.54387 4...
+#> 9   110157  109920      245.9      245.3 MULTIPOLYGON (((-84.16703 4...
+#> 10   15998   18565       46.0       53.4 MULTIPOLYGON (((-86.25825 4...
 
 # No transformation (recommended)
 esri2sf(url, where = where, outFields = outFields, crs = NULL)
-#> ✔ Downloading "Coarse Counties" from
-#>   <https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3>
+#> ✔ Downloading "Detailed Counties" from
+#>   <]8;;https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/2https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/2]8;;>
 #> Layer type: "Feature Layer"
 #> 
 #> Geometry type: "esriGeometryPolygon"
 #> 
-#> Service Coordinate Reference System: "EPSG:4269"
+#> Service CRS: "EPSG:4269"
 #> 
-#> Output Coordinate Reference System: "EPSG:4269"
+#> Output CRS: "EPSG:4269"
 #> Simple feature collection with 83 features and 4 fields
 #> Geometry type: MULTIPOLYGON
 #> Dimension:     XY
-#> Bounding box:  xmin: -90.4082 ymin: 41.69749 xmax: -82.41984 ymax: 48.1738
+#> Bounding box:  xmin: -90.41813 ymin: 41.69608 xmax: -82.41839 ymax: 48.18953
 #> Geodetic CRS:  NAD83
 #> First 10 features:
 #>    POP2000 POP2007 POP00_SQMI POP07_SQMI                          geoms
-#> 1     2301    2324        4.1        4.2 MULTIPOLYGON (((-88.49753 4...
-#> 2    36016   36791       34.6       35.3 MULTIPOLYGON (((-88.50068 4...
-#> 3     7818    7444        5.9        5.6 MULTIPOLYGON (((-88.98743 4...
-#> 4     8746    8760        9.5        9.5 MULTIPOLYGON (((-88.67172 4...
-#> 5    64634   64904       34.6       34.7 MULTIPOLYGON (((-87.6137 45...
-#> 6    17370   17057       15.2       14.9 MULTIPOLYGON (((-88.9853 46...
-#> 7     7024    7159        7.6        7.7 MULTIPOLYGON (((-85.85923 4...
-#> 8     9862   10188       10.5       10.9 MULTIPOLYGON (((-87.11047 4...
-#> 9     8903    8781        7.3        7.2 MULTIPOLYGON (((-86.45828 4...
-#> 10   13138   12750       10.8       10.5 MULTIPOLYGON (((-88.9252 46...
+#> 1    11719   11941       16.9       17.2 MULTIPOLYGON (((-83.88856 4...
+#> 2     9862   10188       10.5       10.9 MULTIPOLYGON (((-86.64984 4...
+#> 3   105665  116417      125.4      138.2 MULTIPOLYGON (((-86.24469 4...
+#> 4    31314   30120       52.8       50.8 MULTIPOLYGON (((-83.88971 4...
+#> 5    23110   25435       44.0       48.5 MULTIPOLYGON (((-85.3889 45...
+#> 6    17269   17912       47.0       48.7 MULTIPOLYGON (((-84.16662 4...
+#> 7     8746    8760        9.5        9.5 MULTIPOLYGON (((-88.64073 4...
+#> 8    56755   60956       98.3      105.6 MULTIPOLYGON (((-85.54387 4...
+#> 9   110157  109920      245.9      245.3 MULTIPOLYGON (((-84.16702 4...
+#> 10   15998   18565       46.0       53.4 MULTIPOLYGON (((-86.25824 4...
 ```
 
 Since the addition of the `WKT1_ESRI` output from `sf::st_crs()` in sf
@@ -336,39 +337,39 @@ the ESRI:102690 CRS.
 ``` r
 # ESRI Authority Code
 df1 <- esri2sf(url, where = where, outFields = outFields, crs = "ESRI:102690")
-#> ✔ Downloading "Coarse Counties" from
-#>   <https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3>
+#> ✔ Downloading "Detailed Counties" from
+#>   <]8;;https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/2https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/2]8;;>
 #> Layer type: "Feature Layer"
 #> 
 #> Geometry type: "esriGeometryPolygon"
 #> 
-#> Service Coordinate Reference System: "EPSG:4269"
+#> Service CRS: "EPSG:4269"
 #> 
-#> Output Coordinate Reference System: "ESRI:102690"
+#> Output CRS: "ESRI:102690"
 # PROJ string
 df2 <- esri2sf(url, where = where, outFields = outFields, crs = "+proj=lcc +lat_1=42.1 +lat_2=43.66666666666666 +lat_0=41.5 +lon_0=-84.36666666666666 +x_0=4000000 +y_0=0 +datum=NAD83 +units=us-ft +no_defs")
-#> ✔ Downloading "Coarse Counties" from
-#>   <https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3>
+#> ✔ Downloading "Detailed Counties" from
+#>   <]8;;https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/2https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/2]8;;>
 #> Layer type: "Feature Layer"
 #> 
 #> Geometry type: "esriGeometryPolygon"
 #> 
-#> Service Coordinate Reference System: "EPSG:4269"
+#> Service CRS: "EPSG:4269"
 #> 
-#> Output Coordinate Reference System: "+proj=lcc +lat_1=42.1
-#> +lat_2=43.66666666666666 +lat_0=41.5 +lon_0=-84.36666666666666 +x_0=4000000
-#> +y_0=0 +datum=NAD83 +units=us-ft +no_defs"
+#> Output CRS: "+proj=lcc +lat_1=42.1 +lat_2=43.66666666666666 +lat_0=41.5
+#> +lon_0=-84.36666666666666 +x_0=4000000 +y_0=0 +datum=NAD83 +units=us-ft
+#> +no_defs"
 # OGC WKT
 df3 <- esri2sf(url, where = where, outFields = outFields, crs = 'PROJCS["NAD_1983_StatePlane_Michigan_South_FIPS_2113_Feet",GEOGCS["GCS_North_American_1983",DATUM["North_American_Datum_1983",SPHEROID["GRS_1980",6378137,298.257222101]],PRIMEM["Greenwich",0],UNIT["Degree",0.017453292519943295]],PROJECTION["Lambert_Conformal_Conic_2SP"],PARAMETER["False_Easting",13123333.33333333],PARAMETER["False_Northing",0],PARAMETER["Central_Meridian",-84.36666666666666],PARAMETER["Standard_Parallel_1",42.1],PARAMETER["Standard_Parallel_2",43.66666666666666],PARAMETER["Latitude_Of_Origin",41.5],UNIT["Foot_US",0.30480060960121924],AUTHORITY["EPSG","102690"]]')
-#> ✔ Downloading "Coarse Counties" from
-#>   <https://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Census_USA/MapServer/3>
+#> ✔ Downloading "Detailed Counties" from
+#>   <]8;;https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/2https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/2]8;;>
 #> Layer type: "Feature Layer"
 #> 
 #> Geometry type: "esriGeometryPolygon"
 #> 
-#> Service Coordinate Reference System: "EPSG:4269"
+#> Service CRS: "EPSG:4269"
 #> 
-#> Output Coordinate Reference System:
+#> Output CRS:
 #> "PROJCS[\"NAD_1983_StatePlane_Michigan_South_FIPS_2113_Feet\",GEOGCS[\"GCS_North_American_1983\",DATUM[\"North_American_Datum_1983\",SPHEROID[\"GRS_1980\",6378137,298.257222101]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],PROJECTION[\"Lambert_Conformal_Conic_2SP\"],PARAMETER[\"False_Easting\",13123333.33333333],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",-84.36666666666666],PARAMETER[\"Standard_Parallel_1\",42.1],PARAMETER[\"Standard_Parallel_2\",43.66666666666666],PARAMETER[\"Latitude_Of_Origin\",41.5],UNIT[\"Foot_US\",0.30480060960121924],AUTHORITY[\"EPSG\",\"102690\"]]"
 ```
 
@@ -386,14 +387,14 @@ coord_diff <- function(df1, df2) {
   })
 }
 coord_diff(df1, df2)
-#>             x             y 
-#>  1.827251e-08 -1.191372e-09
+#>         x         y 
+#>  1.356311 -3.104968
 coord_diff(df1, df3)
-#>             x             y 
-#>  1.827251e-08 -1.191372e-09
-coord_diff(df2, df3)
 #> x y 
 #> 0 0
+coord_diff(df2, df3)
+#>         x         y 
+#> -1.356311  3.104968
 ```
 
 ### Additional functions
@@ -405,51 +406,548 @@ endpoint](https://developers.arcgis.com/rest/services-reference/enterprise/catal
 to return a list of folders and layers.
 
 ``` r
-url <- "https://sampleserver1.arcgisonline.com/ArcGIS/rest/services"
+url <- "https://sampleserver6.arcgisonline.com/ArcGIS/rest/services"
 
 esriCatalog(url)
 #> $currentVersion
-#> [1] 10.01
+#> [1] 10.91
 #> 
 #> $folders
 #> $folders[[1]]
-#> [1] "Demographics"
+#> [1] "AGP"
 #> 
 #> $folders[[2]]
 #> [1] "Elevation"
 #> 
 #> $folders[[3]]
-#> [1] "Locators"
+#> [1] "Energy"
 #> 
 #> $folders[[4]]
-#> [1] "Louisville"
+#> [1] "LocalGovernment"
 #> 
 #> $folders[[5]]
-#> [1] "Network"
+#> [1] "Locators"
 #> 
 #> $folders[[6]]
-#> [1] "Petroleum"
+#> [1] "NetworkAnalysis"
 #> 
 #> $folders[[7]]
-#> [1] "PublicSafety"
+#> [1] "Oblique"
 #> 
 #> $folders[[8]]
-#> [1] "Specialty"
+#> [1] "OsoLandslide"
 #> 
 #> $folders[[9]]
-#> [1] "TaxParcel"
+#> [1] "ScientificData"
 #> 
 #> $folders[[10]]
-#> [1] "WaterTemplate"
+#> [1] "SpatioTemporalAggregation"
+#> 
+#> $folders[[11]]
+#> [1] "StoryMaps"
+#> 
+#> $folders[[12]]
+#> [1] "Sync"
+#> 
+#> $folders[[13]]
+#> [1] "Utilities"
 #> 
 #> 
 #> $services
 #> $services[[1]]
 #> $services[[1]]$name
-#> [1] "Geometry"
+#> [1] "911CallsHotspot"
 #> 
 #> $services[[1]]$type
-#> [1] "GeometryServer"
+#> [1] "GPServer"
+#> 
+#> 
+#> $services[[2]]
+#> $services[[2]]$name
+#> [1] "911CallsHotspot"
+#> 
+#> $services[[2]]$type
+#> [1] "MapServer"
+#> 
+#> 
+#> $services[[3]]
+#> $services[[3]]$name
+#> [1] "911CallsHotspotPro"
+#> 
+#> $services[[3]]$type
+#> [1] "GPServer"
+#> 
+#> 
+#> $services[[4]]
+#> $services[[4]]$name
+#> [1] "Census"
+#> 
+#> $services[[4]]$type
+#> [1] "MapServer"
+#> 
+#> 
+#> $services[[5]]
+#> $services[[5]]$name
+#> [1] "CharlotteLAS"
+#> 
+#> $services[[5]]$type
+#> [1] "ImageServer"
+#> 
+#> 
+#> $services[[6]]
+#> $services[[6]]$name
+#> [1] "CommercialDamageAssessment"
+#> 
+#> $services[[6]]$type
+#> [1] "FeatureServer"
+#> 
+#> 
+#> $services[[7]]
+#> $services[[7]]$name
+#> [1] "CommercialDamageAssessment"
+#> 
+#> $services[[7]]$type
+#> [1] "MapServer"
+#> 
+#> 
+#> $services[[8]]
+#> $services[[8]]$name
+#> [1] "CommunityAddressing"
+#> 
+#> $services[[8]]$type
+#> [1] "FeatureServer"
+#> 
+#> 
+#> $services[[9]]
+#> $services[[9]]$name
+#> [1] "CommunityAddressing"
+#> 
+#> $services[[9]]$type
+#> [1] "MapServer"
+#> 
+#> 
+#> $services[[10]]
+#> $services[[10]]$name
+#> [1] "DamageAssessment"
+#> 
+#> $services[[10]]$type
+#> [1] "FeatureServer"
+#> 
+#> 
+#> $services[[11]]
+#> $services[[11]]$name
+#> [1] "DamageAssessment"
+#> 
+#> $services[[11]]$type
+#> [1] "MapServer"
+#> 
+#> 
+#> $services[[12]]
+#> $services[[12]]$name
+#> [1] "DamageAssessmentStatePlane"
+#> 
+#> $services[[12]]$type
+#> [1] "FeatureServer"
+#> 
+#> 
+#> $services[[13]]
+#> $services[[13]]$name
+#> [1] "DamageAssessmentStatePlane"
+#> 
+#> $services[[13]]$type
+#> [1] "MapServer"
+#> 
+#> 
+#> $services[[14]]
+#> $services[[14]]$name
+#> [1] "Earthquakes_Since1970"
+#> 
+#> $services[[14]]$type
+#> [1] "FeatureServer"
+#> 
+#> 
+#> $services[[15]]
+#> $services[[15]]$name
+#> [1] "Earthquakes_Since1970"
+#> 
+#> $services[[15]]$type
+#> [1] "MapServer"
+#> 
+#> 
+#> $services[[16]]
+#> $services[[16]]$name
+#> [1] "EmergencyFacilities"
+#> 
+#> $services[[16]]$type
+#> [1] "FeatureServer"
+#> 
+#> 
+#> $services[[17]]
+#> $services[[17]]$name
+#> [1] "EmergencyFacilities"
+#> 
+#> $services[[17]]$type
+#> [1] "MapServer"
+#> 
+#> 
+#> $services[[18]]
+#> $services[[18]]$name
+#> [1] "GDBVersions"
+#> 
+#> $services[[18]]$type
+#> [1] "GPServer"
+#> 
+#> 
+#> $services[[19]]
+#> $services[[19]]$name
+#> [1] "Hurricanes"
+#> 
+#> $services[[19]]$type
+#> [1] "MapServer"
+#> 
+#> 
+#> $services[[20]]
+#> $services[[20]]$name
+#> [1] "Military"
+#> 
+#> $services[[20]]$type
+#> [1] "FeatureServer"
+#> 
+#> 
+#> $services[[21]]
+#> $services[[21]]$name
+#> [1] "Military"
+#> 
+#> $services[[21]]$type
+#> [1] "MapServer"
+#> 
+#> 
+#> $services[[22]]
+#> $services[[22]]$name
+#> [1] "MontgomeryQuarters"
+#> 
+#> $services[[22]]$type
+#> [1] "MapServer"
+#> 
+#> 
+#> $services[[23]]
+#> $services[[23]]$name
+#> [1] "MtBaldy_BaseMap"
+#> 
+#> $services[[23]]$type
+#> [1] "MapServer"
+#> 
+#> 
+#> $services[[24]]
+#> $services[[24]]$name
+#> [1] "MultiDimensional_Sample"
+#> 
+#> $services[[24]]$type
+#> [1] "MapServer"
+#> 
+#> 
+#> $services[[25]]
+#> $services[[25]]$name
+#> [1] "NapervilleShelters"
+#> 
+#> $services[[25]]$type
+#> [1] "FeatureServer"
+#> 
+#> 
+#> $services[[26]]
+#> $services[[26]]$name
+#> [1] "NapervilleShelters"
+#> 
+#> $services[[26]]$type
+#> [1] "MapServer"
+#> 
+#> 
+#> $services[[27]]
+#> $services[[27]]$name
+#> [1] "NLCDLandCover2001"
+#> 
+#> $services[[27]]$type
+#> [1] "ImageServer"
+#> 
+#> 
+#> $services[[28]]
+#> $services[[28]]$name
+#> [1] "Notes"
+#> 
+#> $services[[28]]$type
+#> [1] "FeatureServer"
+#> 
+#> 
+#> $services[[29]]
+#> $services[[29]]$name
+#> [1] "Notes"
+#> 
+#> $services[[29]]$type
+#> [1] "MapServer"
+#> 
+#> 
+#> $services[[30]]
+#> $services[[30]]$name
+#> [1] "NYTimes_Covid19Cases_USCounties"
+#> 
+#> $services[[30]]$type
+#> [1] "MapServer"
+#> 
+#> 
+#> $services[[31]]
+#> $services[[31]]$name
+#> [1] "OilSandsProjectBoundaries"
+#> 
+#> $services[[31]]$type
+#> [1] "FeatureServer"
+#> 
+#> 
+#> $services[[32]]
+#> $services[[32]]$name
+#> [1] "OilSandsProjectBoundaries"
+#> 
+#> $services[[32]]$type
+#> [1] "MapServer"
+#> 
+#> 
+#> $services[[33]]
+#> $services[[33]]$name
+#> [1] "OtherGeoprocessingServices"
+#> 
+#> $services[[33]]$type
+#> [1] "GPServer"
+#> 
+#> 
+#> $services[[34]]
+#> $services[[34]]$name
+#> [1] "PhoneIncidents"
+#> 
+#> $services[[34]]$type
+#> [1] "FeatureServer"
+#> 
+#> 
+#> $services[[35]]
+#> $services[[35]]$name
+#> [1] "PhoneIncidents"
+#> 
+#> $services[[35]]$type
+#> [1] "MapServer"
+#> 
+#> 
+#> $services[[36]]
+#> $services[[36]]$name
+#> [1] "PoolPermits"
+#> 
+#> $services[[36]]$type
+#> [1] "FeatureServer"
+#> 
+#> 
+#> $services[[37]]
+#> $services[[37]]$name
+#> [1] "PoolPermits"
+#> 
+#> $services[[37]]$type
+#> [1] "MapServer"
+#> 
+#> 
+#> $services[[38]]
+#> $services[[38]]$name
+#> [1] "Precipitation"
+#> 
+#> $services[[38]]$type
+#> [1] "MapServer"
+#> 
+#> 
+#> $services[[39]]
+#> $services[[39]]$name
+#> [1] "Recreation"
+#> 
+#> $services[[39]]$type
+#> [1] "FeatureServer"
+#> 
+#> 
+#> $services[[40]]
+#> $services[[40]]$name
+#> [1] "Recreation"
+#> 
+#> $services[[40]]$type
+#> [1] "MapServer"
+#> 
+#> 
+#> $services[[41]]
+#> $services[[41]]$name
+#> [1] "RedlandsEmergencyVehicles"
+#> 
+#> $services[[41]]$type
+#> [1] "FeatureServer"
+#> 
+#> 
+#> $services[[42]]
+#> $services[[42]]$name
+#> [1] "RedlandsEmergencyVehicles"
+#> 
+#> $services[[42]]$type
+#> [1] "MapServer"
+#> 
+#> 
+#> $services[[43]]
+#> $services[[43]]$name
+#> [1] "RiversAnnotation"
+#> 
+#> $services[[43]]$type
+#> [1] "FeatureServer"
+#> 
+#> 
+#> $services[[44]]
+#> $services[[44]]$name
+#> [1] "RiversAnnotation"
+#> 
+#> $services[[44]]$type
+#> [1] "MapServer"
+#> 
+#> 
+#> $services[[45]]
+#> $services[[45]]$name
+#> [1] "SampleWorldCities"
+#> 
+#> $services[[45]]$type
+#> [1] "MapServer"
+#> 
+#> 
+#> $services[[46]]
+#> $services[[46]]$name
+#> [1] "ServiceRequest"
+#> 
+#> $services[[46]]$type
+#> [1] "FeatureServer"
+#> 
+#> 
+#> $services[[47]]
+#> $services[[47]]$name
+#> [1] "ServiceRequest"
+#> 
+#> $services[[47]]$type
+#> [1] "MapServer"
+#> 
+#> 
+#> $services[[48]]
+#> $services[[48]]$name
+#> [1] "SF311"
+#> 
+#> $services[[48]]$type
+#> [1] "FeatureServer"
+#> 
+#> 
+#> $services[[49]]
+#> $services[[49]]$name
+#> [1] "SF311"
+#> 
+#> $services[[49]]$type
+#> [1] "MapServer"
+#> 
+#> 
+#> $services[[50]]
+#> $services[[50]]$name
+#> [1] "Toronto"
+#> 
+#> $services[[50]]$type
+#> [1] "ImageServer"
+#> 
+#> 
+#> $services[[51]]
+#> $services[[51]]$name
+#> [1] "USA"
+#> 
+#> $services[[51]]$type
+#> [1] "MapServer"
+#> 
+#> 
+#> $services[[52]]
+#> $services[[52]]$name
+#> [1] "VerticalLines"
+#> 
+#> $services[[52]]$type
+#> [1] "FeatureServer"
+#> 
+#> 
+#> $services[[53]]
+#> $services[[53]]$name
+#> [1] "VerticalLines"
+#> 
+#> $services[[53]]$type
+#> [1] "MapServer"
+#> 
+#> 
+#> $services[[54]]
+#> $services[[54]]$name
+#> [1] "Viewshed"
+#> 
+#> $services[[54]]$type
+#> [1] "GPServer"
+#> 
+#> 
+#> $services[[55]]
+#> $services[[55]]$name
+#> [1] "Water_Network_Base_Map"
+#> 
+#> $services[[55]]$type
+#> [1] "MapServer"
+#> 
+#> 
+#> $services[[56]]
+#> $services[[56]]$name
+#> [1] "Water_Network"
+#> 
+#> $services[[56]]$type
+#> [1] "FeatureServer"
+#> 
+#> 
+#> $services[[57]]
+#> $services[[57]]$name
+#> [1] "Water_Network"
+#> 
+#> $services[[57]]$type
+#> [1] "MapServer"
+#> 
+#> 
+#> $services[[58]]
+#> $services[[58]]$name
+#> [1] "Wildfire"
+#> 
+#> $services[[58]]$type
+#> [1] "FeatureServer"
+#> 
+#> 
+#> $services[[59]]
+#> $services[[59]]$name
+#> [1] "Wildfire"
+#> 
+#> $services[[59]]$type
+#> [1] "MapServer"
+#> 
+#> 
+#> $services[[60]]
+#> $services[[60]]$name
+#> [1] "WindTurbines"
+#> 
+#> $services[[60]]$type
+#> [1] "MapServer"
+#> 
+#> 
+#> $services[[61]]
+#> $services[[61]]$name
+#> [1] "World_Street_Map"
+#> 
+#> $services[[61]]$type
+#> [1] "MapServer"
+#> 
+#> 
+#> $services[[62]]
+#> $services[[62]]$name
+#> [1] "WorldTimeZones"
+#> 
+#> $services[[62]]$type
+#> [1] "MapServer"
 ```
 
 `esriIndex()` wraps `esriCatalog()` but returns a data frame with added
@@ -457,21 +955,20 @@ columns to differentiate between folder, service, and layer URLs.
 
 ``` r
 esriIndex(url)
-#> # A tibble: 11 × 5
-#>    name          type           url                              urlType servi…¹
-#>    <chr>         <chr>          <chr>                            <chr>   <chr>  
-#>  1 Demographics  <NA>           https://sampleserver1.arcgisonl… folder  <NA>   
-#>  2 Elevation     <NA>           https://sampleserver1.arcgisonl… folder  <NA>   
-#>  3 Locators      <NA>           https://sampleserver1.arcgisonl… folder  <NA>   
-#>  4 Louisville    <NA>           https://sampleserver1.arcgisonl… folder  <NA>   
-#>  5 Network       <NA>           https://sampleserver1.arcgisonl… folder  <NA>   
-#>  6 Petroleum     <NA>           https://sampleserver1.arcgisonl… folder  <NA>   
-#>  7 PublicSafety  <NA>           https://sampleserver1.arcgisonl… folder  <NA>   
-#>  8 Specialty     <NA>           https://sampleserver1.arcgisonl… folder  <NA>   
-#>  9 TaxParcel     <NA>           https://sampleserver1.arcgisonl… folder  <NA>   
-#> 10 WaterTemplate <NA>           https://sampleserver1.arcgisonl… folder  <NA>   
-#> 11 Geometry      GeometryServer https://sampleserver1.arcgisonl… service Geomet…
-#> # … with abbreviated variable name ¹​serviceType
+#> # A tibble: 75 × 5
+#>    name                      type  url                           urlType servi…¹
+#>    <chr>                     <chr> <chr>                         <chr>   <chr>  
+#>  1 AGP                       <NA>  https://sampleserver6.arcgis… folder  <NA>   
+#>  2 Elevation                 <NA>  https://sampleserver6.arcgis… folder  <NA>   
+#>  3 Energy                    <NA>  https://sampleserver6.arcgis… folder  <NA>   
+#>  4 LocalGovernment           <NA>  https://sampleserver6.arcgis… folder  <NA>   
+#>  5 Locators                  <NA>  https://sampleserver6.arcgis… folder  <NA>   
+#>  6 NetworkAnalysis           <NA>  https://sampleserver6.arcgis… folder  <NA>   
+#>  7 Oblique                   <NA>  https://sampleserver6.arcgis… folder  <NA>   
+#>  8 OsoLandslide              <NA>  https://sampleserver6.arcgis… folder  <NA>   
+#>  9 ScientificData            <NA>  https://sampleserver6.arcgis… folder  <NA>   
+#> 10 SpatioTemporalAggregation <NA>  https://sampleserver6.arcgis… folder  <NA>   
+#> # … with 65 more rows, and abbreviated variable name ¹​serviceType
 ```
 
 Set `recurse = TRUE` to loop through folders and ensure the data frame
@@ -479,23 +976,23 @@ includes all available services.
 
 ``` r
 esriIndex(url, recurse = TRUE)
-#> # A tibble: 813 × 13
+#> # A tibble: 631 × 15
 #>    name        type  url   urlType folde…¹ servi…² servi…³    id paren…⁴ defau…⁵
 #>    <chr>       <chr> <chr> <chr>   <chr>   <chr>   <chr>   <int>   <int> <lgl>  
-#>  1 Demographi… <NA>  http… folder  <NA>    <NA>    <NA>       NA      NA NA     
+#>  1 AGP         <NA>  http… folder  <NA>    <NA>    <NA>       NA      NA NA     
 #>  2 Elevation   <NA>  http… folder  <NA>    <NA>    <NA>       NA      NA NA     
-#>  3 Locators    <NA>  http… folder  <NA>    <NA>    <NA>       NA      NA NA     
-#>  4 Louisville  <NA>  http… folder  <NA>    <NA>    <NA>       NA      NA NA     
-#>  5 Network     <NA>  http… folder  <NA>    <NA>    <NA>       NA      NA NA     
-#>  6 Petroleum   <NA>  http… folder  <NA>    <NA>    <NA>       NA      NA NA     
-#>  7 PublicSafe… <NA>  http… folder  <NA>    <NA>    <NA>       NA      NA NA     
-#>  8 Specialty   <NA>  http… folder  <NA>    <NA>    <NA>       NA      NA NA     
-#>  9 TaxParcel   <NA>  http… folder  <NA>    <NA>    <NA>       NA      NA NA     
-#> 10 WaterTempl… <NA>  http… folder  <NA>    <NA>    <NA>       NA      NA NA     
-#> # … with 803 more rows, 3 more variables: minScale <dbl>, maxScale <int>,
-#> #   subLayerIds <list>, and abbreviated variable names ¹​folderPath,
-#> #   ²​serviceName, ³​serviceType, ⁴​parentLayerId, ⁵​defaultVisibility
-#> # ℹ Use `print(n = ...)` to see more rows, and `colnames()` to see all variable names
+#>  3 Energy      <NA>  http… folder  <NA>    <NA>    <NA>       NA      NA NA     
+#>  4 LocalGover… <NA>  http… folder  <NA>    <NA>    <NA>       NA      NA NA     
+#>  5 Locators    <NA>  http… folder  <NA>    <NA>    <NA>       NA      NA NA     
+#>  6 NetworkAna… <NA>  http… folder  <NA>    <NA>    <NA>       NA      NA NA     
+#>  7 Oblique     <NA>  http… folder  <NA>    <NA>    <NA>       NA      NA NA     
+#>  8 OsoLandsli… <NA>  http… folder  <NA>    <NA>    <NA>       NA      NA NA     
+#>  9 Scientific… <NA>  http… folder  <NA>    <NA>    <NA>       NA      NA NA     
+#> 10 SpatioTemp… <NA>  http… folder  <NA>    <NA>    <NA>       NA      NA NA     
+#> # … with 621 more rows, 5 more variables: minScale <dbl>, maxScale <int>,
+#> #   geometryType <chr>, supportsDynamicLegends <lgl>, subLayerIds <list>, and
+#> #   abbreviated variable names ¹​folderPath, ²​serviceName, ³​serviceType,
+#> #   ⁴​parentLayerId, ⁵​defaultVisibility
 ```
 
 Similarly, the new `esrigeocode()` provides support for the [Find
@@ -517,3 +1014,19 @@ esrigeocode(url, address = "100 HOLLIDAY STREET")
 #>           address score                   geometry
 #> 1 100 HOLLIDAY ST   100 POINT (-76.61032 39.29052)
 ```
+
+## Related packages and projects
+
+-   [{arcgisbinding}](https://github.com/R-ArcGIS/r-bridge) and the
+    [R-ArcGIS
+    Bridge](https://www.esri.com/en-us/arcgis/products/r-arcgis-bridge/overview)
+-   [{geosapi}](https://github.com/eblondel/geosapi): GeoServer REST API
+    R Interface
+-   [{aarapir}](https://github.com/mps9506/aarapir): Access ArcGIS
+    online API enpoints with R
+-   [Geocoding Addresses with the ArcGIS REST API (Stanford Affiliates
+    Only)](https://github.com/cengel/ArcGIS_geocoding)
+-   [{RPyGeo}](https://github.com/r-spatial/RPyGeo)
+-   [All things R Spatial](https://arc2r.github.io/book/): An
+    introduction to spatial R for ArcGIS users
+    ([repo](https://github.com/arc2r/book))
