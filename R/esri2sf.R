@@ -131,7 +131,7 @@ esri2sf <- function(url,
           can't be found for this url.")
       )
 
-      cli::cli_rule("Trying to download layer with {.fn esri2df}")
+      cli::cli_rule("Trying to download with {.fn esri2df}")
 
       return(
         esri2df(
@@ -315,7 +315,7 @@ esri2df <- function(url,
       use {.fn esri2df}."
     )
 
-    cli::cli_rule("Trying to download layer with {.fn esri2sf}")
+    cli::cli_rule("Trying to download with {.fn esri2sf}")
     return(
       esri2sf(
         url = url,
@@ -413,21 +413,22 @@ getLayerCRS <- function(spatialReference, layerCRS = NULL) {
 sf2geometryType <- function(x, by_geometry = FALSE) {
   if (inherits(x, "bbox")) {
     return("esriGeometryEnvelope")
-  } else if (inherits(x, "sf")) {
-    geometryType <- sf::st_geometry_type(x, by_geometry = by_geometry)
-
-    return(
-      switch(as.character(geometryType),
-        "POINT" = "esriGeometryPoint",
-        "MULTIPOLYGON" = "esriGeometryPolygon",
-        "MULTIPOINT" = "esriGeometryMultipoint",
-        "LINESTRING" = "esriGeometryPolyline",
-        "MULTILINESTRING" = "esriGeometryPolyline"
-      )
-    )
   }
 
-  cli::cli_abort("{.arg geometry} must be a sf or bbox object.")
+  if (!inherits(x, c("sf", "sfc"))) {
+    cli::cli_abort("{.arg geometry} must be a {.cls {c('sf', 'sfc')}} or {.cls bbox} object, not {.cls {class(x)}}.")
+  }
+
+  geometryType <- sf::st_geometry_type(x, by_geometry = by_geometry)
+
+  switch(as.character(geometryType),
+    "POINT" = "esriGeometryPoint",
+    "POLYGON" = "esriGeometryPolygon",
+    "MULTIPOLYGON" = "esriGeometryPolygon",
+    "MULTIPOINT" = "esriGeometryMultipoint",
+    "LINESTRING" = "esriGeometryPolyline",
+    "MULTILINESTRING" = "esriGeometryPolyline"
+  )
 }
 
 
