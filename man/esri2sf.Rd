@@ -17,6 +17,7 @@ esri2sf(
   geomType = NULL,
   spatialRel = NULL,
   replaceDomainInfo = FALSE,
+  .name_repair = "check_unique",
   quiet = FALSE,
   ...
 )
@@ -28,6 +29,7 @@ esri2df(
   token = NULL,
   progress = FALSE,
   replaceDomainInfo = FALSE,
+  .name_repair = "check_unique",
   quiet = FALSE,
   ...
 )
@@ -76,16 +78,35 @@ performing the query; defaults to \code{NULL} (equivalent to
 \item{replaceDomainInfo}{If \code{TRUE}, add domain information to the return data
 frame. Default \code{FALSE}.}
 
+\item{.name_repair}{Treatment of problematic column names:
+\itemize{
+\item \code{"minimal"}: No name repair or checks, beyond basic existence,
+\item \code{"unique"}: Make sure names are unique and not empty,
+\item \code{"check_unique"}: (default value), no name repair, but check they are
+\code{unique},
+\item \code{"universal"}: Make the names \code{unique} and syntactic
+\item a function: apply custom name repair (e.g., \code{.name_repair = make.names}
+for names in the style of base R).
+\item A purrr-style anonymous function, see \code{\link[rlang:as_function]{rlang::as_function()}}
+}
+
+This argument is passed on as \code{repair} to \code{\link[vctrs:vec_as_names]{vctrs::vec_as_names()}}.
+See there for more details on these terms and the strategies used
+to enforce them.}
+
 \item{quiet}{If \code{TRUE}, use \code{\link[=suppressMessages]{suppressMessages()}} to prevent the printing of
 messages about the requested layer. Defaults to \code{FALSE}.}
 
 \item{...}{additional named parameters to pass to the query. (e.g.
 \code{"resultRecordCount = 3"}). See the \href{https://developers.arcgis.com/rest/services-reference/enterprise/query-map-service-layer-.htm}{ArcGIS REST APIs documentation}
 for more information on all supported parameters.}
+
+\item{.rows}{The number of rows, useful to create a 0-column tibble or
+just as an additional check.}
 }
 \value{
-sf dataframe (\code{esri2sf}) or tibble dataframe (\code{esri2df}) or list or
-dataframe (\code{esrimeta}).
+simple feature (\code{esri2sf}) or tibble (\code{esri2df}) or list or
+tibble (\code{esrimeta}).
 }
 \description{
 These functions are the interface to the user.

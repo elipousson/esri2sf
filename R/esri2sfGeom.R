@@ -3,7 +3,10 @@
 #' @noRd
 #' @importFrom dplyr bind_rows
 #' @importFrom sf st_crs st_sf
-esri2sfGeom <- function(jsonFeats, layerGeomType, crs = 4326) {
+esri2sfGeom <- function(jsonFeats,
+                        layerGeomType,
+                        crs = 4326,
+                        .name_repair = "check_unique") {
   # convert esri json to simple feature
   geoms <- switch(layerGeomType,
     esriGeometryPolygon = esri2sfPolygon(jsonFeats),
@@ -25,6 +28,7 @@ esri2sfGeom <- function(jsonFeats, layerGeomType, crs = 4326) {
 
   af <- dplyr::bind_rows(lapply(atts, as.data.frame.list, stringsAsFactors = FALSE))
 
+  af <- dplyr::as_tibble(af, .name_repair = .name_repair)
   # combine geometry and attributes
   sf::st_sf(geoms, af, crs = crs)
 }

@@ -37,12 +37,27 @@
 #'   frame. Default `FALSE`.
 #' @param quiet If `TRUE`, use [suppressMessages()] to prevent the printing of
 #'   messages about the requested layer. Defaults to `FALSE`.
+#' @param .rows The number of rows, useful to create a 0-column tibble or
+#'   just as an additional check.
+#' @param .name_repair Treatment of problematic column names:
+#'   * `"minimal"`: No name repair or checks, beyond basic existence,
+#'   * `"unique"`: Make sure names are unique and not empty,
+#'   * `"check_unique"`: (default value), no name repair, but check they are
+#'     `unique`,
+#'   * `"universal"`: Make the names `unique` and syntactic
+#'   * a function: apply custom name repair (e.g., `.name_repair = make.names`
+#'     for names in the style of base R).
+#'   * A purrr-style anonymous function, see [rlang::as_function()]
+#'
+#'   This argument is passed on as `repair` to [vctrs::vec_as_names()].
+#'   See there for more details on these terms and the strategies used
+#'   to enforce them.
 #' @param ... additional named parameters to pass to the query. (e.g.
 #'   `"resultRecordCount = 3"`). See the [ArcGIS REST APIs
 #'   documentation](https://developers.arcgis.com/rest/services-reference/enterprise/query-map-service-layer-.htm)
 #'   for more information on all supported parameters.
-#' @return sf dataframe (`esri2sf`) or tibble dataframe (`esri2df`) or list or
-#'   dataframe (`esrimeta`).
+#' @return simple feature (`esri2sf`) or tibble (`esri2df`) or list or
+#'   tibble (`esrimeta`).
 #'
 #' @describeIn esri2sf Retrieve spatial object
 #'
@@ -74,6 +89,7 @@ esri2sf <- function(url,
                     geomType = NULL,
                     spatialRel = NULL,
                     replaceDomainInfo = FALSE,
+                    .name_repair = "check_unique",
                     quiet = FALSE,
                     ...) {
   # Share basic layer information
@@ -256,7 +272,8 @@ esri2sf <- function(url,
     esri2sfGeom(
       jsonFeats = esriFeatures,
       layerGeomType = layerGeomType,
-      crs = crs
+      crs = crs,
+      .name_repair = .name_repair
     )
 
   if (!replaceDomainInfo) {
@@ -282,6 +299,7 @@ esri2df <- function(url,
                     token = NULL,
                     progress = FALSE,
                     replaceDomainInfo = FALSE,
+                    .name_repair = "check_unique",
                     quiet = FALSE,
                     ...) {
   if (quiet) {
@@ -345,7 +363,7 @@ esri2df <- function(url,
       ...
     )
 
-  df <- getEsriTable(esriFeatures)
+  df <- getEsriTable(esriFeatures, .name_repair = .name_repair)
 
   if (!replaceDomainInfo) {
     return(df)

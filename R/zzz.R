@@ -63,7 +63,7 @@ getMaxRecordsCount <- function(url,
 #'
 #' @noRd
 #' @importFrom dplyr bind_rows as_tibble
-getEsriTable <- function(jsonFeats) {
+getEsriTable <- function(jsonFeats, .name_repair = "check_unique") {
   atts <- lapply(
     lapply(jsonFeats, `[[`, 1),
     function(att) lapply(att, function(x) ifelse(is.null(x), NA, x))
@@ -74,7 +74,7 @@ getEsriTable <- function(jsonFeats) {
       lapply(atts, as.data.frame.list, stringsAsFactors = FALSE)
     )
 
-  dplyr::as_tibble(df)
+  dplyr::as_tibble(df, .name_repair = .name_repair)
 }
 
 
