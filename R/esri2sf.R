@@ -108,6 +108,7 @@ esri2sf <- function(url,
           geomType = geomType,
           spatialRel = spatialRel,
           replaceDomainInfo = replaceDomainInfo,
+          .name_repair = .name_repair,
           ...
         )
       )
@@ -124,11 +125,7 @@ esri2sf <- function(url,
 
   layerInfo <- esrimeta(url = url, token = token)
 
-  cli::cli_inform(
-    c("v" = "Downloading {.val {layerInfo$name}} from {.url {url}}")
-  )
-
-  layerTypes <- c("Table", "Feature Layer")
+  layerTypes <- c("Table", "Feature Layer", "Group Layer")
 
   if (!is.null(layerInfo$type) && !(layerInfo$type %in% layerTypes)) {
     cli::cli_abort(
@@ -138,6 +135,60 @@ esri2sf <- function(url,
       )
     )
   }
+
+  if (layerInfo$type == "Group Layer") {
+    cli::cli_inform(
+      c("v" = "Downloading group layer {.val {layerInfo$name}} from
+        {.url {url}}")
+    )
+
+    sublayers <- as.character(layerInfo$subLayers$name)
+    names(sublayers) <- rep("*", length(sublayers))
+
+    cli::cli_rule("Sublayers include:")
+    cli::cli_bullets(
+      sublayers
+    )
+
+    url <- vapply(
+      layerInfo$subLayers$id,
+      function(x) {
+        gsub(paste0(basename(url), "$"), x, url)
+      },
+      NA_character_
+    )
+
+    sfdf <-
+      lapply(
+        cli::cli_progress_along(url),
+        function(x) {
+          esri2sf(
+            url = url[[x]],
+            outFields = outFields,
+            where = where,
+            geometry = geometry,
+            bbox = bbox,
+            token = token,
+            crs = crs,
+            progress = progress,
+            geomType = geomType,
+            spatialRel = spatialRel,
+            replaceDomainInfo = replaceDomainInfo,
+            quiet = TRUE,
+            .name_repair = .name_repair,
+            ...
+          )
+        }
+      )
+
+    names(sfdf) <- layerInfo$subLayers$name
+
+    return(sfdf)
+  }
+
+  cli::cli_inform(
+    c("v" = "Downloading {.val {layerInfo$name}} from {.url {url}}")
+  )
 
   # Get the layer geometry type
   if (is.null(geomType)) {
@@ -383,7 +434,12 @@ esri2df <- function(url,
 #' @export
 #' @importFrom dplyr bind_rows
 esrimeta <- function(url, token = NULL, fields = FALSE, ...) {
-  layerInfo <- esriCatalog(url = url, token = token, simplifyVector = TRUE, ...)
+  layerInfo <- esriCatalog(
+    url = url,
+    token = token,
+    simplifyVector = TRUE,
+    ...
+  )
 
   if (!fields) {
     return(layerInfo)
@@ -434,7 +490,8 @@ sf2geometryType <- function(x, by_geometry = FALSE) {
   }
 
   if (!inherits(x, c("sf", "sfc"))) {
-    cli::cli_abort("{.arg geometry} must be a {.cls {c('sf', 'sfc')}} or {.cls bbox} object, not {.cls {class(x)}}.")
+    cli::cli_abort("{.arg geometry} must be a {.cls {c('sf', 'sfc')}}
+                   or {.cls bbox} object, not {.cls {class(x)}}.")
   }
 
   geometryType <- sf::st_geometry_type(x, by_geometry = by_geometry)
