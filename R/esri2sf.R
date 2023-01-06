@@ -431,15 +431,19 @@ esri2df <- function(url,
 #' @inheritParams esriRequest
 #' @param fields `esrimeta` returns data frame with fields if `TRUE`. Default
 #'   `FALSE`.
+#' @param call Defaults to [parent.frame()]. Passed to [cli::cli_abort()] to
+#'   improve error messages when [esrimeta()] is called by another function.
 #' @export
 #' @importFrom dplyr bind_rows
-esrimeta <- function(url, token = NULL, fields = FALSE, ...) {
+esrimeta <- function(url, token = NULL, fields = FALSE, ..., call = parent.frame()) {
   layerInfo <- esriCatalog(
     url = url,
     token = token,
     simplifyVector = TRUE,
     ...
   )
+
+  check_layerInfo(layerInfo, call = call)
 
   if (!fields) {
     return(layerInfo)
@@ -448,6 +452,29 @@ esrimeta <- function(url, token = NULL, fields = FALSE, ...) {
   dplyr::bind_rows(layerInfo$fields)
 }
 
+
+#' Helper function to trigger error if layerInfo returns an erro
+#'
+#' @noRd
+check_layerInfo <- function(layerInfo, call = parent.frame()) {
+  if (is.null(layerInfo$error)) {
+    return(invisible())
+  }
+
+  message <- paste0(
+    layerInfo$error$message,
+    " - code: ", layerInfo$error$code
+  )
+
+  if (layerInfo$error$details != layerInfo$error$message) {
+    message <- c(message, "i" = layerInfo$error$details)
+  }
+
+  cli::cli_abort(
+    message,
+    call = call
+  )
+}
 
 #' Helper function for getting layer CRS based on spatialReference
 #'

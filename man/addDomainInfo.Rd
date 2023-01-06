@@ -4,7 +4,7 @@
 \alias{addDomainInfo}
 \title{Add domain information to the return (sf) dataframe}
 \usage{
-addDomainInfo(df, url, token = NULL)
+addDomainInfo(df, url, token = NULL, call = parent.frame())
 }
 \arguments{
 \item{df}{The returned (sf) df from esri2sf/esri2df.}
@@ -12,6 +12,9 @@ addDomainInfo(df, url, token = NULL)
 \item{url}{The url for the Map/Feature server layer/table.}
 
 \item{token}{string for authentication token (if needed).}
+
+\item{call}{Defaults to \code{\link[=parent.frame]{parent.frame()}}. Passed to \code{\link[cli:cli_abort]{cli::cli_abort()}} to
+improve error messages when \code{\link[=esrimeta]{esrimeta()}} is called by another function.}
 }
 \value{
 An {sf} dataframe

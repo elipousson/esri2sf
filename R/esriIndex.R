@@ -2,7 +2,7 @@
 #'
 #' Recurse over a ArcGIS Server url or folder url to return a data frame index
 #' of folders, services, layers, and tables. This function returns additional
-#' information than [esriCatalog] using `f = "sitemap"` or `f = "geositemap"`.
+#' information than [esriCatalog()] using `f = "sitemap"` or `f = "geositemap"`.
 #'
 #' @rdname esriIndex
 #' @param url URL for ArcGIS server, folder, or service.
@@ -12,7 +12,8 @@
 #'   index that includes services in folders, subfolders, layers, and tables.
 #'   Defaults to `FALSE`.
 #' @inheritParams esriRequest
-#' @param ... Additional parameters passed to [esriCatalog] (not typically required)
+#' @param ... Additional parameters passed to [esriCatalog()] (not typically
+#'   required)
 #' @export
 #' @importFrom dplyr bind_cols bind_rows mutate if_else case_when relocate
 esriIndex <- function(url,
@@ -22,6 +23,8 @@ esriIndex <- function(url,
                       token = NULL,
                       ...) {
   esriResp <- esriCatalog(url, token = token, ...)
+
+  check_layerInfo(esriResp)
 
   index <- NULL
   urlIndex <- url
@@ -192,6 +195,8 @@ esriIndexLayers <- function(url,
                             token = NULL,
                             ...) {
   esriResp <- esriCatalog(url, token = token, ...)
+
+  check_layerInfo(esriResp)
 
   index <- NULL
 

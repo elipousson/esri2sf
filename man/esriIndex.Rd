@@ -38,10 +38,11 @@ Defaults to \code{FALSE}.}
 
 \item{token}{String for authentication token; defaults to \code{NULL}.}
 
-\item{...}{Additional parameters passed to \link{esriCatalog} (not typically required)}
+\item{...}{Additional parameters passed to \code{\link[=esriCatalog]{esriCatalog()}} (not typically
+required)}
 }
 \description{
 Recurse over a ArcGIS Server url or folder url to return a data frame index
 of folders, services, layers, and tables. This function returns additional
-information than \link{esriCatalog} using \code{f = "sitemap"} or \code{f = "geositemap"}.
+information than \code{\link[=esriCatalog]{esriCatalog()}} using \code{f = "sitemap"} or \code{f = "geositemap"}.
 }
