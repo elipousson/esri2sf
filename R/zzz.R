@@ -1,6 +1,16 @@
 # @staticimports pkg:stringstatic
 #  str_extract
 
+.onLoad <- function(libname, pkgname) {
+  utils::data(
+    list = c(
+      "esri_version_ref"
+    ),
+    package = pkgname,
+    envir = parent.env(environment())
+  )
+}
+
 #' Get object ids
 #'
 #' @noRd

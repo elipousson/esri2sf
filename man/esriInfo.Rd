@@ -10,7 +10,9 @@ esriInfo(url, info = NULL, format = NULL, token = NULL, ...)
 \item{url}{A folder, service, or layer URL that can be used with the ArcGIS
 REST API.}
 
-\item{info}{Options include "item", "metadata", or "thumbnail".}
+\item{info}{Info service to use. Options include "info", "item", "metadata",
+or "thumbnail". If info = "info" (default) basic server information is
+displayed and the body of the response is returned invisibly.}
 
 \item{format}{If \code{info = "metadata"}, options include "fgdc" or "iso19139";
 no format is required if \code{info} is "item" or "thumbnail".}
@@ -20,8 +22,8 @@ no format is required if \code{info} is "item" or "thumbnail".}
 \item{...}{Additional parameters passed to \link[httr2:req_url]{httr2::req_url_query}}
 }
 \description{
-Return service item info, metadata, or thumbnail. The {magick} package is
-required to return a thumbnail.
+Return server info, service item info, metadata, or thumbnail. The {magick}
+package is required to return a thumbnail.
 }
 \details{
 Additional documentation:

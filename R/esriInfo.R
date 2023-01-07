@@ -1,13 +1,14 @@
-
 #' Get info from a service url
 #'
-#' Return service item info, metadata, or thumbnail. The {magick} package is
-#' required to return a thumbnail.
+#' Return server info, service item info, metadata, or thumbnail. The {magick}
+#' package is required to return a thumbnail.
 #'
 #' Additional documentation:
 #' <https://developers.arcgis.com/rest/services-reference/enterprise/info.htm>
 #'
-#' @param info Options include "item", "metadata", or "thumbnail".
+#' @param info Info service to use. Options include "info", "item", "metadata",
+#'   or "thumbnail". If info = "info" (default) basic server information is
+#'   displayed and the body of the response is returned invisibly.
 #' @param format If `info = "metadata"`, options include "fgdc" or "iso19139";
 #'   no format is required if `info` is "item" or "thumbnail".
 #' @inheritParams esriRequest
@@ -21,20 +22,52 @@ esriInfo <- function(url, info = NULL, format = NULL, token = NULL, ...) {
 
   append <-
     switch(info,
+      "info" = "info",
       "item" = "info/iteminfo",
       "metadata" = "info/metadata",
       "thumbnail" = "info/thumbnail"
     )
 
 
-  if (info == "item") {
-    f <- "json"
+  if (info == "info") {
+    resp <-
+      esriRequest(
+        url = url,
+        f = "json",
+        token = token
+      )
 
+    body <- httr2::resp_body_json(resp = resp, ...)
+
+    v <- as.character(body[["currentVersion"]])
+    v_url <- esri_version_ref[esri_version_ref[["version"]] == v, ][["url"]]
+    folders <- body[["folders"]]
+    services <- body[["services"]]
+    service_names <- cli::ansi_collapse(
+      vapply(services, function(x) {
+        x[["name"]]
+      }, NA_character_),
+      trunc = 8
+    )
+    cli::cli_h1(c("{cli::col_br_blue(cli::symbol$info)} ArcGIS REST API Server Info"))
+    cli::cli_rule("{.url {url}}", right = "v. {.href [{v}]({v_url})}")
+
+    cli::cli_bullets(
+      c(
+        "*" = "📂 {.num {length(folders)}} folders including {cli::ansi_collapse(as.character(folders), trunc = 8)}.",
+        "*" = "🗺️ {.num {length(services)}} top level services including {service_names}."
+      )
+    )
+
+    return(invisible(body))
+  }
+
+  if (info == "item") {
     resp <-
       esriRequest(
         url = url,
         append = append,
-        f = f,
+        f = "json",
         token = token
       )
 
@@ -58,7 +91,6 @@ esriInfo <- function(url, info = NULL, format = NULL, token = NULL, ...) {
 
   if (info == "metadata") {
     format <- match.arg(format, c("fgdc", "iso19139"))
-    output <- "html"
 
     # Specifies metadata style.
     # The default is item description metadata style.
@@ -68,7 +100,7 @@ esriInfo <- function(url, info = NULL, format = NULL, token = NULL, ...) {
         append = append,
         format = format,
         token = token,
-        output = output
+        output = "html"
       )
 
     return(httr2::resp_body_xml(resp = resp, check_type = FALSE, ...))
