@@ -101,7 +101,7 @@ esri2sf <- function(url,
 
   layerInfo <- esrimeta(url = url, token = token)
 
-  check_layerTypes(layerInfo)
+  check_layerTypes(layerInfo, url, token)
 
   cli::cli_rule(
     "Downloading {.val {layerInfo$name}} from {.url {url}}"
@@ -306,7 +306,7 @@ esri2df <- function(url,
 
   layerInfo <- esrimeta(url = url, token = token)
 
-  check_layerTypes(layerInfo)
+  check_layerTypes(layerInfo, url, token)
 
   if (!is_tableLayer(layerInfo)) {
     cli::cli_alert_warning(
@@ -556,8 +556,20 @@ check_esriUrl <- function(url,
 #' @noRd
 #' @importFrom cli cli_abort
 check_layerTypes <- function(layerInfo,
+                             url = NULL,
+                             token = NULL,
                              layerTypes = c("Table", "Feature Layer", "Group Layer"),
                              call = parent.frame()) {
+  if (!("type" %in% names(layerInfo))) {
+    cli::cli_abort(
+      "{.arg url} must be a
+      {.val {cli::cli_vec(layerTypes, style = list(vec_last = ' or '))}} type
+      {.emph feature} url, not a
+      {.emph {esriUrl_isValidType(url, returnType = TRUE)}} url.",
+      call = call
+    )
+  }
+
   if (!is.null(layerInfo$type) & !(layerInfo$type %in% layerTypes)) {
     cli::cli_abort(
       c("The {.arg url} must be for a

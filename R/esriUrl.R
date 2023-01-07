@@ -32,7 +32,7 @@ esriUrl_isValidType <- function(url,
 
   isType <- NA
 
-  if (servicesUrl) {
+  if (isTRUE(servicesUrl)) {
     layerInfo <- esrimeta(url, token = token, call = call)
     isType <- c(
       "root" = grepl("/rest/services/?$", url),
@@ -42,7 +42,7 @@ esriUrl_isValidType <- function(url,
       "content" = grepl("/content/", url),
       stats::setNames(rep_len(FALSE, length(siteUrl_types)), siteUrl_types)
     )
-  } else if (siteUrl) {
+  } else if (isTRUE(siteUrl)) {
     isType <- c(
       "search" = grepl("/home/search\\.html\\?q=", url),
       "item" = grepl("/home/item\\.html\\?id=", url),
