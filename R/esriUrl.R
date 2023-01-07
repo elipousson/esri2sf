@@ -79,13 +79,11 @@ esriUrl_isValidType <- function(url,
         )
 
       cli::cli_inform(c("!" = reason, " " = "{.url {url}}"),
-        call = call,
         .envir = .envir
       )
     }
 
     cli::cli_inform(c("!" = "Invalid {.arg url}: {.url {url}}"),
-      call = call,
       .envir = .envir
     )
   }
@@ -304,7 +302,7 @@ str_extract_id <- function(url) {
 convert_esriUrl <- function(url, token = NULL, from = "item", to = "feature", call = parent.frame()) {
   stopifnot(
     esriUrl_isValidType(url, type = from, call = call),
-    "convert_esriUrl currently only supports conversion of item URLs" = from != "item"
+    "convert_esriUrl currently only supports conversion of item URLs" = from == "item"
   )
 
   if (from == "item") {

@@ -18,7 +18,7 @@
 #' @importFrom dplyr as_tibble
 #' @importFrom cli cli_abort
 esriInfo <- function(url, info = NULL, format = NULL, token = NULL, ...) {
-  info <- match.arg(info, c("item", "metadata", "thumbnail", "info"))
+  info <- match.arg(info, c("info", "item", "metadata", "thumbnail"))
 
   append <-
     switch(info,
@@ -54,8 +54,8 @@ esriInfo <- function(url, info = NULL, format = NULL, token = NULL, ...) {
 
     cli::cli_bullets(
       c(
-        "*" = "📂 {.num {length(folders)}} folders including {cli::ansi_collapse(as.character(folders), trunc = 8)}.",
-        "*" = "🗺️ {.num {length(services)}} top level services including {service_names}."
+        ">" = "📂 {.num {length(folders)}} folder{?s} including {cli::ansi_collapse(as.character(folders), trunc = 8)}.",
+        ">" = "🗺️ {.num {length(services)}} top level service{?s} including {service_names}."
       )
     )
 

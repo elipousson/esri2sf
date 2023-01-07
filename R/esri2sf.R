@@ -76,8 +76,7 @@
 #' plot(df)
 #'
 #' @export
-#' @importFrom cli cli_inform cli_rule cli_abort cli_alert_success cli_dl
-#' @importFrom sf st_geometry_type
+#' @importFrom cli cli_rule cli_alert_warning cli_alert_info cli_dl cli_par
 esri2sf <- function(url,
                     outFields = NULL,
                     where = NULL,
@@ -92,113 +91,55 @@ esri2sf <- function(url,
                     .name_repair = "check_unique",
                     quiet = FALSE,
                     ...) {
-  # Share basic layer information
   if (quiet) {
-    return(
-      suppressMessages(
-        esri2sf(
-          url = url,
-          outFields = outFields,
-          where = where,
-          geometry = geometry,
-          bbox = bbox,
-          token = token,
-          crs = crs,
-          progress = progress,
-          geomType = geomType,
-          spatialRel = spatialRel,
-          replaceDomainInfo = replaceDomainInfo,
-          .name_repair = .name_repair,
-          ...
-        )
-      )
-    )
+    existing_handler <- getOption("cli.default_handler")
+    options("cli.default_handler" = suppressMessages)
+    on.exit(options("cli.default_handler" = existing_handler))
   }
 
-  if (esriUrl_isValidType(url, type = "item")) {
-    url <-
-      convert_esriUrl(
-        url = url, token = token,
-        from = "item", to = "feature"
-      )
-  }
+  url <- check_esriUrl(url, token)
 
   layerInfo <- esrimeta(url = url, token = token)
 
-  layerTypes <- c("Table", "Feature Layer", "Group Layer")
+  check_layerTypes(layerInfo)
 
-  if (!is.null(layerInfo$type) && !(layerInfo$type %in% layerTypes)) {
-    cli::cli_abort(
-      c("The {.arg url} must be for a
-        {.val {cli::cli_vec(layerTypes, style = list(vec_last = ' or '))}}.",
-        "i" = "The provided {.arg url} is a {.val {layerInfo$type}} service."
-      )
-    )
-  }
-
-  if (layerInfo$type == "Group Layer") {
-    cli::cli_inform(
-      c("v" = "Downloading group layer {.val {layerInfo$name}} from
-        {.url {url}}")
-    )
-
-    sublayers <- as.character(layerInfo$subLayers$name)
-    names(sublayers) <- rep("*", length(sublayers))
-
-    cli::cli_rule("Sublayers include:")
-    cli::cli_bullets(
-      sublayers
-    )
-
-    url <- vapply(
-      layerInfo$subLayers$id,
-      function(x) {
-        gsub(paste0(basename(url), "$"), x, url)
-      },
-      NA_character_
-    )
-
-    sfdf <-
-      lapply(
-        cli::cli_progress_along(url),
-        function(x) {
-          esri2sf(
-            url = url[[x]],
-            outFields = outFields,
-            where = where,
-            geometry = geometry,
-            bbox = bbox,
-            token = token,
-            crs = crs,
-            progress = progress,
-            geomType = geomType,
-            spatialRel = spatialRel,
-            replaceDomainInfo = replaceDomainInfo,
-            quiet = TRUE,
-            .name_repair = .name_repair,
-            ...
-          )
-        }
-      )
-
-    names(sfdf) <- layerInfo$subLayers$name
-
-    return(sfdf)
-  }
-
-  cli::cli_inform(
-    c("v" = "Downloading {.val {layerInfo$name}} from {.url {url}}")
+  cli::cli_rule(
+    "Downloading {.val {layerInfo$name}} from {.url {url}}"
   )
+
+  if (is_groupLayer(layerInfo)) {
+    return(
+      esrigroup(
+        layerInfo,
+        url = url,
+        outFields = outFields,
+        where = where,
+        geometry = geometry,
+        bbox = bbox,
+        token = token,
+        crs = crs,
+        progress = progress,
+        geomType = geomType,
+        spatialRel = spatialRel,
+        replaceDomainInfo = replaceDomainInfo,
+        .name_repair = .name_repair,
+        .fn = esri2sf,
+        ...
+      )
+    )
+  }
 
   # Get the layer geometry type
   if (is.null(geomType)) {
     if (is_missing_geomType(layerInfo)) {
-      cli::cli_inform(
-        c("!" = "geomType is {.val NULL} and a layer geometry type
-          can't be found for this url.")
+      cli::cli_alert_warning(
+        "{.arg geomType} is {.val NULL} and a layer geometry type
+          can't be found for this url."
       )
 
-      cli::cli_rule("Trying to download with {.fn esri2df}")
+      cli::cli_alert_info(
+        "Trying to download with {.fn esri2df}{cli::symbol$ellipsis}"
+      )
 
       return(
         esri2df(
@@ -219,9 +160,9 @@ esri2sf <- function(url,
       !is.null(layerInfo$geometryType) && (layerInfo$geometryType != geomType)
 
     if (geomType_mismatch) {
-      cli::cli_inform(
-        c("!" = "The provided {.arg geomType} value {.val {geomType}} does not
-          match the layer geometryType value {.val {layerInfo$geometryType}}.")
+      cli::cli_alert_warning(
+        "The provided {.arg geomType} value {.val {geomType}} does not
+        match the layer geometryType value {.val {layerInfo$geometryType}}."
       )
     }
 
@@ -243,14 +184,14 @@ esri2sf <- function(url,
       c("Service CRS" = "{.val {sf::st_crs(layerCRS)$input}}")
     )
   } else {
-    cli::cli_inform(
-      c("!" = "The spatial reference for this layer is missing.")
+    cli::cli_alert_warning(
+      "The spatial reference for this layer is missing."
     )
 
     if (!is.null(crs)) {
-      cli::cli_inform(
-        c("i" = "Trying to access the layer using the provided
-          {.arg crs}: {.val {crs}}.")
+      cli::cli_alert_info(
+        "Trying to access the layer using the
+        provided {.arg crs}: {.val {crs}}."
       )
 
       layerCRS <- crs
@@ -261,7 +202,11 @@ esri2sf <- function(url,
     crs <- layerCRS
   }
 
-  if (!is.null(bbox)) {
+  cli::cli_dl(
+    c("Output CRS" = "{.val {sf::st_crs(crs)$input}}")
+  )
+
+  if (!is.null(bbox) & is.null(geometry)) {
     geometry <- bbox2geometry(bbox)
   }
 
@@ -281,27 +226,25 @@ esri2sf <- function(url,
         geometryType = geometryType,
         layerCRS = layerCRS
       )
+
+    if (!is.null(spatialRel)) {
+      spatialRel_opts <-
+        c(
+          "esriSpatialRelIntersects", "esriSpatialRelContains",
+          "esriSpatialRelCrosses", "esriSpatialRelEnvelopeIntersects",
+          "esriSpatialRelIndexIntersects", "esriSpatialRelOverlaps",
+          "esriSpatialRelTouches", "esriSpatialRelWithin"
+        )
+
+      spatialRel <-
+        match.arg(
+          spatialRel,
+          spatialRel_opts
+        )
+    }
   }
 
-  cli::cli_dl(
-    c("Output CRS" = "{.val {sf::st_crs(crs)$input}}")
-  )
-
-  if (!is.null(spatialRel)) {
-    spatialRel_opts <-
-      c(
-        "esriSpatialRelIntersects", "esriSpatialRelContains",
-        "esriSpatialRelCrosses", "esriSpatialRelEnvelopeIntersects",
-        "esriSpatialRelIndexIntersects", "esriSpatialRelOverlaps",
-        "esriSpatialRelTouches", "esriSpatialRelWithin"
-      )
-
-    spatialRel <-
-      match.arg(
-        spatialRel,
-        spatialRel_opts
-      )
-  }
+  cli::cli_par()
 
   # Get layer features
   esriFeatures <-
@@ -343,7 +286,7 @@ is_missing_geomType <- function(layerInfo) {
 
 #' @describeIn esri2sf Retrieve table object (no spatial data).
 #' @export
-#' @importFrom cli cli_warn cli_rule cli_inform cli_dl
+#' @importFrom cli cli_alert_warning cli_alert_info cli_rule cli_dl cli_par
 esri2df <- function(url,
                     outFields = NULL,
                     where = NULL,
@@ -354,37 +297,24 @@ esri2df <- function(url,
                     quiet = FALSE,
                     ...) {
   if (quiet) {
-    return(
-      suppressMessages(
-        esri2df(
-          url = url,
-          outFields = outFields,
-          where = where,
-          progress = progress,
-          replaceDomainInfo = replaceDomainInfo,
-          ...
-        )
-      )
-    )
+    existing_handler <- getOption("cli.default_handler")
+    options("cli.default_handler" = suppressMessages)
+    on.exit(options("cli.default_handler" = existing_handler))
   }
 
-  if (esriUrl_isValidType(url, type = "item")) {
-    url <-
-      convert_esriUrl(
-        url = url, token = token,
-        from = "item", to = "feature"
-      )
-  }
+  url <- check_esriUrl(url, token)
 
   layerInfo <- esrimeta(url = url, token = token)
 
-  if (!is.null(layerInfo$type) && layerInfo$type != "Table") {
-    cli::cli_warn(
+  check_layerTypes(layerInfo)
+
+  if (!is_tableLayer(layerInfo)) {
+    cli::cli_alert_warning(
       "The layer {.var {layerInfo$name}} must be a {.val 'Table'} service to
       use {.fn esri2df}."
     )
 
-    cli::cli_rule("Trying to download with {.fn esri2sf}")
+    cli::cli_alert_info("Trying to download with {.fn esri2sf}{cli::symbol$ellipsis}")
     return(
       esri2sf(
         url = url,
@@ -398,11 +328,14 @@ esri2df <- function(url,
     )
   }
 
-  cli::cli_inform(c("v" = "Downloading {.val {layerInfo$name}}"))
+  cli::cli_rule(
+    "Downloading {.val {layerInfo$name}} from {.url {url}}"
+  )
 
   cli::cli_dl(
     items = c("Layer type" = "{.val {layerInfo$type}}")
   )
+  cli::cli_par()
 
   esriFeatures <-
     getEsriFeatures(
@@ -435,7 +368,11 @@ esri2df <- function(url,
 #'   improve error messages when [esrimeta()] is called by another function.
 #' @export
 #' @importFrom dplyr bind_rows
-esrimeta <- function(url, token = NULL, fields = FALSE, ..., call = parent.frame()) {
+esrimeta <- function(url,
+                     token = NULL,
+                     fields = FALSE,
+                     ...,
+                     call = parent.frame()) {
   layerInfo <- esriCatalog(
     url = url,
     token = token,
@@ -481,7 +418,7 @@ check_layerInfo <- function(layerInfo, call = parent.frame()) {
 #' @noRd
 #' @importFrom sf st_crs
 #' @importFrom cli cli_abort
-getLayerCRS <- function(spatialReference, layerCRS = NULL) {
+getLayerCRS <- function(spatialReference, layerCRS = NULL, call = parent.frame()) {
   # Get the layer CRS from the layer spatial reference
   if ("latestWkid" %in% names(spatialReference)) {
     layerCRS <- spatialReference$latestWkid
@@ -498,8 +435,10 @@ getLayerCRS <- function(spatialReference, layerCRS = NULL) {
 
   if (is.null(layerCRS)) {
     cli::cli_abort(
-      "A valid layer coordinate reference system can't be found.",
-      "*" = "Check that the layer at the {.arg url} has a spatial reference."
+      c("A valid layer coordinate reference system can't be found.",
+        "*" = "Check that the layer at the {.arg url} has a spatial reference."
+      ),
+      call = call
     )
   }
 
@@ -511,14 +450,18 @@ getLayerCRS <- function(spatialReference, layerCRS = NULL) {
 #'
 #' @noRd
 #' @importFrom cli cli_abort
-sf2geometryType <- function(x, by_geometry = FALSE) {
+#' @importFrom sf st_geometry_type
+sf2geometryType <- function(x, by_geometry = FALSE, call = parent.frame()) {
   if (inherits(x, "bbox")) {
     return("esriGeometryEnvelope")
   }
 
   if (!inherits(x, c("sf", "sfc"))) {
-    cli::cli_abort("{.arg geometry} must be a {.cls {c('sf', 'sfc')}}
-                   or {.cls bbox} object, not {.cls {class(x)}}.")
+    cli::cli_abort(
+      "{.arg geometry} must be a {.cls {c('sf', 'sfc')}}
+      or {.cls bbox} object, not {.cls {class(x)}}.",
+      call = call
+    )
   }
 
   geometryType <- sf::st_geometry_type(x, by_geometry = by_geometry)
@@ -541,7 +484,8 @@ sf2geometryType <- function(x, by_geometry = FALSE) {
 #' objects are converted to a bbox.
 #'
 #' @noRd
-#' @importFrom sf st_sf st_as_sfc st_transform st_bbox st_coordinates
+#' @importFrom sf st_sf st_as_sfc st_transform st_geometry_type st_bbox
+#'   st_coordinates
 #' @importFrom cli cli_abort
 sf2geometry <- function(x, geometryType = NULL, layerCRS = NULL) {
   if (inherits(x, "bbox")) {
@@ -573,7 +517,8 @@ sf2geometry <- function(x, geometryType = NULL, layerCRS = NULL) {
 #'
 #' @noRd
 #' @importFrom sf st_bbox
-bbox2geometry <- function(bbox) {
+#' @importFrom cli cli_abort
+bbox2geometry <- function(bbox, call = parent.frame()) {
   # convert sf class bbox to bbox class
   if (inherits(bbox, "sf") | inherits(bbox, "sfc")) {
     bbox <- sf::st_bbox(bbox)
@@ -583,9 +528,125 @@ bbox2geometry <- function(bbox) {
     cli::cli_abort(
       c("{.arg bbox} must be a {.code bbox} or {.code sf} class object.",
         "i" = "The class of the provided {.arg bbox} is {.val {class(bbox)}}"
-      )
+      ),
+      call = call
     )
   }
 
   bbox
+}
+
+#' Helper function to convert item URLs to Feature Server URLs if they only
+#' include a single layer
+#'
+#' @noRd
+check_esriUrl <- function(url,
+                          token = NULL,
+                          from = "item",
+                          to = "feature") {
+  if (!esriUrl_isValidType(url, type = "item")) {
+    return(url)
+  }
+
+  convert_esriUrl(url = url, token = token, from = from, to = to)
+}
+
+#' Helper function to abort if layerType is not supported
+#'
+#' @noRd
+#' @importFrom cli cli_abort
+check_layerTypes <- function(layerInfo,
+                             layerTypes = c("Table", "Feature Layer", "Group Layer"),
+                             call = parent.frame()) {
+  if (!is.null(layerInfo$type) & !(layerInfo$type %in% layerTypes)) {
+    cli::cli_abort(
+      c("The {.arg url} must be for a
+        {.val {cli::cli_vec(layerTypes, style = list(vec_last = ' or '))}}.",
+        "i" = "The provided {.arg url} is a {.val {layerInfo$type}} service."
+      ),
+      call = call
+    )
+  }
+}
+
+#' Helper function to validate if a layer is a Table layer
+#'
+#' @noRd
+is_tableLayer <- function(layerInfo) {
+  !is.null(layerInfo$type) & (layerInfo$type == "Table")
+}
+
+#' Helper function to validate if a layer is a Group layer
+#'
+#' @noRd
+is_groupLayer <- function(layerInfo) {
+  !is.null(layerInfo$type) & (layerInfo$type == "Group Layer")
+}
+
+#' Helper function to download Group Layers for esri2sf
+#'
+#' @noRd
+#' @importFrom cli cli_rule cli_ol cli_par cli_progress_along symbol pb_current
+#'   pb_bar pb_percent
+esrigroup <- function(layerInfo,
+                      url,
+                      outFields = NULL,
+                      where = NULL,
+                      geometry = NULL,
+                      bbox = NULL,
+                      token = NULL,
+                      crs = getOption("esri2sf.crs", 4326),
+                      progress = TRUE,
+                      geomType = NULL,
+                      spatialRel = NULL,
+                      replaceDomainInfo = FALSE,
+                      .name_repair = "check_unique",
+                      quiet = FALSE,
+                      .fn = esri2sf,
+                      ...) {
+  cli::cli_rule(cli::col_blue("Group sublayers include:"))
+  sublayers <- as.character(layerInfo$subLayers$name)
+  cli::cli_ol(
+    sublayers
+  )
+  cli::cli_par()
+
+  url <- vapply(
+    layerInfo$subLayers$id,
+    function(x) {
+      gsub(paste0(basename(url), "$"), x, url)
+    },
+    NA_character_
+  )
+
+  sfdf <-
+    lapply(
+      cli::cli_progress_along(
+        url,
+        format = "{cli::symbol$info} Downloading {.val {sublayers[[cli::pb_current]]}} | {cli::pb_bar} {cli::pb_percent}",
+        total = length(url)
+      ),
+      function(x) {
+        .fn(
+          url = url[[x]],
+          outFields = outFields,
+          where = where,
+          geometry = geometry,
+          bbox = bbox,
+          token = token,
+          crs = crs,
+          progress = progress,
+          geomType = geomType,
+          spatialRel = spatialRel,
+          replaceDomainInfo = replaceDomainInfo,
+          quiet = TRUE,
+          .name_repair = .name_repair,
+          ...
+        )
+      }
+    )
+
+  names(sfdf) <- layerInfo$subLayers$name
+
+  sfdf
 }

@@ -40,7 +40,7 @@
 #' }
 #' @rdname esrisearch
 #' @export
-#' @importFrom cli cli_abort cli_warn cli_inform
+#' @importFrom cli cli_abort cli_alert_warning cli_bullets
 #' @importFrom httr2 resp_body_json
 #' @importFrom dplyr as_tibble mutate across
 esrisearch <- function(query = NULL,
@@ -50,11 +50,18 @@ esrisearch <- function(query = NULL,
                        start = 1,
                        category_filter = NULL,
                        sort = NULL,
-                       desc = FALSE) {
+                       desc = FALSE,
+                       quiet = FALSE) {
   if (is.null(query) && is.null(bbox)) {
     cli::cli_abort(
       "{.arg query} or {.arg bbox} must be provided."
     )
+  }
+
+  if (quiet) {
+    existing_handler <- getOption("cli.default_handler")
+    options("cli.default_handler" = suppressMessages)
+    on.exit(options("cli.default_handler" = existing_handler))
   }
 
   if (!is.null(bbox)) {
@@ -71,7 +78,7 @@ esrisearch <- function(query = NULL,
   }
 
   if (num > 100 | num < 1) {
-    cli::cli_warn(
+    cli::cli_alert_warning(
       "{.arg num} must be a positive number between 1 and 100,
       not {.val {num}}.",
       " " = "Setting {.arg num} to default value {.val 50}.",
@@ -82,7 +89,7 @@ esrisearch <- function(query = NULL,
   }
 
   if (start < 1) {
-    cli::cli_warn(
+    cli::cli_alert_warning(
       "{.arg num} must be a positive number.",
       " " = "Setting {.arg start} to default value {.val 1}."
     )
@@ -141,7 +148,7 @@ esrisearch <- function(query = NULL,
     msg <- "Search completed with provided {.arg bbox} at {.url {url}}."
   }
 
-  cli::cli_inform(
+  cli::cli_bullets(
     c(
       "v" = msg,
       " " = "Returning {.val {num}} results ({.val {resp$start}} to

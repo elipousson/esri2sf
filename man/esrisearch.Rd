@@ -12,7 +12,8 @@ esrisearch(
   start = 1,
   category_filter = NULL,
   sort = NULL,
-  desc = FALSE
+  desc = FALSE,
+  quiet = FALSE
 )
 }
 \arguments{
