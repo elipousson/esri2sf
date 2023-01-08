@@ -61,7 +61,7 @@ esrisearch <- function(query = NULL,
   if (quiet) {
     existing_handler <- getOption("cli.default_handler")
     options("cli.default_handler" = suppressMessages)
-    on.exit(options("cli.default_handler" = existing_handler))
+    on.exit(options("cli.default_handler" = existing_handler), add = TRUE)
   }
 
   if (!is.null(bbox)) {
