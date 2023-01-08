@@ -94,7 +94,7 @@ esri2sf <- function(url,
   if (quiet) {
     existing_handler <- getOption("cli.default_handler")
     options("cli.default_handler" = suppressMessages)
-    on.exit(options("cli.default_handler" = existing_handler))
+    on.exit(options("cli.default_handler" = existing_handler), add = TRUE)
   }
 
   url <- check_esriUrl(url, token)
@@ -131,7 +131,7 @@ esri2sf <- function(url,
 
   # Get the layer geometry type
   if (is.null(geomType)) {
-    if (is_missing_geomType(layerInfo)) {
+    if (is_tableLayer(layerInfo) | is_missing_geomType(layerInfo)) {
       cli::cli_alert_warning(
         "{.arg geomType} is {.val NULL} and a layer geometry type
           can't be found for this url."
@@ -149,6 +149,8 @@ esri2sf <- function(url,
           token = token,
           progress = progress,
           replaceDomainInfo = replaceDomainInfo,
+          .name_repair = .name_repair,
+          quiet = quiet,
           ...
         )
       )
@@ -181,7 +183,7 @@ esri2sf <- function(url,
       getLayerCRS(spatialReference = layerInfo$extent$spatialReference)
 
     cli::cli_dl(
-      c("Service CRS" = "{.val {sf::st_crs(layerCRS)$input}}")
+      c("Service CRS" = "{.val {sf::st_crs(layerCRS)$srid}}")
     )
   } else {
     cli::cli_alert_warning(
@@ -203,10 +205,10 @@ esri2sf <- function(url,
   }
 
   cli::cli_dl(
-    c("Output CRS" = "{.val {sf::st_crs(crs)$input}}")
+    c("Output CRS" = "{.val {sf::st_crs(crs)$srid}}")
   )
 
-  if (!is.null(bbox) & is.null(geometry)) {
+  if (!is.null(bbox) && is.null(geometry)) {
     geometry <- bbox2geometry(bbox)
   }
 
@@ -299,7 +301,7 @@ esri2df <- function(url,
   if (quiet) {
     existing_handler <- getOption("cli.default_handler")
     options("cli.default_handler" = suppressMessages)
-    on.exit(options("cli.default_handler" = existing_handler))
+    on.exit(options("cli.default_handler" = existing_handler), add = TRUE)
   }
 
   url <- check_esriUrl(url, token)
@@ -314,7 +316,7 @@ esri2df <- function(url,
       use {.fn esri2df}."
     )
 
-    cli::cli_alert_info("Trying to download with {.fn esri2sf}{cli::symbol$ellipsis}")
+    cli::cli_alert_info("Trying to download with {.fn esri2sf} {cli::symbol$ellipsis}")
     return(
       esri2sf(
         url = url,
@@ -380,7 +382,7 @@ esrimeta <- function(url,
     ...
   )
 
-  check_layerInfo(layerInfo, call = call)
+  # check_layerInfo(layerInfo, call = call)
 
   if (!fields) {
     return(layerInfo)
@@ -393,8 +395,10 @@ esrimeta <- function(url,
 #' Helper function to trigger error if layerInfo returns an erro
 #'
 #' @noRd
+#' @importFrom utils hasName
+#' @importFrom cli cli_abort
 check_layerInfo <- function(layerInfo, call = parent.frame()) {
-  if (is.null(layerInfo$error)) {
+  if (!utils::hasName(layerInfo, "error")) {
     return(invisible())
   }
 
@@ -403,8 +407,9 @@ check_layerInfo <- function(layerInfo, call = parent.frame()) {
     " - code: ", layerInfo$error$code
   )
 
-  if (layerInfo$error$details != layerInfo$error$message) {
-    message <- c(message, "i" = layerInfo$error$details)
+  if (utils::hasName(layerInfo$error, "details") &&
+    !identical(layerInfo$error$details, layerInfo$error$message)) {
+    message <- c(message, "i" = as.character(layerInfo$error$details))
   }
 
   cli::cli_abort(
@@ -458,7 +463,7 @@ sf2geometryType <- function(x, by_geometry = FALSE, call = parent.frame()) {
 
   if (!inherits(x, c("sf", "sfc"))) {
     cli::cli_abort(
-      "{.arg geometry} must be a {.cls {c('sf', 'sfc')}}
+      "{.arg geometry} must be a {.cls sf} or {.cls sfc}
       or {.cls bbox} object, not {.cls {class(x)}}.",
       call = call
     )
@@ -520,7 +525,7 @@ sf2geometry <- function(x, geometryType = NULL, layerCRS = NULL) {
 #' @importFrom cli cli_abort
 bbox2geometry <- function(bbox, call = parent.frame()) {
   # convert sf class bbox to bbox class
-  if (inherits(bbox, "sf") | inherits(bbox, "sfc")) {
+  if (inherits(bbox, c("sf", "sfc"))) {
     bbox <- sf::st_bbox(bbox)
   }
 
@@ -542,13 +547,14 @@ bbox2geometry <- function(bbox, call = parent.frame()) {
 #' @noRd
 check_esriUrl <- function(url,
                           token = NULL,
-                          from = "item",
-                          to = "feature") {
-  if (!esriUrl_isValidType(url, type = "item")) {
+                          from = NULL,
+                          to = "feature",
+                          call = parent.frame()) {
+  if (esriUrl_isValidType(url, type = to, call = call)) {
     return(url)
   }
 
-  convert_esriUrl(url = url, token = token, from = from, to = to)
+  convert_esriUrl(url = url, token = token, from = from, to = to, call = call)
 }
 
 #' Helper function to abort if layerType is not supported
@@ -558,7 +564,7 @@ check_esriUrl <- function(url,
 check_layerTypes <- function(layerInfo,
                              url = NULL,
                              token = NULL,
-                             layerTypes = c("Table", "Feature Layer", "Group Layer"),
+                             layerTypes = c("Feature Layer", "Table", "Group Layer"),
                              call = parent.frame()) {
   if (!("type" %in% names(layerInfo))) {
     cli::cli_abort(
@@ -570,7 +576,7 @@ check_layerTypes <- function(layerInfo,
     )
   }
 
-  if (!is.null(layerInfo$type) & !(layerInfo$type %in% layerTypes)) {
+  if (!is.null(layerInfo$type) & !all(layerInfo$type %in% layerTypes)) {
     cli::cli_abort(
       c("The {.arg url} must be for a
         {.val {cli::cli_vec(layerTypes, style = list(vec_last = ' or '))}}.",

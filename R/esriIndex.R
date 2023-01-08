@@ -24,7 +24,7 @@ esriIndex <- function(url,
                       ...) {
   esriResp <- esriCatalog(url, token = token, ...)
 
-  check_layerInfo(esriResp)
+  # check_layerInfo(esriResp)
 
   index <- NULL
   urlIndex <- url
@@ -196,7 +196,7 @@ esriIndexLayers <- function(url,
                             ...) {
   esriResp <- esriCatalog(url, token = token, ...)
 
-  check_layerInfo(esriResp)
+  # check_layerInfo(esriResp)
 
   index <- NULL
 
@@ -322,7 +322,8 @@ esriCatalog <- function(url,
   if (format %in% c("sitemap", "geositemap")) {
     if (!requireNamespace("xml2", quietly = TRUE)) {
       cli::cli_abort(
-        "The {.pkg xml2} package must be installed if {.arg format} is {.val sitemap} or {.val geositemap}."
+        "The {.pkg xml2} package must be installed if {.arg format}
+        is {.val sitemap} or {.val geositemap}."
       )
     }
 

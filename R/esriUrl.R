@@ -34,6 +34,8 @@ esriUrl_isValidType <- function(url,
 
   if (isTRUE(servicesUrl)) {
     layerInfo <- esrimeta(url, token = token, call = call)
+    check_layerInfo(layerInfo, call)
+
     isType <- c(
       "root" = grepl("/rest/services/?$", url),
       "folder" = ("folders" %in% names(layerInfo)),
@@ -299,11 +301,41 @@ str_extract_id <- function(url) {
 #' Convert ESRI item URL to feature URL
 #'
 #' @noRd
-convert_esriUrl <- function(url, token = NULL, from = "item", to = "feature", call = parent.frame()) {
-  stopifnot(
-    esriUrl_isValidType(url, type = from, call = call),
-    "convert_esriUrl currently only supports conversion of item URLs" = from == "item"
-  )
+#' @importFrom cliExtras cli_menu
+convert_esriUrl <- function(url,
+                            token = NULL,
+                            from = NULL,
+                            to = "feature",
+                            call = parent.frame()) {
+  type <- esriUrl_isValidType(url, token, returnType = TRUE)
+  if (!is.null(to) && (type == to)) {
+    return(url)
+  }
+
+  from <- from %||% type
+
+  if (from == "service") {
+    layerInfo <- esrimeta(url, token)
+    layers <- layerInfo[["layers"]]
+
+    if (nrow(layers) == 1) {
+      return(paste0(url, "/", layers[["id"]]))
+    }
+
+    id <-
+      cliExtras::cli_menu(
+        choices = layers[["name"]],
+        title = c(
+          "i" = "{.val {layerInfo$serviceDescription}} is a service with
+          {nrow(layers)} layer{?s}:"
+        ),
+        message = "{cli::symbol$tick} Enter your selection or press {.kbd 0} to exit.",
+        prompt = "? Select a layer to download:",
+        ind = TRUE
+      )
+
+    return(paste0(url, "/", layers[id, ][["id"]]))
+  }
 
   if (from == "item") {
     url <-
