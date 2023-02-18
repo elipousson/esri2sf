@@ -30,6 +30,13 @@ esriInfo <- function(url, info = NULL, format = NULL, token = NULL, ...) {
 
 
   if (info == "info") {
+    url <-
+      convert_esriUrl(
+        url = url,
+        token = token,
+        to = "root"
+      )
+
     resp <-
       esriRequest(
         url = url,
@@ -49,15 +56,23 @@ esriInfo <- function(url, info = NULL, format = NULL, token = NULL, ...) {
       }, NA_character_),
       trunc = 8
     )
-    cli::cli_h1(c("{cli::col_br_blue(cli::symbol$info)} ArcGIS REST API Server Info"))
+    cli::cli_h1(c("{cli::col_br_blue(cli::symbol$info)} ArcGIS REST API Server"))
     cli::cli_rule("{.url {url}}", right = "v. {.href [{v}]({v_url})}")
 
-    cli::cli_bullets(
-      c(
-        ">" = "📂 {.num {length(folders)}} folder{?s} including {cli::ansi_collapse(as.character(folders), trunc = 8)}.",
-        ">" = "🗺️ {.num {length(services)}} top level service{?s} including {service_names}."
+    if (length(folders) > 0) {
+      cli::cli_bullets(
+        c(
+          ">" = "\U0001f4c2 {.num {length(folders)}} folder{?s} including {cli::ansi_collapse(as.character(folders), trunc = 8)}."
+        )
       )
-    )
+    }
+    if (length(services) > 0) {
+      cli::cli_bullets(
+        c(
+          ">" = "\U0001f5fa\ufe0f {.num {length(services)}} top level service{?s} including {service_names}."
+        )
+      )
+    }
 
     return(invisible(body))
   }
