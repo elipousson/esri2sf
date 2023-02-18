@@ -69,6 +69,40 @@
 ---
 
     Code
+      esriUrl_parseUrl(
+        "https://sampleserver6.arcgisonline.com/arcgis/rest/services/LocalGovernment")
+    Output
+      $url
+      [1] "https://sampleserver6.arcgisonline.com/arcgis/rest/services/LocalGovernment"
+      
+      $scheme
+      [1] "https://"
+      
+      $host
+      [1] "sampleserver6.arcgisonline.com"
+      
+      $instance
+      [1] "arcgis"
+      
+      $restIndicator
+      [1] "rest/services"
+      
+      $folderPath
+      [1] "LocalGovernment"
+      
+      $serviceName
+      [1] ""
+      
+      $serviceType
+      [1] ""
+      
+      $featureID
+      integer(0)
+      
+
+---
+
+    Code
       esriUrl_parseUrl("https://sampleserver6.arcgisonline.com/ArcGIS/rest/services")
     Output
       $url

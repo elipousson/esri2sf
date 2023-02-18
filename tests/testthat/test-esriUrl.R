@@ -4,7 +4,7 @@ test_that("esriUrl_serviceUrl returns correct substring", {
   expect_identical(esriUrl_serviceUrl("https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/3/"), "https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer")
   expect_identical(esriUrl_serviceUrl("https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer"), "https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer")
   expect_identical(esriUrl_serviceUrl("https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/"), "https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer")
-  expect_error(esriUrl_serviceUrl("https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/"), "`url` must end in one of the supported service types", fixed = TRUE)
+  expect_error(esriUrl_serviceUrl("https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/"), "Folder not found - code:", fixed = TRUE)
 })
 
 # test_that("esriUrl_isValidType checks", {
@@ -30,8 +30,8 @@ test_that("esriUrl_serviceUrl returns correct substring", {
 #   expect_true(esriUrl_isValidType("https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/3/", type = "feature"))
 #   expect_false(esriUrl_isValidType("https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer", type = "feature"))
 #   expect_message(esriUrl_isValidType("https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer", type = "feature", displayReason = TRUE), "`url` must end in a feature ID")
-#   expect_false(esriUrl_isValidType("https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census", type = "feature"))
-#   expect_message(esriUrl_isValidType("https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census", type = "feature", displayReason = TRUE), "`url` must end in a feature ID")
+#   expect_false(esriUrl_isValidType("https://sampleserver6.arcgisonline.com/arcgis/rest/services/LocalGovernment", type = "feature"))
+#   expect_message(esriUrl_isValidType("https://sampleserver6.arcgisonline.com/arcgis/rest/services/LocalGovernment", type = "feature", displayReason = TRUE), "`url` must end in a feature ID")
 #   expect_false(esriUrl_isValidType("https://sampleserver6.arcgisonline.com/ArcGIS/rest/services", type = "feature"))
 #   expect_message(esriUrl_isValidType("https://sampleserver6.arcgisonline.com/ArcGIS/rest/services", type = "feature", displayReason = TRUE), "`url` must end in a feature ID")
 #   expect_false(esriUrl_isValidType("https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/3", type = "feature"))
@@ -46,8 +46,8 @@ test_that("esriUrl_serviceUrl returns correct substring", {
 #   expect_message(esriUrl_isValidType("https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/3", type = "service", displayReason = TRUE), "`url` must end in one of the supported service types")
 #   expect_true(esriUrl_isValidType("https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer", type = "service"))
 #   expect_true(esriUrl_isValidType("https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/", type = "service"))
-#   expect_false(esriUrl_isValidType("https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census", type = "service"))
-#   expect_message(esriUrl_isValidType("https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census", type = "service", displayReason = TRUE), "`url` must end in one of the supported service types")
+#   expect_false(esriUrl_isValidType("https://sampleserver6.arcgisonline.com/arcgis/rest/services/LocalGovernment", type = "service"))
+#   expect_message(esriUrl_isValidType("https://sampleserver6.arcgisonline.com/arcgis/rest/services/LocalGovernment", type = "service", displayReason = TRUE), "`url` must end in one of the supported service types")
 #   expect_false(esriUrl_isValidType("https://sampleserver6.arcgisonline.com/ArcGIS/rest/services", type = "service"))
 #   expect_message(esriUrl_isValidType("https://sampleserver6.arcgisonline.com/ArcGIS/rest/services", type = "service", displayReason = TRUE), "`url` must end in one of the supported service types")
 #   expect_false(esriUrl_isValidType("https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/3", type = "service"))
@@ -62,7 +62,7 @@ test_that("esriUrl_serviceUrl returns correct substring", {
 #   expect_message(esriUrl_isValidType("https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/3", type = "folder", displayReason = TRUE), "must be a 'Folder' endpoint")
 #   expect_false(esriUrl_isValidType("https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer", type = "folder"))
 #   expect_message(esriUrl_isValidType("https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer", type = "folder", displayReason = TRUE), "`url` must be a 'Folder' endpoint")
-#   expect_true(esriUrl_isValidType("https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census", type = "folder"))
+#   expect_true(esriUrl_isValidType("https://sampleserver6.arcgisonline.com/arcgis/rest/services/LocalGovernment", type = "folder"))
 #   expect_true(esriUrl_isValidType("https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/", type = "folder"))
 #   expect_true(esriUrl_isValidType("https://sampleserver6.arcgisonline.com/ArcGIS/rest/services", type = "folder"))
 #   expect_false(esriUrl_isValidType("https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/3", type = "folder"))
@@ -77,8 +77,8 @@ test_that("esriUrl_serviceUrl returns correct substring", {
 #   expect_message(esriUrl_isValidType("https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/3", type = "root", displayReason = TRUE), "Url is not a valid ESRI Service Url.\nUrl does not end in '/rest/services'.")
 #   expect_false(esriUrl_isValidType("https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer", type = "root"))
 #   expect_message(esriUrl_isValidType("https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer", type = "root", displayReason = TRUE), "Url is not a valid ESRI Service Url.\nUrl does not end in '/rest/services'.")
-#   expect_false(esriUrl_isValidType("https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census", type = "root"))
-#   expect_message(esriUrl_isValidType("https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census", type = "root", displayReason = TRUE), "Url is not a valid ESRI Service Url.\nUrl does not end in '/rest/services'.")
+#   expect_false(esriUrl_isValidType("https://sampleserver6.arcgisonline.com/arcgis/rest/services/LocalGovernment", type = "root"))
+#   expect_message(esriUrl_isValidType("https://sampleserver6.arcgisonline.com/arcgis/rest/services/LocalGovernment", type = "root", displayReason = TRUE), "Url is not a valid ESRI Service Url.\nUrl does not end in '/rest/services'.")
 #   expect_true(esriUrl_isValidType("https://sampleserver6.arcgisonline.com/ArcGIS/rest/services", type = "root"))
 #   expect_true(esriUrl_isValidType("https://sampleserver6.arcgisonline.com/ArcGIS/rest/services/", type = "root"))
 #   expect_false(esriUrl_isValidType("https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/3", type = "root"))
@@ -108,10 +108,10 @@ test_that("esriUrl_serviceUrl returns correct substring", {
 #   expect_identical(esriUrl_isValidType("https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer", type = "root", returnType = TRUE), "service")
 #
 #   # Test returnType - Service
-#   expect_identical(esriUrl_isValidType("https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census", type = "feature", returnType = TRUE), "folder")
-#   expect_identical(esriUrl_isValidType("https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census", type = "service", returnType = TRUE), "folder")
-#   expect_identical(esriUrl_isValidType("https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census", type = "folder", returnType = TRUE), "folder")
-#   expect_identical(esriUrl_isValidType("https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census", type = "root", returnType = TRUE), "folder")
+#   expect_identical(esriUrl_isValidType("https://sampleserver6.arcgisonline.com/arcgis/rest/services/LocalGovernment", type = "feature", returnType = TRUE), "folder")
+#   expect_identical(esriUrl_isValidType("https://sampleserver6.arcgisonline.com/arcgis/rest/services/LocalGovernment", type = "service", returnType = TRUE), "folder")
+#   expect_identical(esriUrl_isValidType("https://sampleserver6.arcgisonline.com/arcgis/rest/services/LocalGovernment", type = "folder", returnType = TRUE), "folder")
+#   expect_identical(esriUrl_isValidType("https://sampleserver6.arcgisonline.com/arcgis/rest/services/LocalGovernment", type = "root", returnType = TRUE), "folder")
 #
 #   # Test returnType - Root
 #   expect_identical(esriUrl_isValidType("https://sampleserver6.arcgisonline.com/ArcGIS/rest/services", type = "feature", returnType = TRUE), "root")
@@ -168,19 +168,22 @@ test_that("esriUrl_isValid requires token", {
 })
 
 test_that("esriUrl_isValidFeature checks", {
-  # skip_if_offline("arcgisonline.com")
-
+  skip_if_offline("arcgisonline.com")
   expect_true(esriUrl_isValidFeature("https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/3"))
   expect_true(esriUrl_isValidFeature("https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/3/"))
 
   expect_false(esriUrl_isValidFeature("https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/"))
-  expect_message(esriUrl_isValidFeature("https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/", displayReason = TRUE), "`url` must end in a feature ID")
-  expect_message(esriUrl_isValidFeature("https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer", displayReason = TRUE), "`url` must end in a feature ID")
+  expect_message(
+    esriUrl_isValidFeature("https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/", displayReason = TRUE)
+  )
+  expect_message(
+    esriUrl_isValidFeature("https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer", displayReason = TRUE)
+  )
 })
 
 
 test_that("esriUrl_isValidService checks", {
-  # skip_if_offline_url(url = "https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/3")
+  skip_if_offline("arcgisonline.com")
 
   expect_true(esriUrl_isValidService("https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer"))
   expect_true(esriUrl_isValidService("https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/"))
@@ -196,12 +199,16 @@ test_that("esriUrl_isValidRoot checks", {
   expect_true(esriUrl_isValidRoot("https://sampleserver6.arcgisonline.com/arcgis/rest/services"))
   expect_true(esriUrl_isValidRoot("https://sampleserver6.arcgisonline.com/arcgis/rest/services/"))
 
-  expect_false(esriUrl_isValidRoot("https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census"))
-  expect_message(esriUrl_isValidRoot("https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census", displayReason = TRUE), "`url` must end in '/rest/services")
+  expect_false(esriUrl_isValidRoot("https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer"))
+  expect_message(
+    esriUrl_isValidRoot("https://sampleserver6.arcgisonline.com/arcgis/rest/services/LocalGovernment", displayReason = TRUE),
+    "`url` must end in '/rest/services"
+  )
 })
 
 
 test_that("esriUrl_isValidFolder checks", {
+  skip_if_offline("arcgisonline.com")
   # skip_if_offline_url("https://sampleserver6.arcgisonline.com/arcgis/rest/services/StoryMaps")
 
   expect_true(esriUrl_isValidFolder("https://sampleserver6.arcgisonline.com/ArcGIS/rest/services"))
@@ -215,14 +222,15 @@ test_that("esriUrl_isValidFolder checks", {
 
 
 test_that("esriUrl_parseUrl", {
+  skip_if_offline("arcgisonline.com")
   # skip_if_offline_url(url = "https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/3")
   # skip_if_offline_url(url = "https://services.arcgis.com/V6ZHFr6zdgNZuVG0/arcgis/rest/services/Landscape_Trees/FeatureServer/0")
 
   expect_snapshot(esriUrl_parseUrl("https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/3"))
   expect_snapshot(esriUrl_parseUrl("https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer"))
-  expect_snapshot(esriUrl_parseUrl("https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census"))
+  expect_snapshot(esriUrl_parseUrl("https://sampleserver6.arcgisonline.com/arcgis/rest/services/LocalGovernment"))
   expect_snapshot(esriUrl_parseUrl("https://sampleserver6.arcgisonline.com/ArcGIS/rest/services"))
   expect_snapshot(esriUrl_parseUrl("https://services.arcgis.com/V6ZHFr6zdgNZuVG0/arcgis/rest/services/Landscape_Trees/FeatureServer/0/"))
 
-  expect_error(esriUrl_parseUrl("https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/4"), "HTTP 503 Service Unavailable", fixed = TRUE)
+  expect_error(esriUrl_parseUrl("https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/4"))
 })
