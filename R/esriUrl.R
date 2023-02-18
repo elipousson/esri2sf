@@ -16,8 +16,7 @@ esriUrl_isValidType <- function(url,
                                 type = NULL,
                                 displayReason = FALSE,
                                 returnType = FALSE,
-                                call = .envir,
-                                .envir = parent.frame()) {
+                                call = parent.frame()) {
   servicesUrl <- grepl("/rest/services", url)
   servicesUrl_types <- c("root", "folder", "service", "feature", "content")
 
@@ -68,21 +67,19 @@ esriUrl_isValidType <- function(url,
     if (!is.null(type) && !returnType) {
       reason <-
         switch(type,
-          "root" = "A {.val {type}} type {.arg url} must end in '/rest/services':",
-          "folder" = "A {.val {type}} type {.arg url} must be a 'Folder' endpoint:",
-          "service" = "A {.val {type}} type {.arg url} must end in one of the supported service types ({serviceTypes}):",
-          "feature" = "A {.val {type}} type {.arg url} must end in a feature ID:",
-          "content" = "A {.val {type}} type {.arg url} must include '/content/':",
-          "search" = "A {.val {type}} type {.arg url} must include '/home/search.html?q=':",
-          "item" = "A {.val {type}} type {.arg url} must include '/home/item.html?id=':",
-          "group" = "A {.val {type}} type {.arg url} must include '/home/group.html?id=':",
-          "user" = "A {.val {type}} type {.arg url} must include '/home/user.html?user=':",
-          "app" = "A {.val {type}} type {.arg url} must include '/index.html?appid=':"
+          "root" = "A {.val {type}} {.arg url} must end in '/rest/services':",
+          "folder" = "A {.val {type}} {.arg url} must be a 'Folder' endpoint:",
+          "service" = "A {.val {type}} {.arg url} must end in one of the supported service types ({serviceTypes}):",
+          "feature" = "A {.val {type}} {.arg url} must end in a feature ID:",
+          "content" = "A {.val {type}} {.arg url} must include '/content/':",
+          "search" = "A {.val {type}} {.arg url} must include '/home/search.html?q=':",
+          "item" = "An {.val {type}} {.arg url} must include '/home/item.html?id=':",
+          "group" = "A {.val {type}} {.arg url} must include '/home/group.html?id=':",
+          "user" = "A {.val {type}} {.arg url} must include '/home/user.html?user=':",
+          "app" = "An {.val {type}} {.arg url} must include '/index.html?appid=':"
         )
 
-      cli::cli_inform(c("!" = reason, " " = "{.url {url}}"),
-        .envir = .envir
-      )
+      cli::cli_bullets(c("!" = reason, " " = "{.url {url}}"))
     }
 
     cli::cli_inform(c("!" = "Invalid {.arg url}: {.url {url}}"),
@@ -143,8 +140,11 @@ esriUrl_isValidType <- function(url,
 #' @export
 esriUrl_isValid <- function(url, token = NULL, displayReason = FALSE) {
   esriUrl_isValidType(
-    url = url, token = token, type = NULL,
-    displayReason = displayReason, returnType = FALSE
+    url = url,
+    token = token,
+    type = NULL,
+    displayReason = displayReason,
+    returnType = FALSE
   )
 }
 
@@ -153,8 +153,11 @@ esriUrl_isValid <- function(url, token = NULL, displayReason = FALSE) {
 #' @export
 esriUrl_isValidRoot <- function(url, token = NULL, displayReason = FALSE) {
   esriUrl_isValidType(
-    url = url, token = token, type = "root",
-    displayReason = displayReason, returnType = FALSE
+    url = url,
+    token = token,
+    type = "root",
+    displayReason = displayReason,
+    returnType = FALSE
   )
 }
 
@@ -163,8 +166,11 @@ esriUrl_isValidRoot <- function(url, token = NULL, displayReason = FALSE) {
 #' @export
 esriUrl_isValidFolder <- function(url, token = NULL, displayReason = FALSE) {
   esriUrl_isValidType(
-    url = url, token = token, type = "folder",
-    displayReason = displayReason, returnType = FALSE
+    url = url,
+    token = token,
+    type = "folder",
+    displayReason = displayReason,
+    returnType = FALSE
   )
 }
 
@@ -173,8 +179,11 @@ esriUrl_isValidFolder <- function(url, token = NULL, displayReason = FALSE) {
 #' @export
 esriUrl_isValidService <- function(url, token = NULL, displayReason = FALSE) {
   esriUrl_isValidType(
-    url = url, token = token, type = "service",
-    displayReason = displayReason, returnType = FALSE
+    url = url,
+    token = token,
+    type = "service",
+    displayReason = displayReason,
+    returnType = FALSE
   )
 }
 
@@ -193,8 +202,11 @@ esriUrl_isValidID <- function(url, token = NULL, displayReason = FALSE) {
 #' @export
 esriUrl_isValidFeature <- function(url, token = NULL, displayReason = FALSE) {
   esriUrl_isValidType(
-    url = url, token = token, type = "feature",
-    displayReason = displayReason, returnType = FALSE
+    url = url,
+    token = token,
+    type = "feature",
+    displayReason = displayReason,
+    returnType = FALSE
   )
 }
 
@@ -228,6 +240,23 @@ esriUrl_serviceUrl <- function(url, token = NULL) {
   return(urlNoLayerID)
 }
 
+#' @keywords internal
+parse_url_scheme <- function(url) {
+  regmatches(url, regexpr("^https://|^http://", url))
+}
+
+#' @keywords internal
+parse_url_host <- function(url, scheme = NULL) {
+  scheme <- scheme %||% parse_url_scheme(url)
+  unlist(strsplit(sub(scheme, "", url), "/"))[1]
+}
+
+#' @keywords internal
+parse_url_instance <- function(url, host = NULL, scheme = NULL) {
+  host <- host %||% parse_url_host(url, scheme)
+  sub("/rest/services.*", "", sub(paste0(".*", host, "/"), "", url))
+}
+
 #' @describeIn esriUrl Parse Url into parts.
 #' @export
 esriUrl_parseUrl <- function(url, token = NULL) {
@@ -241,9 +270,9 @@ esriUrl_parseUrl <- function(url, token = NULL) {
     }
   )
 
-  scheme <- regmatches(url, regexpr("^https://|^http://", url))
-  host <- unlist(strsplit(sub(scheme, "", url), "/"))[1]
-  instance <- sub("/rest/services.*", "", sub(paste0(".*", host, "/"), "", url))
+  scheme <- parse_url_scheme(url)
+  host <- parse_url_host(url, scheme)
+  instance <- parse_url_instance(url, host, scheme)
 
   # Find type of URL
   urlType <- esriUrl_isValidType(url,
@@ -251,29 +280,22 @@ esriUrl_parseUrl <- function(url, token = NULL) {
     displayReason = FALSE, returnType = TRUE
   )
 
-  if (urlType == "root") {
-    folderPath <- ""
-    serviceName <- ""
-    serviceType <- ""
-    featureID <- integer(0)
-  } else if (urlType == "folder") {
+  folderPath <- ""
+  serviceName <- ""
+  serviceType <- ""
+  featureID <- integer(0)
+
+  if (urlType == "folder") {
     folderPath <- sub("/$", "", sub(".*/rest/services/", "", url))
-    serviceName <- ""
-    serviceType <- ""
-    featureID <- integer(0)
   } else if (urlType %in% c("service", "feature")) {
     folderService <- unlist(strsplit(sub(paste0("/(", paste0(serviceTypes, collapse = "|"), ").*"), "", sub(".*/rest/services/", "", url)), "/"))
     if (length(folderService) > 1) {
       folderPath <- paste0(folderService[-length(folderService)], collapse = "/")
-    } else {
-      folderPath <- ""
     }
     serviceSplit <- unlist(strsplit(sub(paste0("/(", paste0(serviceTypes, collapse = "|"), ").*"), "", url), "/"))
     serviceName <- serviceSplit[length(serviceSplit)]
     serviceType <- gsub("/", "", regmatches(url, regexpr(paste0("/(", paste0(serviceTypes, collapse = "|"), ")/?"), url)))
-    if (urlType == "service") {
-      featureID <- integer(0)
-    } else if (urlType == "feature") {
+    if (urlType == "feature") {
       featureID <- as.integer(gsub("/", "", regmatches(url, regexpr("/[0-9]+/?$", url))))
     }
   }
@@ -307,12 +329,22 @@ convert_esriUrl <- function(url,
                             from = NULL,
                             to = "feature",
                             call = parent.frame()) {
-  type <- esriUrl_isValidType(url, token, returnType = TRUE)
-  if (!is.null(to) && (type == to)) {
+  type <- esriUrl_isValidType(url = url, token = token, returnType = TRUE)
+  if (isTRUE(identical(type, to))) {
     return(url)
   }
 
   from <- from %||% type
+
+  if ((from != "item") & (to == "root")) {
+    url <- esriUrl_parseUrl(url, token)
+    return(
+      paste0(
+        url["scheme"],
+        paste0(url[c("host", "instance", "restIndicator")], collapse = "/")
+      )
+    )
+  }
 
   if (from == "service") {
     layerInfo <- esrimeta(url, token)
