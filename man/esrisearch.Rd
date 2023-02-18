@@ -43,6 +43,9 @@ categories. Only 3 or less terms currently supported, Default: \code{NULL}}
 
 \item{desc}{If \code{TRUE}, return results in descending order. If \code{FALSE}
 (default), return results in ascending order. Ignored if sort is \code{NULL}.}
+
+\item{quiet}{If \code{TRUE}, suppress warnings and informational messages.
+Defaults to \code{FALSE}.}
 }
 \value{
 A tibble data.frame with results from the item search.

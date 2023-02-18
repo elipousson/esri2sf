@@ -25,6 +25,8 @@
 #'   "numcomments", "numviews". Default: `NULL`.
 #' @param desc If `TRUE`, return results in descending order. If `FALSE`
 #'   (default), return results in ascending order. Ignored if sort is `NULL`.
+#' @param quiet If `TRUE`, suppress warnings and informational messages.
+#'   Defaults to `FALSE`.
 #' @return A tibble data.frame with results from the item search.
 #' @examples
 #' \dontrun{
@@ -136,10 +138,10 @@ esrisearch <- function(query = NULL,
 
   resp <- httr2::resp_body_json(resp, simplifyVector = TRUE)
 
-  if (resp$total >= 10000) {
+  total <- resp$total
+
+  if (total >= 10000) {
     total <- "10000+"
-  } else {
-    total <- resp$total
   }
 
   if (!is.null(resp$query)) {
