@@ -15,7 +15,7 @@
 #' @param ... Additional parameters passed to [esriCatalog()] (not typically
 #'   required)
 #' @export
-#' @importFrom dplyr bind_cols bind_rows mutate if_else case_when relocate
+#' @importFrom dplyr bind_rows mutate if_else case_when relocate
 esriIndex <- function(url,
                       folderPath = NULL,
                       serviceName = NULL,
@@ -38,32 +38,40 @@ esriIndex <- function(url,
 
   if (!!length(esriResp[["folders"]])) {
     folders <-
-      dplyr::bind_cols(
-        "name" = unlist(esriResp$folders),
-        "urlType" = "folder",
-        "type" = NA
+      list_cbind(
+        list(
+          "name" = unlist(esriResp[["folders"]]),
+          "urlType" = "folder",
+          "type" = NA
+        )
       )
 
     index <-
-      dplyr::bind_rows(
-        index,
-        folders
+      list_rbind(
+        list(
+          index,
+          folders
+        )
       )
   }
 
   if (!!length(esriResp[["services"]])) {
-    services <- dplyr::bind_rows(esriResp$services)
+    services <- dplyr::bind_rows(esriResp[["services"]])
 
     services <-
-      dplyr::bind_cols(
-        services,
-        "urlType" = "service"
+      list_cbind(
+        list(
+          services,
+          "urlType" = "service"
+        )
       )
 
     index <-
-      dplyr::bind_rows(
-        index,
-        services
+      list_rbind(
+        list(
+          index,
+          services
+        )
       )
   }
 
@@ -82,7 +90,7 @@ esriIndex <- function(url,
       )
     )
 
-  na_type <- all(sapply(index$type, is.na))
+  na_type <- all(sapply(index[["type"]], is.na))
 
   index <-
     dplyr::mutate(
@@ -94,44 +102,38 @@ esriIndex <- function(url,
       )
     )
 
-  index <-
-    dplyr::bind_cols(
+  index <- list_cbind(
+    list(
       index,
       "folderPath" = folderPath,
       "serviceName" = serviceName
     )
-
-  if (!requireNamespace("purrr", quietly = TRUE) && recurse) {
-    cli::cli_warn(
-      c("The {.pkg purrr} package is not installed.",
-        "i" = "{.pkg purrr} is required when {.arg recurse} is {.val TRUE}.",
-        ">" = "Setting {.arg recurse} to {.val FALSE}."
-      )
-    )
-
-    recurse <- FALSE
-  }
+  )
 
   if (recurse) {
     folderIndex <- subset(index, urlType == "folder")
 
     if (nrow(folderIndex) > 0) {
       folderIndex <-
-        purrr::map2_dfr(
-          folderIndex$url,
-          folderIndex$name,
-          ~ esriIndex(
-            url = .x,
-            folderPath = .y,
-            serviceName = serviceName,
-            recurse = TRUE
+        list_rbind(
+          map2(
+            folderIndex[["url"]],
+            folderIndex[["name"]],
+            ~ esriIndex(
+              url = .x,
+              folderPath = .y,
+              serviceName = serviceName,
+              recurse = TRUE
+            )
           )
         )
 
       index <-
-        dplyr::bind_rows(
-          index,
-          folderIndex
+        list_rbind(
+          list(
+            index,
+            folderIndex
+          )
         )
     }
 
@@ -146,21 +148,25 @@ esriIndex <- function(url,
 
     if (nrow(layerIndex) > 0) {
       layerIndex <-
-        purrr::map2_dfr(
-          layerIndex$url,
-          layerIndex$name,
-          ~ esriIndexLayers(
-            url = .x,
-            folderPath = folderPath,
-            serviceName = .y,
-            recurse = TRUE
+        list_rbind(
+          map2(
+            layerIndex[["url"]],
+            layerIndex[["name"]],
+            ~ esriIndexLayers(
+              url = .x,
+              folderPath = folderPath,
+              serviceName = .y,
+              recurse = TRUE
+            )
           )
         )
 
       index <-
-        dplyr::bind_rows(
-          index,
-          layerIndex
+        list_rbind(
+          list(
+            index,
+            layerIndex
+          )
         )
     }
   }
@@ -188,7 +194,7 @@ esriIndex <- function(url,
 #' @name esriIndexLayers
 #' @rdname esriIndex
 #' @export
-#' @importFrom dplyr bind_cols bind_rows
+#' @importFrom dplyr bind_rows
 esriIndexLayers <- function(url,
                             folderPath = NULL,
                             serviceName = NULL,
@@ -202,29 +208,37 @@ esriIndexLayers <- function(url,
 
   if (!!length(esriResp[["layers"]])) {
     layers <-
-      dplyr::bind_cols(
-        dplyr::bind_rows(esriResp$layers),
-        "urlType" = "layer"
+      list_cbind(
+        list(
+          dplyr::bind_rows(esriResp$layers),
+          "urlType" = "layer"
+        )
       )
 
     index <-
-      dplyr::bind_rows(
-        index,
-        layers
+      list_rbind(
+        list(
+          index,
+          layers
+        )
       )
   }
 
   if (!!length(esriResp[["tables"]])) {
     tables <-
-      dplyr::bind_cols(
-        dplyr::bind_rows(esriResp$tables),
-        "urlType" = "table"
+      list_cbind(
+        list(
+          dplyr::bind_rows(esriResp$tables),
+          "urlType" = "table"
+        )
       )
 
     index <-
-      dplyr::bind_rows(
-        index,
-        tables
+      list_rbind(
+        list(
+          index,
+          tables
+        )
       )
   }
 
@@ -233,11 +247,13 @@ esriIndexLayers <- function(url,
   }
 
   index <-
-    dplyr::bind_cols(
-      index,
-      "url" = paste0(gsub("/$", "", url), "/", index$id),
-      "folderPath" = folderPath,
-      "serviceName" = serviceName
+    list_cbind(
+      list(
+        index,
+        "url" = paste0(gsub("/$", "", url), "/", index$id),
+        "folderPath" = folderPath,
+        "serviceName" = serviceName
+      )
     )
 
   dplyr::distinct(
@@ -271,6 +287,7 @@ esriindex <- esriIndex
 #'   resp_body_xml
 #' @importFrom dplyr case_when bind_rows
 #' @importFrom cli cli_abort
+#' @importFrom rlang check_installed
 esriCatalog <- function(url,
                         f = "json",
                         token = NULL,
@@ -320,18 +337,19 @@ esriCatalog <- function(url,
   }
 
   if (format %in% c("sitemap", "geositemap")) {
-    if (!requireNamespace("xml2", quietly = TRUE)) {
-      cli::cli_abort(
-        "The {.pkg xml2} package must be installed if {.arg format}
+    rlang::check_installed(
+      "xml2",
+      reason = "The {.pkg xml2} package must be installed if {.arg format}
         is {.val sitemap} or {.val geositemap}."
-      )
-    }
+    )
 
     sitemap <- httr2::resp_body_xml(resp = resp, ...)
 
     sitemap <- xml2::as_list(sitemap)
 
-    dplyr::bind_rows("url" = unlist(sitemap, use.names = FALSE))
+    list_rbind(
+      list("url" = unlist(sitemap, use.names = FALSE))
+    )
   }
 }
 
