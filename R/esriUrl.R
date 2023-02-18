@@ -82,9 +82,7 @@ esriUrl_isValidType <- function(url,
       cli::cli_bullets(c("!" = reason, " " = "{.url {url}}"))
     }
 
-    cli::cli_inform(c("!" = "Invalid {.arg url}: {.url {url}}"),
-      .envir = .envir
-    )
+    cli::cli_inform(c("!" = "Invalid {.arg url}: {.url {url}}"))
   }
 
   if (returnType) {
