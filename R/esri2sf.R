@@ -37,8 +37,6 @@
 #'   frame. Default `FALSE`.
 #' @param quiet If `TRUE`, use [suppressMessages()] to prevent the printing of
 #'   messages about the requested layer. Defaults to `FALSE`.
-#' @param .rows The number of rows, useful to create a 0-column tibble or
-#'   just as an additional check.
 #' @param .name_repair Treatment of problematic column names:
 #'   * `"minimal"`: No name repair or checks, beyond basic existence,
 #'   * `"unique"`: Make sure names are unique and not empty,
@@ -388,7 +386,7 @@ esrimeta <- function(url,
     return(layerInfo)
   }
 
-  dplyr::bind_rows(layerInfo$fields)
+  list_rbind(layerInfo["fields"])
 }
 
 
@@ -423,13 +421,14 @@ check_layerInfo <- function(layerInfo, call = parent.frame()) {
 #' @noRd
 #' @importFrom sf st_crs
 #' @importFrom cli cli_abort
+#' @importFrom rlang has_name
 getLayerCRS <- function(spatialReference, layerCRS = NULL, call = parent.frame()) {
   # Get the layer CRS from the layer spatial reference
-  if ("latestWkid" %in% names(spatialReference)) {
+  if (rlang::has_name(spatialReference, "latestWkid")) {
     layerCRS <- spatialReference$latestWkid
-  } else if ("wkid" %in% names(spatialReference)) {
+  } else if (rlang::has_name(spatialReference, "wkid")) {
     layerCRS <- spatialReference$wkid
-  } else if ("wkt" %in% names(spatialReference)) {
+  } else if (rlang::has_name(spatialReference, "wkt")) {
     layerCRS <- spatialReference$wkt
   }
 
@@ -561,12 +560,13 @@ check_esriUrl <- function(url,
 #'
 #' @noRd
 #' @importFrom cli cli_abort
+#' @importFrom rlang has_name
 check_layerTypes <- function(layerInfo,
                              url = NULL,
                              token = NULL,
                              layerTypes = c("Feature Layer", "Table", "Group Layer"),
                              call = parent.frame()) {
-  if (!("type" %in% names(layerInfo))) {
+  if (!rlang::has_name(layerInfo, "type")) {
     cli::cli_abort(
       "{.arg url} must be a
       {.val {cli::cli_vec(layerTypes, style = list(vec_last = ' or '))}} type
@@ -606,6 +606,7 @@ is_groupLayer <- function(layerInfo) {
 #' @noRd
 #' @importFrom cli cli_rule cli_ol cli_par cli_progress_along symbol pb_current
 #'   pb_bar pb_percent
+#' @importFrom rlang set_names
 esrigroup <- function(layerInfo,
                       url,
                       outFields = NULL,
@@ -664,7 +665,5 @@ esrigroup <- function(layerInfo,
       }
     )
 
-  names(sfdf) <- layerInfo$subLayers$name
-
-  sfdf
+  rlang::set_names(sfdf, layerInfo[["subLayers"]][["name"]])
 }

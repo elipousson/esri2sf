@@ -26,7 +26,7 @@ esri2sfGeom <- function(jsonFeats,
       function(att) lapply(att, function(x) ifelse(is.null(x), NA, x))
     )
 
-  af <- dplyr::bind_rows(lapply(atts, as.data.frame.list, stringsAsFactors = FALSE))
+  af <- list_rbind(lapply(atts, as.data.frame.list, stringsAsFactors = FALSE))
 
   af <- dplyr::as_tibble(af, .name_repair = .name_repair)
   # combine geometry and attributes

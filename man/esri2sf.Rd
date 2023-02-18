@@ -100,9 +100,6 @@ messages about the requested layer. Defaults to \code{FALSE}.}
 \item{...}{additional named parameters to pass to the query. (e.g.
 \code{"resultRecordCount = 3"}). See the \href{https://developers.arcgis.com/rest/services-reference/enterprise/query-map-service-layer-.htm}{ArcGIS REST APIs documentation}
 for more information on all supported parameters.}
-
-\item{.rows}{The number of rows, useful to create a 0-column tibble or
-just as an additional check.}
 }
 \value{
 simple feature (\code{esri2sf}) or tibble (\code{esri2df}) or list or
