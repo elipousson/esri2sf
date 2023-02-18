@@ -17,6 +17,7 @@
 #' @importFrom httr2 resp_body_json resp_body_xml resp_body_raw
 #' @importFrom dplyr as_tibble
 #' @importFrom cli cli_abort
+#' @importFrom rlang check_installed
 esriInfo <- function(url, info = NULL, format = NULL, token = NULL, ...) {
   info <- match.arg(info, c("info", "item", "metadata", "thumbnail"))
 
@@ -132,12 +133,11 @@ esriInfo <- function(url, info = NULL, format = NULL, token = NULL, ...) {
 
     resp <- httr2::resp_body_raw(resp = resp)
 
-    if (!requireNamespace("magick", quietly = TRUE)) {
-      cli::cli_abort(
-        "The {.pkg magick} package must be installed when {.arg info}
+    rlang::check_installed(
+      "magick",
+      reason = "The {.pkg magick} package must be installed when {.arg info}
         is set to {.val thumbnail}."
-      )
-    }
+    )
 
     magick::image_read(resp)
   }

@@ -12,15 +12,17 @@
 #'   "png24", "jpg", "bmp", "gif", "tiff", "png32", "bip", "bsq", and "lerc"
 #' @param adjustAspectRatio defaults to `FALSE`
 #' @return SpatRaster object from `terra::rast`
+#' @importFrom rlang check_installed
 esri2rast <- function(url,
                       bbox = NULL,
                       token = NULL,
                       format = "jpgpng",
                       adjustAspectRatio = FALSE,
                       ...) {
-  if (!requireNamespace("terra", quietly = TRUE)) {
-    cli::cli_abort("{.pkg terra} must be installed to use {.fn esri2rast}.")
-  }
+  rlang::check_installed(
+    "terra",
+    reason = "{.pkg terra} must be installed to use {.fn esri2rast}."
+  )
 
   layerInfo <- esrimeta(url = url, token = token)
 
