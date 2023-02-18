@@ -11,8 +11,39 @@
   )
 }
 
+utils::globalVariables(
+  c("name", "serviceType", "type", "urlType")
+)
+
+#' @keywords internal
+#' @importFrom rlang zap current_env
+#' @importFrom vctrs vec_rbind
+list_rbind <- function(x, names_to = rlang::zap(), ptype = NULL) {
+  vctrs::vec_rbind(
+    !!!x,
+    .names_to = names_to,
+    .ptype = ptype,
+    .error_call = rlang::current_env()
+  )
+}
+
+#' @keywords internal
+#' @importFrom rlang zap current_env
+#' @importFrom vctrs vec_cbind
+list_cbind <- function(x,
+                       name_repair = c("unique", "universal", "check_unique"),
+                       size = NULL) {
+  vctrs::vec_cbind(
+    !!!x,
+    .name_repair = name_repair,
+    .size = size,
+    .error_call = rlang::current_env()
+  )
+}
+
 #' Get object ids
 #'
+#' @keywords internal
 #' @noRd
 #' @importFrom httr2 resp_body_json
 getObjectIds <- function(url,
@@ -47,6 +78,7 @@ getObjectIds <- function(url,
 
 #' Get count of maximum records per request
 #'
+#' @keywords internal
 #' @noRd
 getMaxRecordsCount <- function(url,
                                token = NULL,
@@ -71,8 +103,9 @@ getMaxRecordsCount <- function(url,
 
 #' Get table for Table layer
 #'
+#' @keywords internal
 #' @noRd
-#' @importFrom dplyr bind_rows as_tibble
+#' @importFrom dplyr as_tibble
 getEsriTable <- function(jsonFeats, .name_repair = "check_unique") {
   atts <- lapply(
     lapply(jsonFeats, `[[`, 1),
@@ -80,7 +113,7 @@ getEsriTable <- function(jsonFeats, .name_repair = "check_unique") {
   )
 
   df <-
-    dplyr::bind_rows(
+    list_rbind(
       lapply(atts, as.data.frame.list, stringsAsFactors = FALSE)
     )
 
@@ -90,6 +123,7 @@ getEsriTable <- function(jsonFeats, .name_repair = "check_unique") {
 
 #' Get features using feature ids from getObjectIds
 #'
+#' @keywords internal
 #' @noRd
 #' @importFrom httr2 resp_body_json
 getEsriFeaturesByIds <- function(objectIds = NULL,
@@ -138,6 +172,7 @@ getEsriFeaturesByIds <- function(objectIds = NULL,
 
 #' Get ESRI features
 #'
+#' @keywords internal
 #' @noRd
 #' @importFrom dplyr case_when
 #' @importFrom jsonlite toJSON
@@ -206,14 +241,12 @@ getEsriFeatures <- function(url,
   unlist(results, recursive = FALSE)
 }
 
+#' @keywords internal
 isWktID <- function(crs) {
   is.numeric(crs) || grepl(pattern = "^(EPSG|ESRI):[[:digit:]]+$", x = crs)
 }
 
+#' @keywords internal
 WKTunPretty <- function(wkt) {
   gsub("\\n[[:blank:]]*", "", wkt)
 }
-
-utils::globalVariables(
-  c("name", "serviceType", "type", "urlType")
-)

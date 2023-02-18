@@ -3,25 +3,25 @@
 # Imported from pkg:stringstatic
 # ======================================================================
 
-`%||%` <- function(lhs, rhs) {
-  if (length(lhs) == 0) {
-    return(rhs)
-  }
-  lhs
-}
-
 str_extract <- function(string, pattern) {
-  is_fixed <- inherits(pattern, "fixed")
-  ignore.case <- attr(pattern, "options")$case_insensitive %||% FALSE
+	if (length(string) == 0 || length(pattern) == 0) return(character(0))
 
-  regmatches(
-    x = string,
-    m = regexpr(
-      pattern = pattern,
-      text = string,
-      ignore.case = ignore.case,
-      perl = !is_fixed,
-      fixed = is_fixed
-    )
-  )
+	is_fixed <- inherits(pattern, "stringr_fixed")
+
+	result <- Map(
+		function(string, pattern) {
+			if (is.na(string) || is.na(pattern)) return(NA_character_)
+
+			regmatches(
+				x = string,
+				m = regexpr(
+					pattern = pattern, text = string, perl = !is_fixed, fixed = is_fixed
+				)
+			)
+		},
+		string, pattern, USE.NAMES = FALSE
+	)
+
+	result[lengths(result) == 0] <- NA_character_
+	unlist(result)
 }
