@@ -103,18 +103,6 @@
     },
     {
       "@type": "SoftwareApplication",
-      "identifier": "purrr",
-      "name": "purrr",
-      "provider": {
-        "@id": "https://cran.r-project.org",
-        "@type": "Organization",
-        "name": "Comprehensive R Archive Network (CRAN)",
-        "url": "https://cran.r-project.org"
-      },
-      "sameAs": "https://CRAN.R-project.org/package=purrr"
-    },
-    {
-      "@type": "SoftwareApplication",
       "identifier": "rappdirs",
       "name": "rappdirs",
       "provider": {
@@ -196,6 +184,13 @@
     },
     "3": {
       "@type": "SoftwareApplication",
+      "identifier": "cliExtras",
+      "name": "cliExtras",
+      "version": ">= 0.1.0",
+      "sameAs": "https://github.com/elipousson/cliExtras"
+    },
+    "4": {
+      "@type": "SoftwareApplication",
       "identifier": "dplyr",
       "name": "dplyr",
       "provider": {
@@ -206,10 +201,11 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=dplyr"
     },
-    "4": {
+    "5": {
       "@type": "SoftwareApplication",
       "identifier": "httr2",
       "name": "httr2",
+      "version": ">= 0.2.2",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -218,7 +214,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=httr2"
     },
-    "5": {
+    "6": {
       "@type": "SoftwareApplication",
       "identifier": "jsonlite",
       "name": "jsonlite",
@@ -230,7 +226,19 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=jsonlite"
     },
-    "6": {
+    "7": {
+      "@type": "SoftwareApplication",
+      "identifier": "rlang",
+      "name": "rlang",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=rlang"
+    },
+    "8": {
       "@type": "SoftwareApplication",
       "identifier": "sf",
       "name": "sf",
@@ -243,14 +251,26 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=sf"
     },
-    "7": {
+    "9": {
       "@type": "SoftwareApplication",
       "identifier": "stats",
       "name": "stats"
     },
+    "10": {
+      "@type": "SoftwareApplication",
+      "identifier": "vctrs",
+      "name": "vctrs",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=vctrs"
+    },
     "SystemRequirements": null
   },
-  "fileSize": "761.578KB",
+  "fileSize": "781.004KB",
   "readme": "https://github.com/yonghah/esri2sf/blob/master/README.md",
   "developmentStatus": "https://www.repostatus.org/#active"
 }
