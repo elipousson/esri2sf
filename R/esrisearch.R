@@ -60,11 +60,7 @@ esrisearch <- function(query = NULL,
     )
   }
 
-  if (quiet) {
-    existing_handler <- getOption("cli.default_handler")
-    options("cli.default_handler" = suppressMessages)
-    on.exit(options("cli.default_handler" = existing_handler), add = TRUE)
-  }
+  cli_quiet(quiet)
 
   if (!is.null(bbox)) {
     bbox <-
@@ -79,7 +75,7 @@ esrisearch <- function(query = NULL,
     )
   }
 
-  if (num > 100 | num < 1) {
+  if (num > 100 || num < 1) {
     cli::cli_alert_warning(
       "{.arg num} must be a positive number between 1 and 100,
       not {.val {num}}.",

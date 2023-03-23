@@ -89,11 +89,7 @@ esri2sf <- function(url,
                     .name_repair = "check_unique",
                     quiet = FALSE,
                     ...) {
-  if (quiet) {
-    existing_handler <- getOption("cli.default_handler")
-    options("cli.default_handler" = suppressMessages)
-    on.exit(options("cli.default_handler" = existing_handler), add = TRUE)
-  }
+  cli_quiet(quiet)
 
   url <- check_esriUrl(url, token)
 
@@ -296,11 +292,7 @@ esri2df <- function(url,
                     .name_repair = "check_unique",
                     quiet = FALSE,
                     ...) {
-  if (quiet) {
-    existing_handler <- getOption("cli.default_handler")
-    options("cli.default_handler" = suppressMessages)
-    on.exit(options("cli.default_handler" = existing_handler), add = TRUE)
-  }
+  cli_quiet(quiet)
 
   url <- check_esriUrl(url, token)
 
