@@ -20,10 +20,11 @@ knitr::opts_chunk$set(
 [![CRAN status](https://www.r-pkg.org/badges/version/esri2sf)](https://CRAN.R-project.org/package=esri2sf)
 [![Project Status: Active -- The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-
 <!-- badges: end -->
 
 Download ArcGIS FeatureServer and MapServer Data to Simple Features
+
+**Note:** This package has diverged substantially from the [original esri2sf package](https://github.com/yonghah/esri2sf/) and I am unsure when or if any of the code may be merged back into the original repository. I am actively maintaining this package so please feel free to submit an issue if you have any feature requests or problems.
 
 The [ArcGIS FeatureServer](https://enterprise.arcgis.com/en/server/latest/publish-services/windows/what-is-a-feature-service-.htm) or [MapServer](https://enterprise.arcgis.com/en/server/latest/publish-services/windows/what-is-a-map-service.htm) services are among the most common sources for geospatial data. The esri2sf package enables users to download data from an ArcGIS Server to a simple feature (sf) or data frame object using the [ArcGIS REST API](https://developers.arcgis.com/rest/). You can learn more about [working with sf objects](https://r-spatial.github.io/sf/articles/sf1.html) in the documentation for the [sf package](https://r-spatial.github.io/sf/).
 
@@ -99,7 +100,7 @@ plot(mi)
 You can download non-spatial tables of the 'Table' layer type using `esri2df()`.
 
 ```{r tables}
-df <- esri2df("https://sampleserver6.arcgisonline.com/arcgis/rest/services/SF311/MapServer/1", objectIds = paste(22696727:22696777, collapse = ","))
+df <- esri2df("https://sampleserver6.arcgisonline.com/arcgis/rest/services/SF311/MapServer/1", objectIds = paste(24804387:24804396, collapse = ","))
 
 df
 ```
@@ -201,11 +202,19 @@ url <- "https://geodata.baltimorecity.gov/egis/rest/services/Locator/EGISComposi
 esrigeocode(url, address = "100 HOLLIDAY STREET")
 ```
 
-## Related packages and projects
+## Related projects
+
+### R packages
 
 - [{arcgisbinding}](https://github.com/R-ArcGIS/r-bridge) and the [R-ArcGIS Bridge](https://www.esri.com/en-us/arcgis/products/r-arcgis-bridge/overview)
 - [{geosapi}](https://github.com/eblondel/geosapi): GeoServer REST API R Interface
-- [{aarapir}](https://github.com/mps9506/aarapir): Access ArcGIS online API enpoints with R
-- [Geocoding Addresses with the ArcGIS REST API (Stanford Affiliates Only)](https://github.com/cengel/ArcGIS_geocoding)
+- [{aarapir}](https://github.com/mps9506/aarapir): Access ArcGIS online API endpoints with R
 - [{RPyGeo}](https://github.com/r-spatial/RPyGeo)
+
+### Other
+
+- [esri-dump](https://github.com/openaddresses/esri-dump): A Node module to assist with pulling data out of an ESRI ArcGIS REST server into GeoJSON.
+- [pyesridump](https://github.com/openaddresses/pyesridump): Scrapes an ESRI MapServer REST endpoint to spit out more generally-usable geodata.
+- [Geocoding Addresses with the ArcGIS REST API (Stanford Affiliates Only)](https://github.com/cengel/ArcGIS_geocoding)
 - [All things R Spatial](https://arc2r.github.io/book/): An introduction to spatial R for ArcGIS users ([repo](https://github.com/arc2r/book))
+- [ArcRasterRescue](https://github.com/r-barnes/ArcRasterRescue): Extract raster data from ArcGIS/ESRI formats.

@@ -4,8 +4,8 @@
   "identifier": "esri2sf",
   "description": "This package enables you to scrape geographic features directly from ArcGIS servers REST API into R as simple features.",
   "name": "esri2sf: Create Simple Features from ArcGIS Server REST API",
-  "codeRepository": "https://github.com/yonghah/esri2sf/",
-  "issueTracker": "https://github.com/yonghah/esri2sf/issues",
+  "codeRepository": "https://github.com/elipousson/esri2sf/",
+  "issueTracker": "https://github.com/elipousson/esri2sf/issues",
   "license": "https://spdx.org/licenses/MIT",
   "version": "0.1.1",
   "programmingLanguage": {
@@ -270,7 +270,8 @@
     },
     "SystemRequirements": null
   },
-  "fileSize": "781.004KB",
-  "readme": "https://github.com/yonghah/esri2sf/blob/master/README.md",
-  "developmentStatus": "https://www.repostatus.org/#active"
+  "fileSize": "780.93KB",
+  "readme": "https://github.com/elipousson/esri2sf/blob/master/README.md",
+  "developmentStatus": "https://www.repostatus.org/#active",
+  "keywords": ["esri", "rstats", "arcgis", "r-package"]
 }

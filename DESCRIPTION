@@ -12,8 +12,8 @@ Authors@R: c(
 Description: This package enables you to scrape geographic features
     directly from ArcGIS servers REST API into R as simple features.
 License: MIT + file LICENSE
-URL: https://github.com/yonghah/esri2sf/
-BugReports: https://github.com/yonghah/esri2sf/issues
+URL: https://github.com/elipousson/esri2sf/
+BugReports: https://github.com/elipousson/esri2sf/issues
 Depends: 
     R (>= 3.1.0)
 Imports:

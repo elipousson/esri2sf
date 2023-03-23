@@ -69,15 +69,12 @@ library(esri2sf)
 url <- "https://services.arcgis.com/V6ZHFr6zdgNZuVG0/arcgis/rest/services/Landscape_Trees/FeatureServer/0"
 
 df <- esri2sf(url)
-#> ✔ Downloading "Landscape_Trees" from
-#>   <]8;;https://services.arcgis.com/V6ZHFr6zdgNZuVG0/arcgis/rest/services/Landscape_Trees/FeatureServer/0https://services.arcgis.com/V6ZHFr6zdgNZuVG0/arcgis/rest/services/Landscape_Trees/FeatureServer/0]8;;>
+#> ── Downloading "Landscape_Trees" from <]8;;https://services.arcgis.com/V6ZHFr6zdgNZuVG0/arcgis/rest/services/Landscape_Trees/FeatureServer/0https://services.arcgis.com/V6ZHFr6zdgNZu]8;;
 #> Layer type: "Feature Layer"
-#> 
 #> Geometry type: "esriGeometryPoint"
-#> 
 #> Service CRS: "EPSG:3857"
-#> 
 #> Output CRS: "EPSG:4326"
+#> 
 
 plot(df)
 #> Warning: plotting the first 9 out of 56 attributes; use max.plot = 56 to plot
@@ -147,15 +144,12 @@ esrimeta(url, fields = TRUE)
 #> 22    sqlTypeOther     TRUE     TRUE     NA           NA     NA
 
 df <- esri2sf(url, outFields = c("AADT", "DFLG"))
-#> ✔ Downloading "Florida_Annual_Average_Daily_Traffic" from
-#>   <]8;;https://services.arcgis.com/V6ZHFr6zdgNZuVG0/arcgis/rest/services/Florida_Annual_Average_Daily_Traffic/FeatureServer/0https://services.arcgis.com/V6ZHFr6zdgNZuVG0/arcgis/rest/services/Florida_Annual_Average_Daily_Traffic/FeatureServer/0]8;;>
+#> ── Downloading "Florida_Annual_Average_Daily_Traffic" from <]8;;https://services.arcgis.com/V6ZHFr6zdgNZuVG0/arcgis/rest/services/Florida_Annual_Average_Daily_Traffic/FeatureServer/0https://services.arc]8;;
 #> Layer type: "Feature Layer"
-#> 
 #> Geometry type: "esriGeometryPolyline"
-#> 
 #> Service CRS: "EPSG:3857"
-#> 
 #> Output CRS: "EPSG:4326"
+#> 
 
 plot(df)
 ```
@@ -180,15 +174,12 @@ mi <- esri2sf(
   where = "STATE_NAME = 'Michigan'",
   outFields = c("POP2000", "pop2007", "POP00_SQMI", "POP07_SQMI")
 )
-#> ✔ Downloading "Detailed Counties" from
-#>   <]8;;https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/2https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/2]8;;>
+#> ── Downloading "Detailed Counties" from <]8;;https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/2https://sampleserver6.arcgisonline.com/]8;;
 #> Layer type: "Feature Layer"
-#> 
 #> Geometry type: "esriGeometryPolygon"
-#> 
 #> Service CRS: "EPSG:4269"
-#> 
 #> Output CRS: "EPSG:4326"
+#> 
 
 plot(mi)
 ```
@@ -203,26 +194,14 @@ You can download non-spatial tables of the ‘Table’ layer type using
 `esri2df()`.
 
 ``` r
-df <- esri2df("https://sampleserver6.arcgisonline.com/arcgis/rest/services/SF311/MapServer/1", objectIds = paste(22696727:22696777, collapse = ","))
-#> ✔ Downloading "SF_Crime_Incidents"
+df <- esri2df("https://sampleserver6.arcgisonline.com/arcgis/rest/services/SF311/MapServer/1", objectIds = paste(24804387:24804396, collapse = ","))
+#> ── Downloading "SF_Crime_Incidents" from <]8;;https://sampleserver6.arcgisonline.com/arcgis/rest/services/SF311/MapServer/1https://sampleserver6.arcgisonline.com]8;;
 #> Layer type: "Table"
+#> Warning: No records match the search criteria.
+#> 
 
 df
-#> # A tibble: 51 × 10
-#>    objectid incidn…¹ categ…² descr…³ dayof…⁴ date_ time  pddis…⁵ resol…⁶ datet…⁷
-#>       <int> <chr>    <chr>   <chr>   <chr>   <chr> <chr> <chr>   <chr>     <dbl>
-#>  1 22696727 0960696… LARCEN… GRAND … Sunday  08/1… 21:00 INGLES… NONE    1.25e12
-#>  2 22696728 0960697… LARCEN… GRAND … Saturd… 08/1… 18:00 INGLES… NONE    1.25e12
-#>  3 22696729 0960697… LARCEN… GRAND … Monday  08/1… 09:00 CENTRAL NONE    1.25e12
-#>  4 22696730 0960697… LARCEN… GRAND … Thursd… 08/1… 18:30 CENTRAL NONE    1.25e12
-#>  5 22696731 0960697… LARCEN… GRAND … Saturd… 08/1… 15:00 CENTRAL NONE    1.25e12
-#>  6 22696732 0960697… LARCEN… GRAND … Saturd… 08/1… 14:30 CENTRAL NONE    1.25e12
-#>  7 22696733 0960697… LARCEN… GRAND … Saturd… 08/1… 19:30 CENTRAL NONE    1.25e12
-#>  8 22696734 0960698… LARCEN… GRAND … Saturd… 08/1… 21:00 CENTRAL NONE    1.25e12
-#>  9 22696735 0960698… LARCEN… GRAND … Sunday  08/1… 10:45 CENTRAL NONE    1.25e12
-#> 10 22696736 0960698… VANDAL… MALICI… Sunday  08/1… 13:25 CENTRAL NONE    1.25e12
-#> # … with 41 more rows, and abbreviated variable names ¹​incidntnum, ²​category,
-#> #   ³​descript, ⁴​dayofweek, ⁵​pddistrict, ⁶​resolution, ⁷​datetime
+#> # A tibble: 0 × 0
 ```
 
 In some cases, tables may include coordinates as numeric attribute
@@ -269,15 +248,12 @@ outFields <- c("POP2000", "pop2007", "POP00_SQMI", "POP07_SQMI")
 
 # default crs = 4326
 esri2sf(url, where = where, outFields = outFields)
-#> ✔ Downloading "Detailed Counties" from
-#>   <]8;;https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/2https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/2]8;;>
+#> ── Downloading "Detailed Counties" from <]8;;https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/2https://sampleserver6.arcgisonline.com/]8;;
 #> Layer type: "Feature Layer"
-#> 
 #> Geometry type: "esriGeometryPolygon"
-#> 
 #> Service CRS: "EPSG:4269"
-#> 
 #> Output CRS: "EPSG:4326"
+#> 
 #> Simple feature collection with 83 features and 4 fields
 #> Geometry type: MULTIPOLYGON
 #> Dimension:     XY
@@ -298,15 +274,12 @@ esri2sf(url, where = where, outFields = outFields)
 
 # No transformation (recommended)
 esri2sf(url, where = where, outFields = outFields, crs = NULL)
-#> ✔ Downloading "Detailed Counties" from
-#>   <]8;;https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/2https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/2]8;;>
+#> ── Downloading "Detailed Counties" from <]8;;https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/2https://sampleserver6.arcgisonline.com/]8;;
 #> Layer type: "Feature Layer"
-#> 
 #> Geometry type: "esriGeometryPolygon"
-#> 
 #> Service CRS: "EPSG:4269"
-#> 
 #> Output CRS: "EPSG:4269"
+#> 
 #> Simple feature collection with 83 features and 4 fields
 #> Geometry type: MULTIPOLYGON
 #> Dimension:     XY
@@ -338,40 +311,28 @@ the ESRI:102690 CRS.
 ``` r
 # ESRI Authority Code
 df1 <- esri2sf(url, where = where, outFields = outFields, crs = "ESRI:102690")
-#> ✔ Downloading "Detailed Counties" from
-#>   <]8;;https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/2https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/2]8;;>
+#> ── Downloading "Detailed Counties" from <]8;;https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/2https://sampleserver6.arcgisonline.com/]8;;
 #> Layer type: "Feature Layer"
-#> 
 #> Geometry type: "esriGeometryPolygon"
-#> 
 #> Service CRS: "EPSG:4269"
-#> 
 #> Output CRS: "ESRI:102690"
+#> 
 # PROJ string
 df2 <- esri2sf(url, where = where, outFields = outFields, crs = "+proj=lcc +lat_1=42.1 +lat_2=43.66666666666666 +lat_0=41.5 +lon_0=-84.36666666666666 +x_0=4000000 +y_0=0 +datum=NAD83 +units=us-ft +no_defs")
-#> ✔ Downloading "Detailed Counties" from
-#>   <]8;;https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/2https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/2]8;;>
+#> ── Downloading "Detailed Counties" from <]8;;https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/2https://sampleserver6.arcgisonline.com/]8;;
 #> Layer type: "Feature Layer"
-#> 
 #> Geometry type: "esriGeometryPolygon"
-#> 
 #> Service CRS: "EPSG:4269"
+#> Output CRS: NA
 #> 
-#> Output CRS: "+proj=lcc +lat_1=42.1 +lat_2=43.66666666666666 +lat_0=41.5
-#> +lon_0=-84.36666666666666 +x_0=4000000 +y_0=0 +datum=NAD83 +units=us-ft
-#> +no_defs"
 # OGC WKT
 df3 <- esri2sf(url, where = where, outFields = outFields, crs = 'PROJCS["NAD_1983_StatePlane_Michigan_South_FIPS_2113_Feet",GEOGCS["GCS_North_American_1983",DATUM["North_American_Datum_1983",SPHEROID["GRS_1980",6378137,298.257222101]],PRIMEM["Greenwich",0],UNIT["Degree",0.017453292519943295]],PROJECTION["Lambert_Conformal_Conic_2SP"],PARAMETER["False_Easting",13123333.33333333],PARAMETER["False_Northing",0],PARAMETER["Central_Meridian",-84.36666666666666],PARAMETER["Standard_Parallel_1",42.1],PARAMETER["Standard_Parallel_2",43.66666666666666],PARAMETER["Latitude_Of_Origin",41.5],UNIT["Foot_US",0.30480060960121924],AUTHORITY["EPSG","102690"]]')
-#> ✔ Downloading "Detailed Counties" from
-#>   <]8;;https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/2https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/2]8;;>
+#> ── Downloading "Detailed Counties" from <]8;;https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/2https://sampleserver6.arcgisonline.com/]8;;
 #> Layer type: "Feature Layer"
-#> 
 #> Geometry type: "esriGeometryPolygon"
-#> 
 #> Service CRS: "EPSG:4269"
+#> Output CRS: "EPSG:102690"
 #> 
-#> Output CRS:
-#> "PROJCS[\"NAD_1983_StatePlane_Michigan_South_FIPS_2113_Feet\",GEOGCS[\"GCS_North_American_1983\",DATUM[\"North_American_Datum_1983\",SPHEROID[\"GRS_1980\",6378137,298.257222101]],PRIMEM[\"Greenwich\",0],UNIT[\"Degree\",0.017453292519943295]],PROJECTION[\"Lambert_Conformal_Conic_2SP\"],PARAMETER[\"False_Easting\",13123333.33333333],PARAMETER[\"False_Northing\",0],PARAMETER[\"Central_Meridian\",-84.36666666666666],PARAMETER[\"Standard_Parallel_1\",42.1],PARAMETER[\"Standard_Parallel_2\",43.66666666666666],PARAMETER[\"Latitude_Of_Origin\",41.5],UNIT[\"Foot_US\",0.30480060960121924],AUTHORITY[\"EPSG\",\"102690\"]]"
 ```
 
 Their similarity on the output CRS can be proven by the following
@@ -977,7 +938,7 @@ includes all available services.
 
 ``` r
 esriIndex(url, recurse = TRUE)
-#> # A tibble: 631 × 15
+#> # A tibble: 668 × 15
 #>    name        type  url   urlType folde…¹ servi…² servi…³    id paren…⁴ defau…⁵
 #>    <chr>       <chr> <chr> <chr>   <chr>   <chr>   <chr>   <int>   <int> <lgl>  
 #>  1 AGP         <NA>  http… folder  <NA>    <NA>    <NA>       NA      NA NA     
@@ -990,7 +951,7 @@ esriIndex(url, recurse = TRUE)
 #>  8 OsoLandsli… <NA>  http… folder  <NA>    <NA>    <NA>       NA      NA NA     
 #>  9 Scientific… <NA>  http… folder  <NA>    <NA>    <NA>       NA      NA NA     
 #> 10 SpatioTemp… <NA>  http… folder  <NA>    <NA>    <NA>       NA      NA NA     
-#> # … with 621 more rows, 5 more variables: minScale <dbl>, maxScale <int>,
+#> # … with 658 more rows, 5 more variables: minScale <dbl>, maxScale <int>,
 #> #   geometryType <chr>, supportsDynamicLegends <lgl>, subLayerIds <list>, and
 #> #   abbreviated variable names ¹​folderPath, ²​serviceName, ³​serviceType,
 #> #   ⁴​parentLayerId, ⁵​defaultVisibility
@@ -1016,18 +977,27 @@ esrigeocode(url, address = "100 HOLLIDAY STREET")
 #> 1 100 HOLLIDAY ST   100 POINT (-76.61032 39.29052)
 ```
 
-## Related packages and projects
+## Related projects
 
--   [{arcgisbinding}](https://github.com/R-ArcGIS/r-bridge) and the
-    [R-ArcGIS
-    Bridge](https://www.esri.com/en-us/arcgis/products/r-arcgis-bridge/overview)
--   [{geosapi}](https://github.com/eblondel/geosapi): GeoServer REST API
-    R Interface
--   [{aarapir}](https://github.com/mps9506/aarapir): Access ArcGIS
-    online API enpoints with R
--   [Geocoding Addresses with the ArcGIS REST API (Stanford Affiliates
-    Only)](https://github.com/cengel/ArcGIS_geocoding)
--   [{RPyGeo}](https://github.com/r-spatial/RPyGeo)
--   [All things R Spatial](https://arc2r.github.io/book/): An
-    introduction to spatial R for ArcGIS users
-    ([repo](https://github.com/arc2r/book))
+### R packages
+
+- [{arcgisbinding}](https://github.com/R-ArcGIS/r-bridge) and the
+  [R-ArcGIS
+  Bridge](https://www.esri.com/en-us/arcgis/products/r-arcgis-bridge/overview)
+- [{geosapi}](https://github.com/eblondel/geosapi): GeoServer REST API R
+  Interface
+- [{aarapir}](https://github.com/mps9506/aarapir): Access ArcGIS online
+  API endpoints with R
+- [{RPyGeo}](https://github.com/r-spatial/RPyGeo)
+
+### Other
+
+- [pyesridump](https://github.com/openaddresses/pyesridump): Scrapes an
+  ESRI MapServer REST endpoint to spit out more generally-usable
+  geodata.
+- [Geocoding Addresses with the ArcGIS REST API (Stanford Affiliates
+  Only)](https://github.com/cengel/ArcGIS_geocoding)
+- [All things R Spatial](https://arc2r.github.io/book/): An introduction
+  to spatial R for ArcGIS users ([repo](https://github.com/arc2r/book))
+- [ArcRasterRescue](https://github.com/r-barnes/ArcRasterRescue):
+  Extract raster data from ArcGIS/ESRI formats.

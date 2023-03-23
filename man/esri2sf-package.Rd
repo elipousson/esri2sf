@@ -11,8 +11,8 @@ This package enables you to scrape geographic features directly from ArcGIS serv
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://github.com/yonghah/esri2sf/}
-  \item Report bugs at \url{https://github.com/yonghah/esri2sf/issues}
+  \item \url{https://github.com/elipousson/esri2sf/}
+  \item Report bugs at \url{https://github.com/elipousson/esri2sf/issues}
 }
 
 }
