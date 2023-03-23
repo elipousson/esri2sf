@@ -12,10 +12,15 @@ state and is being actively
 developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![License:
 MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-
 <!-- badges: end -->
 
 Download ArcGIS FeatureServer and MapServer Data to Simple Features
+
+**Note:** This package has diverged substantially from the [original
+esri2sf package](https://github.com/yonghah/esri2sf/) and I am unsure
+when or if any of the code may be merged back into the original
+repository. I am actively maintaining this package so please feel free
+to submit an issue if you have any feature requests or problems.
 
 The [ArcGIS
 FeatureServer](https://enterprise.arcgis.com/en/server/latest/publish-services/windows/what-is-a-feature-service-.htm)
@@ -992,6 +997,9 @@ esrigeocode(url, address = "100 HOLLIDAY STREET")
 
 ### Other
 
+- [esri-dump](https://github.com/openaddresses/esri-dump): A Node module
+  to assist with pulling data out of an ESRI ArcGIS REST server into
+  GeoJSON.
 - [pyesridump](https://github.com/openaddresses/pyesridump): Scrapes an
   ESRI MapServer REST endpoint to spit out more generally-usable
   geodata.
