@@ -64,16 +64,7 @@ cli_if <- function(x = NULL,
     if (rlang::has_name(rlang::call_args_names(fn_call), "call")) {
       fn_call <- rlang::call_modify(fn_call, call = call, .homonyms = "last")
     }
-    rlang::try_fetch(
-      eval(fn_call),
-      error = function(cnd) {
-        cli::cli_abort(
-          "{.fn {quote(.fn)}} can't be evaluated.",
-          parent = cnd,
-          call = call
-        )
-      }
-    )
+    eval(fn_call)
   }
 }
 
