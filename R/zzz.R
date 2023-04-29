@@ -246,7 +246,7 @@ getEsriFeatures <- function(url,
 
   if (is_null(ids)) {
     cli::cli_warn("No records match the search criteria.")
-    invisible(return(NULL))
+    return(invisible(NULL))
   }
 
   # Get max record count and split ids based on count
