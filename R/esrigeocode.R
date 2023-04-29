@@ -27,7 +27,6 @@
 #' @importFrom cli cli_alert_warning
 #' @importFrom sf st_crs
 #' @importFrom dplyr case_when bind_cols select any_of
-#' @importFrom cliExtras cli_abort_if cli_abort_ifnot
 #' @importFrom httr2 resp_body_json
 esrigeocode <- function(url,
                         address = NULL,
@@ -38,35 +37,41 @@ esrigeocode <- function(url,
                         crs = getOption("esri2sf.crs", 4326),
                         geometry = TRUE,
                         ...) {
-  stopifnot(
-    grepl("GeocodeServer", url),
-    !is.null(address) | !is.null(coords)
+
+  cli_abort_ifnot(
+    x = grepl("GeocodeServer", url),
+    message = "{.arg url} must be a {.val GeocodeServer} url."
   )
 
-  layerInfo <- esrimeta(url)
-
-  if (!is.null(layerInfo$spatialReference)) {
-    layerCRS <- getLayerCRS(spatialReference = layerInfo$spatialReference)
-  } else {
-    cli::cli_alert_warning(
-      "Can't find a spatial reference at the provided url."
-    )
-    layerCRS <- sf::st_crs(crs)$srid
-  }
+  cli_abort_ifnot(
+    x = !is_null(address) || !is_null(coords),
+    message = "{.arg address} or {.arg coords} must be supplied."
+  )
 
   location <- NULL
   SingleLine <- NULL
 
+  layerInfo <- esrimeta(url)
+
+  if (is_null(layerInfo$spatialReference)) {
+    cli::cli_alert_warning(
+      "Can't find a spatial reference at the provided url."
+    )
+    layerCRS <- sf::st_crs(crs)$srid
+  } else {
+    layerCRS <- getLayerCRS(spatialReference = layerInfo$spatialReference)
+  }
+
   operation <- dplyr::case_when(
-    !is.null(address) && (length(address) == 1) ~ "findAddressCandidates",
-    !is.null(address) ~ "geocodeAddresses",
-    !is.null(coords) ~ "reverseGeocode"
+    !is_null(address) && has_length(address, 1) ~ "findAddressCandidates",
+    !is_null(address) ~ "geocodeAddresses",
+    !is_null(coords) ~ "reverseGeocode"
   )
 
-  cliExtras::cli_abort_if(
-    "{.fn esrigeocode} currently only supports length 1
-      character vectors for the {.arg address} argument.",
-    condition = (operation == "geocodeAddresses")
+  cli_abort_ifnot(
+    x = operation != "geocodeAddresses",
+    message = "{.fn esrigeocode} currently only supports length 1
+      character vectors for the {.arg address} argument."
   )
 
   if (operation == "findAddressCandidates") {
@@ -74,13 +79,13 @@ esrigeocode <- function(url,
   }
 
   if (operation == "reverseGeocode") {
-    if (inherits(coords, "sf")) {
+    if (is_sf(coords)) {
       coords <- sf2coords(coords, layerCRS)
     }
 
-    cliExtras::cli_abort_ifnot(
-      "{.arg coords} must be a sf object or a length 2 numeric vector.",
-      condition = (is.numeric(coords) && (length(coords) == 2))
+    cli_abort_ifnot(
+      x = is.numeric(coords) && has_length(coords, 2),
+      message = "{.arg coords} must be a {.cls sf} object or a length 2 numeric vector."
     )
 
     location <- paste0(coords, collapse = ",")
@@ -106,9 +111,10 @@ esrigeocode <- function(url,
   if (operation == "findAddressCandidates") {
     candidates <- resp[["candidates"]]
 
-    cliExtras::cli_abort_ifnot(
-      "Can't find any candidates matching the provided {.arg address}
-      or {.arg coords}." = nrow(candidates) > 0
+    cli_abort_ifnot(
+      x = nrow(candidates) > 0,
+      message = "Address candidates can't be found to match the {.arg address}
+      or {.arg coords} supplied."
     )
 
     if (is.numeric(score)) {
@@ -126,7 +132,7 @@ esrigeocode <- function(url,
         candidates[["location"]]
       )
 
-    if (!is.null(n)) {
+    if (!is_null(n)) {
       results <- results[seq(n), ]
     }
   }
@@ -141,11 +147,13 @@ esrigeocode <- function(url,
       )
   }
 
-  if (!geometry) {
-    return(results)
+  check_bool(geometry)
+
+  if (geometry) {
+    return(geocoderesultss2sf(results, layerCRS = layerCRS, crs = crs))
   }
 
-  geocoderesultss2sf(results, layerCRS = layerCRS, crs = crs)
+  results
 }
 
 #' Helper to convert results to an sf object
@@ -156,7 +164,7 @@ geocoderesultss2sf <- function(x,
                                coords = NULL,
                                layerCRS = 4326,
                                crs = NULL) {
-  if (is.null(coords)) {
+  if (is_null(coords)) {
     coords <- c("x", "y")
   }
 
@@ -171,7 +179,7 @@ geocoderesultss2sf <- function(x,
       crs = layerCRS
     )
 
-  if (is.null(crs)) {
+  if (is_null(crs)) {
     return(x)
   }
 
@@ -184,7 +192,11 @@ geocoderesultss2sf <- function(x,
 #' @importFrom sf st_transform st_union st_centroid st_coordinates
 sf2coords <- function(x,
                       crs = NULL) {
-  coords <- sf::st_union(sf::st_transform(x, crs = crs))
+  if (!is_null(crs)) {
+    x <- sf::st_transform(x, crs = crs)
+  }
+
+  coords <- sf::st_union(x)
   coords <- suppressWarnings(sf::st_centroid(coords))
   as.numeric(sf::st_coordinates(coords, by_geometry = FALSE))
 }

@@ -42,14 +42,15 @@ esriLayers <- function(url, token = NULL, returnUpdates = NULL, returnDomainName
 #'
 #' @noRd
 #' @importFrom cli cli_abort
-is_urlServer <- function(url) {
+is_urlServer <- function(url, call = caller_env()) {
   if (!grepl("/(FeatureServer|MapServer)/?$", url)) {
     cli::cli_abort(
       c(
         "Invalid {.arg url}:",
         "{.url {url}}",
         "Function requires a {.val MapServer} or {.val FeaturepServer} url."
-      )
+      ),
+      call = call
     )
   }
 }

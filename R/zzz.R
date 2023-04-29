@@ -15,15 +15,60 @@ utils::globalVariables(
   c("name", "serviceType", "type", "urlType")
 )
 
+#' Does x inherit a bbox class?
+#'
+#' @noRd
+is_bbox <- function(x) {
+  inherits(x, "bbox")
+}
+
+#' Does x inherit a sf or (optionally) sfc class?
+#'
+#' @noRd
+is_sf <- function(x, allow_sfc = TRUE) {
+  inherits(x, "sf") || (allow_sfc && inherits(x, "sfc"))
+}
+
+
+#' @noRd
+cli_abort_ifnot <- function(x = NULL,
+                            ...,
+                            .fn = NULL,
+                            call = caller_env()) {
+  cli_ifnot(
+    x = x,
+    ...,
+    .predicate = is_false,
+    .fn = .fn,
+    .default = cli::cli_abort,
+    call = call
+  )
+}
+
+#' @noRd
+cli_abort_if <- function(x = NULL,
+                         ...,
+                         .fn = NULL,
+                         call = caller_env()) {
+  cli_if(
+    x = x,
+    ...,
+    .predicate = is_true,
+    .fn = .fn,
+    .default = cli::cli_abort,
+    call = call
+  )
+}
+
 #' @keywords internal
 #' @importFrom rlang zap current_env
 #' @importFrom vctrs vec_rbind
-list_rbind <- function(x, names_to = rlang::zap(), ptype = NULL) {
+list_rbind <- function(x, names_to = zap(), ptype = NULL) {
   vctrs::vec_rbind(
     !!!x,
     .names_to = names_to,
     .ptype = ptype,
-    .error_call = rlang::current_env()
+    .error_call = current_env()
   )
 }
 
@@ -37,7 +82,7 @@ list_cbind <- function(x,
     !!!x,
     .name_repair = name_repair,
     .size = size,
-    .error_call = rlang::current_env()
+    .error_call = current_env()
   )
 }
 
@@ -53,10 +98,6 @@ getObjectIds <- function(url,
                          geometry = NULL,
                          geometryType = NULL,
                          ...) {
-  if (is.null(where)) {
-    where <- "1=1"
-  }
-
   resp <-
     esriRequest(
       url = url,
@@ -64,7 +105,7 @@ getObjectIds <- function(url,
       token = token,
       f = "json",
       objectIds = objectIds,
-      where = where,
+      where = where %||% "1=1",
       geometryType = geometryType,
       geometry = geometry,
       returnIdsOnly = TRUE,
@@ -84,13 +125,13 @@ getMaxRecordsCount <- function(url,
                                token = NULL,
                                maxRecords = NULL,
                                upperLimit = FALSE) {
-  if (!is.null(maxRecords)) {
+  if (!is_null(maxRecords)) {
     return(as.integer(maxRecords))
   }
 
   urlInfo <- esriCatalog(url = url, token = token)
 
-  if (!is.null(urlInfo[["maxRecordCount"]])) {
+  if (!is_null(urlInfo[["maxRecordCount"]])) {
     if (urlInfo[["maxRecordCount"]] > 25000 && upperLimit) {
       return(25000L)
     }
@@ -105,11 +146,11 @@ getMaxRecordsCount <- function(url,
 #'
 #' @keywords internal
 #' @noRd
-#' @importFrom dplyr as_tibble
+#' @importFrom tibble as_tibble
 getEsriTable <- function(jsonFeats, .name_repair = "check_unique") {
   atts <- lapply(
     lapply(jsonFeats, `[[`, 1),
-    function(att) lapply(att, function(x) ifelse(is.null(x), NA, x))
+    function(att) lapply(att, function(x) ifelse(is_null(x), NA, x))
   )
 
   df <-
@@ -117,7 +158,7 @@ getEsriTable <- function(jsonFeats, .name_repair = "check_unique") {
       lapply(atts, as.data.frame.list, stringsAsFactors = FALSE)
     )
 
-  dplyr::as_tibble(df, .name_repair = .name_repair)
+  tibble::as_tibble(df, .name_repair = .name_repair)
 }
 
 
@@ -134,13 +175,8 @@ getEsriFeaturesByIds <- function(objectIds = NULL,
                                  simplifyDataFrame = FALSE,
                                  simplifyVector = simplifyDataFrame,
                                  ...) {
-  if (!is.null(objectIds)) {
-    objectIds <- I(paste(objectIds, collapse = ","))
-  }
 
-  if (is.null(fields)) {
-    fields <- c("*")
-  }
+  fields <- fields %||% c("*")
 
   outFields <- I(paste(fields, collapse = ","))
 
@@ -187,11 +223,11 @@ getEsriFeatures <- function(url,
                             token = NULL,
                             crs = NULL,
                             progress = FALSE,
-                            call = parent.frame(),
+                            call = caller_env(),
                             ...) {
   crs <-
     dplyr::case_when(
-      is.null(crs) ~ "",
+      is_null(crs) ~ "",
       is.numeric(crs) ~ as.character(crs),
       isWktID(crs) ~ sub(pattern = "^(EPSG|ESRI):", replacement = "", x = crs),
       TRUE ~ as.character(jsonlite::toJSON(list("wkt" = WKTunPretty(sf::st_crs(crs)$WKT1_ESRI)), auto_unbox = TRUE))
@@ -208,7 +244,7 @@ getEsriFeatures <- function(url,
       ...
     )
 
-  if (is.null(ids)) {
+  if (is_null(ids)) {
     cli::cli_warn("No records match the search criteria.")
     invisible(return(NULL))
   }

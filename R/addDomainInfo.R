@@ -11,7 +11,7 @@
 #' @inheritParams esrimeta
 #'
 #' @return An {sf} dataframe
-addDomainInfo <- function(df, url, token = NULL, call = parent.frame()) {
+addDomainInfo <- function(df, url, token = NULL, call = caller_env()) {
   # Get Field Metadata
   layerTableFields <- esrimeta(url, token = token, fields = TRUE, call = call)
 
@@ -21,7 +21,7 @@ addDomainInfo <- function(df, url, token = NULL, call = parent.frame()) {
   }
 
   # Check if any values in the domain list column are NULL
-  if (any(lapply(layerTableFields[["domain"]], is.null))) {
+  if (any(lapply(layerTableFields[["domain"]], is_null))) {
     cli::cli_alert("This layer has partial domain information but {.fn addDomainInfo} does not support this possibility.")
     return(df)
   }

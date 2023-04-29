@@ -6,9 +6,25 @@
 \title{Get information on folders, services, tables, and layers using the Catalog
 service}
 \usage{
-esriCatalog(url, f = "json", token = NULL, option = NULL, outSR = NULL, ...)
+esriCatalog(
+  url,
+  f = "json",
+  token = NULL,
+  option = NULL,
+  outSR = NULL,
+  ...,
+  call = caller_env()
+)
 
-esricatalog(url, f = "json", token = NULL, option = NULL, outSR = NULL, ...)
+esricatalog(
+  url,
+  f = "json",
+  token = NULL,
+  option = NULL,
+  outSR = NULL,
+  ...,
+  call = caller_env()
+)
 }
 \arguments{
 \item{url}{A folder, service, or layer URL that can be used with the ArcGIS
@@ -27,6 +43,11 @@ returned as a feature collection}
 only supported when \code{option = "footprints"}.}
 
 \item{...}{Additional parameters passed to \link[httr2:req_url]{httr2::req_url_query}}
+
+\item{call}{The execution environment of a currently
+running function, e.g. \code{caller_env()}. The function will be
+mentioned in error messages as the source of the error. See the
+\code{call} argument of \code{\link[rlang:abort]{abort()}} for more information.}
 }
 \description{
 The Catalog resource from the ArcGIS REST API represents a catalog of folders

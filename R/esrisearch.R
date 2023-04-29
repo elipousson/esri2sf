@@ -44,7 +44,8 @@
 #' @export
 #' @importFrom cli cli_abort cli_alert_warning cli_bullets
 #' @importFrom httr2 resp_body_json
-#' @importFrom dplyr as_tibble mutate across
+#' @importFrom dplyr mutate across
+#' @importFrom tibble as_tibble
 esrisearch <- function(query = NULL,
                        bbox = NULL,
                        url = NULL,
@@ -54,7 +55,7 @@ esrisearch <- function(query = NULL,
                        sort = NULL,
                        desc = FALSE,
                        quiet = FALSE) {
-  if (is.null(query) && is.null(bbox)) {
+  if (is_null(query) && is_null(bbox)) {
     cli::cli_abort(
       "{.arg query} or {.arg bbox} must be provided."
     )
@@ -62,12 +63,12 @@ esrisearch <- function(query = NULL,
 
   cli_quiet(quiet)
 
-  if (!is.null(bbox)) {
+  if (!is_null(bbox)) {
     bbox <-
       sf2geometry(bbox, geometryType = "esriGeometryEnvelope", layerCRS = 4326)
   }
 
-  if (is.null(url)) {
+  if (is_null(url)) {
     url <- "https://www.arcgis.com"
   } else if (!is_url(url)) {
     cli::cli_abort(
@@ -95,14 +96,14 @@ esrisearch <- function(query = NULL,
     start <- 1
   }
 
-  if (!is.null(category_filter)) {
+  if (!is_null(category_filter)) {
     check_category_filter(category_filter)
     category_filter <- paste0(category_filter, collapse = ",")
   }
 
   sortOrder <- NULL
 
-  if (!is.null(sort)) {
+  if (!is_null(sort)) {
     sort <-
       match.arg(
         sort,
@@ -140,9 +141,9 @@ esrisearch <- function(query = NULL,
     total <- "10000+"
   }
 
-  if (!is.null(resp$query)) {
+  if (!is_null(resp$query)) {
     msg <- "Search completed for {.val {resp$query}} at {.url {url}}."
-  } else if (!is.null(bbox)) {
+  } else if (!is_null(bbox)) {
     msg <- "Search completed with provided {.arg bbox} at {.url {url}}."
   }
 
@@ -155,7 +156,7 @@ esrisearch <- function(query = NULL,
   )
 
   results <-
-    dplyr::as_tibble(
+    tibble::as_tibble(
       resp[["results"]]
     )
 

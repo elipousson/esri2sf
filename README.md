@@ -65,7 +65,11 @@ widget on the service’s webpage (see image below), by asking a GIS
 admin, or looking at the code of a webpage where it creates a feature
 layer.
 
-![REST Service screenshot](inst/www/images/rest-service-ss.png)
+<figure>
+<img src="inst/www/images/rest-service-ss.png"
+alt="REST Service screenshot" />
+<figcaption aria-hidden="true">REST Service screenshot</figcaption>
+</figure>
 
 You can then use the url with esri2sf to download data:
 
@@ -74,7 +78,7 @@ library(esri2sf)
 url <- "https://services.arcgis.com/V6ZHFr6zdgNZuVG0/arcgis/rest/services/Landscape_Trees/FeatureServer/0"
 
 df <- esri2sf(url)
-#> ── Downloading "Landscape_Trees" from <]8;;https://services.arcgis.com/V6ZHFr6zdgNZuVG0/arcgis/rest/services/Landscape_Trees/FeatureServer/0https://services.arcgis.com/V6ZHFr6zdgNZu]8;;
+#> ── Downloading "Landscape_Trees" from <https://services.arcgis.com/V6ZHFr6zdgNZu
 #> Layer type: "Feature Layer"
 #> Geometry type: "esriGeometryPoint"
 #> Service CRS: "EPSG:3857"
@@ -149,7 +153,7 @@ esrimeta(url, fields = TRUE)
 #> 22    sqlTypeOther     TRUE     TRUE     NA           NA     NA
 
 df <- esri2sf(url, outFields = c("AADT", "DFLG"))
-#> ── Downloading "Florida_Annual_Average_Daily_Traffic" from <]8;;https://services.arcgis.com/V6ZHFr6zdgNZuVG0/arcgis/rest/services/Florida_Annual_Average_Daily_Traffic/FeatureServer/0https://services.arc]8;;
+#> ── Downloading "Florida_Annual_Average_Daily_Traffic" from <https://services.arc
 #> Layer type: "Feature Layer"
 #> Geometry type: "esriGeometryPolyline"
 #> Service CRS: "EPSG:3857"
@@ -179,7 +183,7 @@ mi <- esri2sf(
   where = "STATE_NAME = 'Michigan'",
   outFields = c("POP2000", "pop2007", "POP00_SQMI", "POP07_SQMI")
 )
-#> ── Downloading "Detailed Counties" from <]8;;https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/2https://sampleserver6.arcgisonline.com/]8;;
+#> ── Downloading "Detailed Counties" from <https://sampleserver6.arcgisonline.com/
 #> Layer type: "Feature Layer"
 #> Geometry type: "esriGeometryPolygon"
 #> Service CRS: "EPSG:4269"
@@ -199,14 +203,27 @@ You can download non-spatial tables of the ‘Table’ layer type using
 `esri2df()`.
 
 ``` r
-df <- esri2df("https://sampleserver6.arcgisonline.com/arcgis/rest/services/SF311/MapServer/1", objectIds = paste(24804387:24804396, collapse = ","))
-#> ── Downloading "SF_Crime_Incidents" from <]8;;https://sampleserver6.arcgisonline.com/arcgis/rest/services/SF311/MapServer/1https://sampleserver6.arcgisonline.com]8;;
+df <- esri2df("https://sampleserver6.arcgisonline.com/arcgis/rest/services/SF311/MapServer/1", objectIds = c(25436238:25436287))
+#> ── Downloading "SF_Crime_Incidents" from <https://sampleserver6.arcgisonline.com
 #> Layer type: "Table"
-#> Warning: No records match the search criteria.
 #> 
 
 df
-#> # A tibble: 0 × 0
+#> # A tibble: 50 × 10
+#>    objectid incidntnum category      descript   dayofweek date_ time  pddistrict
+#>       <int> <chr>      <chr>         <chr>      <chr>     <chr> <chr> <chr>     
+#>  1 25436238 090866721  ASSAULT       BATTERY    Monday    08/2… 07:30 BAYVIEW   
+#>  2 25436239 090815392  DRUG/NARCOTIC POSSESSIO… Monday    08/1… 20:05 NORTHERN  
+#>  3 25436240 096060947  LARCENY/THEFT GRAND THE… Monday    07/2… 21:00 TARAVAL   
+#>  4 25436241 096060969  LARCENY/THEFT GRAND THE… Tuesday   07/2… 08:00 RICHMOND  
+#>  5 25436242 096060975  LARCENY/THEFT GRAND THE… Monday    07/2… 23:00 RICHMOND  
+#>  6 25436243 090785654  LARCENY/THEFT GRAND THE… Sunday    08/0… 19:30 NORTHERN  
+#>  7 25436244 096061779  LARCENY/THEFT GRAND THE… Wednesday 07/2… 00:15 SOUTHERN  
+#>  8 25436245 096061785  LARCENY/THEFT GRAND THE… Sunday    07/2… 10:00 TENDERLOIN
+#>  9 25436246 096061791  LARCENY/THEFT PETTY THE… Sunday    07/2… 16:00 SOUTHERN  
+#> 10 25436247 096061804  LARCENY/THEFT GRAND THE… Tuesday   07/2… 19:00 SOUTHERN  
+#> # ℹ 40 more rows
+#> # ℹ 2 more variables: resolution <chr>, datetime <dbl>
 ```
 
 In some cases, tables may include coordinates as numeric attribute
@@ -253,7 +270,7 @@ outFields <- c("POP2000", "pop2007", "POP00_SQMI", "POP07_SQMI")
 
 # default crs = 4326
 esri2sf(url, where = where, outFields = outFields)
-#> ── Downloading "Detailed Counties" from <]8;;https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/2https://sampleserver6.arcgisonline.com/]8;;
+#> ── Downloading "Detailed Counties" from <https://sampleserver6.arcgisonline.com/
 #> Layer type: "Feature Layer"
 #> Geometry type: "esriGeometryPolygon"
 #> Service CRS: "EPSG:4269"
@@ -279,7 +296,7 @@ esri2sf(url, where = where, outFields = outFields)
 
 # No transformation (recommended)
 esri2sf(url, where = where, outFields = outFields, crs = NULL)
-#> ── Downloading "Detailed Counties" from <]8;;https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/2https://sampleserver6.arcgisonline.com/]8;;
+#> ── Downloading "Detailed Counties" from <https://sampleserver6.arcgisonline.com/
 #> Layer type: "Feature Layer"
 #> Geometry type: "esriGeometryPolygon"
 #> Service CRS: "EPSG:4269"
@@ -316,7 +333,7 @@ the ESRI:102690 CRS.
 ``` r
 # ESRI Authority Code
 df1 <- esri2sf(url, where = where, outFields = outFields, crs = "ESRI:102690")
-#> ── Downloading "Detailed Counties" from <]8;;https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/2https://sampleserver6.arcgisonline.com/]8;;
+#> ── Downloading "Detailed Counties" from <https://sampleserver6.arcgisonline.com/
 #> Layer type: "Feature Layer"
 #> Geometry type: "esriGeometryPolygon"
 #> Service CRS: "EPSG:4269"
@@ -324,7 +341,7 @@ df1 <- esri2sf(url, where = where, outFields = outFields, crs = "ESRI:102690")
 #> 
 # PROJ string
 df2 <- esri2sf(url, where = where, outFields = outFields, crs = "+proj=lcc +lat_1=42.1 +lat_2=43.66666666666666 +lat_0=41.5 +lon_0=-84.36666666666666 +x_0=4000000 +y_0=0 +datum=NAD83 +units=us-ft +no_defs")
-#> ── Downloading "Detailed Counties" from <]8;;https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/2https://sampleserver6.arcgisonline.com/]8;;
+#> ── Downloading "Detailed Counties" from <https://sampleserver6.arcgisonline.com/
 #> Layer type: "Feature Layer"
 #> Geometry type: "esriGeometryPolygon"
 #> Service CRS: "EPSG:4269"
@@ -332,7 +349,7 @@ df2 <- esri2sf(url, where = where, outFields = outFields, crs = "+proj=lcc +lat_
 #> 
 # OGC WKT
 df3 <- esri2sf(url, where = where, outFields = outFields, crs = 'PROJCS["NAD_1983_StatePlane_Michigan_South_FIPS_2113_Feet",GEOGCS["GCS_North_American_1983",DATUM["North_American_Datum_1983",SPHEROID["GRS_1980",6378137,298.257222101]],PRIMEM["Greenwich",0],UNIT["Degree",0.017453292519943295]],PROJECTION["Lambert_Conformal_Conic_2SP"],PARAMETER["False_Easting",13123333.33333333],PARAMETER["False_Northing",0],PARAMETER["Central_Meridian",-84.36666666666666],PARAMETER["Standard_Parallel_1",42.1],PARAMETER["Standard_Parallel_2",43.66666666666666],PARAMETER["Latitude_Of_Origin",41.5],UNIT["Foot_US",0.30480060960121924],AUTHORITY["EPSG","102690"]]')
-#> ── Downloading "Detailed Counties" from <]8;;https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/2https://sampleserver6.arcgisonline.com/]8;;
+#> ── Downloading "Detailed Counties" from <https://sampleserver6.arcgisonline.com/
 #> Layer type: "Feature Layer"
 #> Geometry type: "esriGeometryPolygon"
 #> Service CRS: "EPSG:4269"
@@ -923,19 +940,19 @@ columns to differentiate between folder, service, and layer URLs.
 ``` r
 esriIndex(url)
 #> # A tibble: 75 × 5
-#>    name                      type  url                           urlType servi…¹
-#>    <chr>                     <chr> <chr>                         <chr>   <chr>  
-#>  1 AGP                       <NA>  https://sampleserver6.arcgis… folder  <NA>   
-#>  2 Elevation                 <NA>  https://sampleserver6.arcgis… folder  <NA>   
-#>  3 Energy                    <NA>  https://sampleserver6.arcgis… folder  <NA>   
-#>  4 LocalGovernment           <NA>  https://sampleserver6.arcgis… folder  <NA>   
-#>  5 Locators                  <NA>  https://sampleserver6.arcgis… folder  <NA>   
-#>  6 NetworkAnalysis           <NA>  https://sampleserver6.arcgis… folder  <NA>   
-#>  7 Oblique                   <NA>  https://sampleserver6.arcgis… folder  <NA>   
-#>  8 OsoLandslide              <NA>  https://sampleserver6.arcgis… folder  <NA>   
-#>  9 ScientificData            <NA>  https://sampleserver6.arcgis… folder  <NA>   
-#> 10 SpatioTemporalAggregation <NA>  https://sampleserver6.arcgis… folder  <NA>   
-#> # … with 65 more rows, and abbreviated variable name ¹​serviceType
+#>    name                      type  url                       urlType serviceType
+#>    <chr>                     <chr> <chr>                     <chr>   <chr>      
+#>  1 AGP                       <NA>  https://sampleserver6.ar… folder  <NA>       
+#>  2 Elevation                 <NA>  https://sampleserver6.ar… folder  <NA>       
+#>  3 Energy                    <NA>  https://sampleserver6.ar… folder  <NA>       
+#>  4 LocalGovernment           <NA>  https://sampleserver6.ar… folder  <NA>       
+#>  5 Locators                  <NA>  https://sampleserver6.ar… folder  <NA>       
+#>  6 NetworkAnalysis           <NA>  https://sampleserver6.ar… folder  <NA>       
+#>  7 Oblique                   <NA>  https://sampleserver6.ar… folder  <NA>       
+#>  8 OsoLandslide              <NA>  https://sampleserver6.ar… folder  <NA>       
+#>  9 ScientificData            <NA>  https://sampleserver6.ar… folder  <NA>       
+#> 10 SpatioTemporalAggregation <NA>  https://sampleserver6.ar… folder  <NA>       
+#> # ℹ 65 more rows
 ```
 
 Set `recurse = TRUE` to loop through folders and ensure the data frame
@@ -944,22 +961,22 @@ includes all available services.
 ``` r
 esriIndex(url, recurse = TRUE)
 #> # A tibble: 668 × 15
-#>    name        type  url   urlType folde…¹ servi…² servi…³    id paren…⁴ defau…⁵
-#>    <chr>       <chr> <chr> <chr>   <chr>   <chr>   <chr>   <int>   <int> <lgl>  
-#>  1 AGP         <NA>  http… folder  <NA>    <NA>    <NA>       NA      NA NA     
-#>  2 Elevation   <NA>  http… folder  <NA>    <NA>    <NA>       NA      NA NA     
-#>  3 Energy      <NA>  http… folder  <NA>    <NA>    <NA>       NA      NA NA     
-#>  4 LocalGover… <NA>  http… folder  <NA>    <NA>    <NA>       NA      NA NA     
-#>  5 Locators    <NA>  http… folder  <NA>    <NA>    <NA>       NA      NA NA     
-#>  6 NetworkAna… <NA>  http… folder  <NA>    <NA>    <NA>       NA      NA NA     
-#>  7 Oblique     <NA>  http… folder  <NA>    <NA>    <NA>       NA      NA NA     
-#>  8 OsoLandsli… <NA>  http… folder  <NA>    <NA>    <NA>       NA      NA NA     
-#>  9 Scientific… <NA>  http… folder  <NA>    <NA>    <NA>       NA      NA NA     
-#> 10 SpatioTemp… <NA>  http… folder  <NA>    <NA>    <NA>       NA      NA NA     
-#> # … with 658 more rows, 5 more variables: minScale <dbl>, maxScale <int>,
-#> #   geometryType <chr>, supportsDynamicLegends <lgl>, subLayerIds <list>, and
-#> #   abbreviated variable names ¹​folderPath, ²​serviceName, ³​serviceType,
-#> #   ⁴​parentLayerId, ⁵​defaultVisibility
+#>    name             type  url   urlType folderPath serviceName serviceType    id
+#>    <chr>            <chr> <chr> <chr>   <chr>      <chr>       <chr>       <int>
+#>  1 AGP              <NA>  http… folder  <NA>       <NA>        <NA>           NA
+#>  2 Elevation        <NA>  http… folder  <NA>       <NA>        <NA>           NA
+#>  3 Energy           <NA>  http… folder  <NA>       <NA>        <NA>           NA
+#>  4 LocalGovernment  <NA>  http… folder  <NA>       <NA>        <NA>           NA
+#>  5 Locators         <NA>  http… folder  <NA>       <NA>        <NA>           NA
+#>  6 NetworkAnalysis  <NA>  http… folder  <NA>       <NA>        <NA>           NA
+#>  7 Oblique          <NA>  http… folder  <NA>       <NA>        <NA>           NA
+#>  8 OsoLandslide     <NA>  http… folder  <NA>       <NA>        <NA>           NA
+#>  9 ScientificData   <NA>  http… folder  <NA>       <NA>        <NA>           NA
+#> 10 SpatioTemporalA… <NA>  http… folder  <NA>       <NA>        <NA>           NA
+#> # ℹ 658 more rows
+#> # ℹ 7 more variables: parentLayerId <int>, defaultVisibility <lgl>,
+#> #   minScale <dbl>, maxScale <int>, geometryType <chr>,
+#> #   supportsDynamicLegends <lgl>, subLayerIds <list>
 ```
 
 Similarly, the new `esrigeocode()` provides support for the [Find
@@ -989,6 +1006,9 @@ esrigeocode(url, address = "100 HOLLIDAY STREET")
 - [{arcgisbinding}](https://github.com/R-ArcGIS/r-bridge) and the
   [R-ArcGIS
   Bridge](https://www.esri.com/en-us/arcgis/products/r-arcgis-bridge/overview)
+- [{arcpullr}](https://github.com/pfrater/arcpullr/): Functions for
+  pulling spatial data from an ArcGIS REST API and formatting those
+  layers into either sf or Raster\* objects.
 - [{geosapi}](https://github.com/eblondel/geosapi): GeoServer REST API R
   Interface
 - [{aarapir}](https://github.com/mps9506/aarapir): Access ArcGIS online

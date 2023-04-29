@@ -16,7 +16,8 @@ esriRequest(
   .max_seconds = 3,
   .is_error = TRUE,
   .body_form = FALSE,
-  ...
+  ...,
+  call = caller_env()
 )
 }
 \arguments{
@@ -53,6 +54,11 @@ return the response. If \code{FALSE}, return the request.}
 the request using \code{\link[httr2:req_body]{httr2::req_body_form()}}. Defaults to \code{FALSE}.}
 
 \item{...}{Additional parameters passed to \link[httr2:req_url]{httr2::req_url_query}}
+
+\item{call}{The execution environment of a currently
+running function, e.g. \code{caller_env()}. The function will be
+mentioned in error messages as the source of the error. See the
+\code{call} argument of \code{\link[rlang:abort]{abort()}} for more information.}
 }
 \description{
 This function is primarily useful for the development of new functions to

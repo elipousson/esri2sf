@@ -4,7 +4,7 @@
 \alias{addDomainInfo}
 \title{Add domain information to the return (sf) dataframe}
 \usage{
-addDomainInfo(df, url, token = NULL, call = parent.frame())
+addDomainInfo(df, url, token = NULL, call = caller_env())
 }
 \arguments{
 \item{df}{The returned (sf) df from esri2sf/esri2df.}
@@ -13,8 +13,10 @@ addDomainInfo(df, url, token = NULL, call = parent.frame())
 
 \item{token}{string for authentication token (if needed).}
 
-\item{call}{Defaults to \code{\link[=parent.frame]{parent.frame()}}. Passed to \code{\link[cli:cli_abort]{cli::cli_abort()}} to
-improve error messages when \code{\link[=esrimeta]{esrimeta()}} is called by another function.}
+\item{call}{The execution environment of a currently
+running function, e.g. \code{caller_env()}. The function will be
+mentioned in error messages as the source of the error. See the
+\code{call} argument of \code{\link[rlang:abort]{abort()}} for more information.}
 }
 \value{
 An {sf} dataframe

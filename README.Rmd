@@ -100,7 +100,7 @@ plot(mi)
 You can download non-spatial tables of the 'Table' layer type using `esri2df()`.
 
 ```{r tables}
-df <- esri2df("https://sampleserver6.arcgisonline.com/arcgis/rest/services/SF311/MapServer/1", objectIds = paste(24804387:24804396, collapse = ","))
+df <- esri2df("https://sampleserver6.arcgisonline.com/arcgis/rest/services/SF311/MapServer/1", objectIds = c(25436238:25436287))
 
 df
 ```
@@ -207,6 +207,7 @@ esrigeocode(url, address = "100 HOLLIDAY STREET")
 ### R packages
 
 - [{arcgisbinding}](https://github.com/R-ArcGIS/r-bridge) and the [R-ArcGIS Bridge](https://www.esri.com/en-us/arcgis/products/r-arcgis-bridge/overview)
+- [{arcpullr}](https://github.com/pfrater/arcpullr/): Functions for pulling spatial data from an ArcGIS REST API and formatting those layers into either sf or Raster* objects.
 - [{geosapi}](https://github.com/eblondel/geosapi): GeoServer REST API R Interface
 - [{aarapir}](https://github.com/mps9506/aarapir): Access ArcGIS online API endpoints with R
 - [{RPyGeo}](https://github.com/r-spatial/RPyGeo)

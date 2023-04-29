@@ -4,7 +4,7 @@
 \alias{esrimeta}
 \title{Retrieve layer metadata}
 \usage{
-esrimeta(url, token = NULL, fields = FALSE, ..., call = parent.frame())
+esrimeta(url, token = NULL, fields = FALSE, ..., call = caller_env())
 }
 \arguments{
 \item{url}{url to retrieve metadata for.}
@@ -16,8 +16,10 @@ esrimeta(url, token = NULL, fields = FALSE, ..., call = parent.frame())
 
 \item{...}{Additional parameters passed to \link[httr2:req_url]{httr2::req_url_query}}
 
-\item{call}{Defaults to \code{\link[=parent.frame]{parent.frame()}}. Passed to \code{\link[cli:cli_abort]{cli::cli_abort()}} to
-improve error messages when \code{\link[=esrimeta]{esrimeta()}} is called by another function.}
+\item{call}{The execution environment of a currently
+running function, e.g. \code{caller_env()}. The function will be
+mentioned in error messages as the source of the error. See the
+\code{call} argument of \code{\link[rlang:abort]{abort()}} for more information.}
 }
 \description{
 Retrieve layer metadata

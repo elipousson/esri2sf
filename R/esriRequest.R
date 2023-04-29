@@ -27,6 +27,7 @@
 #' @param .body_form If objectIds is `NULL` and .body_form is `TRUE`, generate
 #'   the request using [httr2::req_body_form()]. Defaults to `FALSE`.
 #' @param ... Additional parameters passed to [httr2::req_url_query]
+#' @inheritParams rlang::args_error_context
 #' @export
 #' @importFrom httr2 request req_url_path_append req_url_query req_body_form
 #'   req_user_agent req_cache req_retry req_error resp_body_json req_perform
@@ -42,31 +43,31 @@ esriRequest <- function(url,
                         .max_seconds = 3,
                         .is_error = TRUE,
                         .body_form = FALSE,
-                        ...) {
+                        ...,
+                        call = caller_env()) {
+  check_required(url, call = call)
+  check_string(url, call = call)
+
   # Create request based on url
   req <- httr2::request(url)
 
   # Append method or other url elements
-  if (!is.null(append)) {
+  if (!is_null(append)) {
     req <- httr2::req_url_path_append(req, append)
   }
 
-  # Set token to required default
-  if (is.null(token)) {
-    token <- ""
-  }
-
-  # Add f, format, and any additional query parameters
   req <-
     httr2::req_url_query(
       req,
+      # Add f, format, and any additional query parameters
       f = f,
       format = format,
-      token = token,
+      # Set token to required default
+      token = token %||% "",
       ...
     )
 
-  if (!is.null(objectIds)) {
+  if (!is_null(objectIds)) {
     # Add objectIds
     req <-
       req_object_ids(
@@ -83,6 +84,7 @@ esriRequest <- function(url,
         req,
         f = f,
         format = format,
+        token = token,
         ...
       )
   }
@@ -90,19 +92,16 @@ esriRequest <- function(url,
   req <-
     httr2::req_user_agent(
       req,
-      string = "esri2sf (https://github.com/yonghah/esri2sf)"
+      string = "esri2sf (https://github.com/elipousson/esri2sf)"
+    )
+
+  req <-
+    httr2::req_retry(
+      req = req,
+      max_seconds = .max_seconds
     )
 
   # Check if rappdirs::user_cache_dir can be used
-  if (!requireNamespace("rappdirs", quietly = TRUE) & .cache) {
-    cli::cli_warn(
-      c("{.pkg rappdirs} must be installed if {.code .cache = TRUE}.",
-        "i" = "Setting {.arg .cache} to {.val FALSE}."
-      )
-    )
-    .cache <- FALSE
-  }
-
   if (.cache) {
     req <-
       httr2::req_cache(
@@ -110,12 +109,6 @@ esriRequest <- function(url,
         path = rappdirs::user_cache_dir("esri2sf")
       )
   }
-
-  req <-
-    httr2::req_retry(
-      req = req,
-      max_seconds = .max_seconds
-    )
 
   # Pass .is_error = FALSE to use httr2::req_error
   if (!.is_error) {
@@ -131,13 +124,13 @@ esriRequest <- function(url,
       )
   }
 
-  # Return request if perform is FALSE
-  if (!.perform) {
-    return(req)
+  # perform the request if .perform is TRUE
+  if (.perform) {
+    return(httr2::req_perform(req = req))
   }
 
-  # Otherwise perform the request
-  httr2::req_perform(req = req)
+  # Otherwise return request
+  req
 }
 
 #' Helper function to check if url with objectIds exceeds max length and use
@@ -150,26 +143,29 @@ req_object_ids <- function(req,
                            objectIds = NULL,
                            token = NULL,
                            ...) {
+
+  if (!is_null(objectIds)) {
+    objectIds <- I(paste(objectIds, collapse = ","))
+  }
+
   req_ids <-
     httr2::req_url_query(
       req,
       objectIds = objectIds
     )
 
-  # If url is more than 2048 characters long, add the query to the
-  # body of the request
-  if (nchar(req_ids$url) > 2048) {
-    return(
-      httr2::req_body_form(
-        req,
-        f = f,
-        format = format,
-        token = token,
-        objectIds = objectIds,
-        ...
-      )
-    )
+  if (nchar(req_ids$url) <= 2048) {
+    return(req_ids)
   }
 
-  req_ids
+  # If url is more than 2048 characters long, add the query to the
+  # body of the request
+  httr2::req_body_form(
+    req,
+    f = f,
+    format = format,
+    token = token,
+    objectIds = objectIds,
+    ...
+  )
 }

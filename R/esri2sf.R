@@ -102,30 +102,30 @@ esri2sf <- function(url,
   )
 
   if (is_groupLayer(layerInfo)) {
-    return(
-      esrigroup(
-        layerInfo,
-        url = url,
-        outFields = outFields,
-        where = where,
-        geometry = geometry,
-        bbox = bbox,
-        token = token,
-        crs = crs,
-        progress = progress,
-        geomType = geomType,
-        spatialRel = spatialRel,
-        replaceDomainInfo = replaceDomainInfo,
-        .name_repair = .name_repair,
-        .fn = esri2sf,
-        ...
-      )
+    sf_list <- esrigroup(
+      layerInfo,
+      url = url,
+      outFields = outFields,
+      where = where,
+      geometry = geometry,
+      bbox = bbox,
+      token = token,
+      crs = crs,
+      progress = progress,
+      geomType = geomType,
+      spatialRel = spatialRel,
+      replaceDomainInfo = replaceDomainInfo,
+      .name_repair = .name_repair,
+      .fn = esri2sf,
+      ...
     )
+
+    return(sf_list)
   }
 
   # Get the layer geometry type
-  if (is.null(geomType)) {
-    if (is_tableLayer(layerInfo) | is_missing_geomType(layerInfo)) {
+  if (is_null(geomType)) {
+    if (is_tableLayer(layerInfo) || is_missing_geomType(layerInfo)) {
       cli::cli_alert_warning(
         "{.arg geomType} is {.val NULL} and a layer geometry type
           can't be found for this url."
@@ -135,25 +135,25 @@ esri2sf <- function(url,
         "Trying to download with {.fn esri2df}{cli::symbol$ellipsis}"
       )
 
-      return(
-        esri2df(
-          url = url,
-          outFields = outFields,
-          where = where,
-          token = token,
-          progress = progress,
-          replaceDomainInfo = replaceDomainInfo,
-          .name_repair = .name_repair,
-          quiet = quiet,
-          ...
-        )
+      df <- esri2df(
+        url = url,
+        outFields = outFields,
+        where = where,
+        token = token,
+        progress = progress,
+        replaceDomainInfo = replaceDomainInfo,
+        .name_repair = .name_repair,
+        quiet = quiet,
+        ...
       )
+
+      return(df)
     }
 
-    layerGeomType <- layerInfo$geometryType
+    layerGeomType <- layerInfo[["geometryType"]]
   } else {
     geomType_mismatch <-
-      !is.null(layerInfo$geometryType) && (layerInfo$geometryType != geomType)
+      !is_null(layerInfo[["geometryType"]]) && (layerInfo[["geometryType"]] != geomType)
 
     if (geomType_mismatch) {
       cli::cli_alert_warning(
@@ -172,7 +172,7 @@ esri2sf <- function(url,
     )
   )
 
-  if (!is.null(layerInfo$extent$spatialReference)) {
+  if (!is_null(layerInfo$extent$spatialReference)) {
     layerCRS <-
       getLayerCRS(spatialReference = layerInfo$extent$spatialReference)
 
@@ -184,7 +184,7 @@ esri2sf <- function(url,
       "The spatial reference for this layer is missing."
     )
 
-    if (!is.null(crs)) {
+    if (!is_null(crs)) {
       cli::cli_alert_info(
         "Trying to access the layer using the
         provided {.arg crs}: {.val {crs}}."
@@ -194,7 +194,7 @@ esri2sf <- function(url,
     }
   }
 
-  if (is.null(crs)) {
+  if (is_null(crs)) {
     crs <- layerCRS
   }
 
@@ -202,14 +202,14 @@ esri2sf <- function(url,
     c("Output CRS" = "{.val {sf::st_crs(crs)$srid}}")
   )
 
-  if (!is.null(bbox) && is.null(geometry)) {
+  if (!is_null(bbox) && is_null(geometry)) {
     geometry <- bbox2geometry(bbox)
   }
 
   # Set default geometryType for spatial filter
   geometryType <- NULL
 
-  if (!is.null(geometry)) {
+  if (!is_null(geometry)) {
     # Set geometryType based on geometry type of simple feature
     geometryType <-
       sf2geometryType(
@@ -223,7 +223,7 @@ esri2sf <- function(url,
         layerCRS = layerCRS
       )
 
-    if (!is.null(spatialRel)) {
+    if (!is_null(spatialRel)) {
       spatialRel_opts <-
         c(
           "esriSpatialRelIntersects", "esriSpatialRelContains",
@@ -266,18 +266,20 @@ esri2sf <- function(url,
       .name_repair = .name_repair
     )
 
-  if (!replaceDomainInfo) {
-    return(sfdf)
+  check_bool(replaceDomainInfo)
+
+  if (replaceDomainInfo) {
+    return(addDomainInfo(sfdf, url = url, token = token))
   }
 
-  addDomainInfo(sfdf, url = url, token = token)
+  sfdf
 }
 
 #' Is layerInfo missing geometryType?
 #'
 #' @noRd
 is_missing_geomType <- function(layerInfo) {
-  any(c(is.null(layerInfo$geometryType), (layerInfo$geometryType == "")))
+  any(c(is_null(layerInfo$geometryType), (layerInfo$geometryType == "")))
 }
 
 #' @describeIn esri2sf Retrieve table object (no spatial data).
@@ -307,17 +309,17 @@ esri2df <- function(url,
     )
 
     cli::cli_alert_info("Trying to download with {.fn esri2sf} {cli::symbol$ellipsis}")
-    return(
-      esri2sf(
-        url = url,
-        outFields = outFields,
-        where = where,
-        token = token,
-        progress = progress,
-        replaceDomainInfo = replaceDomainInfo,
-        ...
-      )
+    sfdf <- esri2sf(
+      url = url,
+      outFields = outFields,
+      where = where,
+      token = token,
+      progress = progress,
+      replaceDomainInfo = replaceDomainInfo,
+      ...
     )
+
+    return(sfdf)
   }
 
   cli::cli_rule(
@@ -341,6 +343,8 @@ esri2df <- function(url,
 
   df <- getEsriTable(esriFeatures, .name_repair = .name_repair)
 
+  check_bool(replaceDomainInfo)
+
   if (!replaceDomainInfo) {
     return(df)
   }
@@ -356,29 +360,31 @@ esri2df <- function(url,
 #' @inheritParams esriRequest
 #' @param fields `esrimeta` returns data frame with fields if `TRUE`. Default
 #'   `FALSE`.
-#' @param call Defaults to [parent.frame()]. Passed to [cli::cli_abort()] to
-#'   improve error messages when [esrimeta()] is called by another function.
+#' @inheritParams rlang::args_error_context
 #' @export
 #' @importFrom dplyr bind_rows
 esrimeta <- function(url,
                      token = NULL,
                      fields = FALSE,
                      ...,
-                     call = parent.frame()) {
+                     call = caller_env()) {
   layerInfo <- esriCatalog(
     url = url,
     token = token,
     simplifyVector = TRUE,
-    ...
+    ...,
+    call = call
   )
 
   # check_layerInfo(layerInfo, call = call)
 
-  if (!fields) {
-    return(layerInfo)
+  check_bool(fields, call = call)
+
+  if (fields) {
+    return(list_rbind(layerInfo["fields"]))
   }
 
-  list_rbind(layerInfo["fields"])
+  layerInfo
 }
 
 
@@ -387,7 +393,7 @@ esrimeta <- function(url,
 #' @noRd
 #' @importFrom utils hasName
 #' @importFrom cli cli_abort
-check_layerInfo <- function(layerInfo, call = parent.frame()) {
+check_layerInfo <- function(layerInfo, call = caller_env()) {
   if (!utils::hasName(layerInfo, "error")) {
     return(invisible())
   }
@@ -414,13 +420,13 @@ check_layerInfo <- function(layerInfo, call = parent.frame()) {
 #' @importFrom sf st_crs
 #' @importFrom cli cli_abort
 #' @importFrom rlang has_name
-getLayerCRS <- function(spatialReference, layerCRS = NULL, call = parent.frame()) {
+getLayerCRS <- function(spatialReference, layerCRS = NULL, call = caller_env()) {
   # Get the layer CRS from the layer spatial reference
-  if (rlang::has_name(spatialReference, "latestWkid")) {
+  if (has_name(spatialReference, "latestWkid")) {
     layerCRS <- spatialReference$latestWkid
-  } else if (rlang::has_name(spatialReference, "wkid")) {
+  } else if (has_name(spatialReference, "wkid")) {
     layerCRS <- spatialReference$wkid
-  } else if (rlang::has_name(spatialReference, "wkt")) {
+  } else if (has_name(spatialReference, "wkt")) {
     layerCRS <- spatialReference$wkt
   }
 
@@ -429,7 +435,7 @@ getLayerCRS <- function(spatialReference, layerCRS = NULL, call = parent.frame()
     layerCRS <- sf::st_crs(layerCRS)$srid
   }
 
-  if (is.null(layerCRS)) {
+  if (is_null(layerCRS)) {
     cli::cli_abort(
       c("A valid layer coordinate reference system can't be found.",
         "*" = "Check that the layer at the {.arg url} has a spatial reference."
@@ -444,21 +450,21 @@ getLayerCRS <- function(spatialReference, layerCRS = NULL, call = parent.frame()
 
 #' Helper function for setting geometryType based on geometry parameter
 #'
+#' @inheritParams rlang::args_error_context
 #' @noRd
 #' @importFrom cli cli_abort
 #' @importFrom sf st_geometry_type
-sf2geometryType <- function(x, by_geometry = FALSE, call = parent.frame()) {
-  if (inherits(x, "bbox")) {
+sf2geometryType <- function(x, by_geometry = FALSE, call = caller_env()) {
+  if (is_bbox(x)) {
     return("esriGeometryEnvelope")
   }
 
-  if (!inherits(x, c("sf", "sfc"))) {
-    cli::cli_abort(
-      "{.arg geometry} must be a {.cls sf} or {.cls sfc}
+  cli_abort_ifnot(
+    x = is_sf(x),
+    message = "{.arg geometry} must be a {.cls sf} or {.cls sfc}
       or {.cls bbox} object, not {.cls {class(x)}}.",
-      call = call
-    )
-  }
+    call = call
+  )
 
   geometryType <- sf::st_geometry_type(x, by_geometry = by_geometry)
 
@@ -484,11 +490,11 @@ sf2geometryType <- function(x, by_geometry = FALSE, call = parent.frame()) {
 #'   st_coordinates
 #' @importFrom cli cli_abort
 sf2geometry <- function(x, geometryType = NULL, layerCRS = NULL) {
-  if (inherits(x, "bbox")) {
+  if (is_bbox(x)) {
     x <- sf::st_sf(sf::st_as_sfc(x))
   }
 
-  if (!is.null(layerCRS)) {
+  if (!is_null(layerCRS)) {
     x <- sf::st_transform(x, layerCRS)
   }
 
@@ -514,20 +520,20 @@ sf2geometry <- function(x, geometryType = NULL, layerCRS = NULL) {
 #' @noRd
 #' @importFrom sf st_bbox
 #' @importFrom cli cli_abort
-bbox2geometry <- function(bbox, call = parent.frame()) {
+bbox2geometry <- function(bbox, call = caller_env()) {
   # convert sf class bbox to bbox class
-  if (inherits(bbox, c("sf", "sfc"))) {
+  if (is_sf(bbox)) {
     bbox <- sf::st_bbox(bbox)
   }
 
-  if (!inherits(bbox, "bbox")) {
-    cli::cli_abort(
-      c("{.arg bbox} must be a {.code bbox} or {.code sf} class object.",
-        "i" = "The class of the provided {.arg bbox} is {.val {class(bbox)}}"
-      ),
-      call = call
-    )
-  }
+  cli_abort_ifnot(
+    x = is_bbox(bbox),
+    message = c(
+      "{.arg bbox} must be a {.code bbox} or {.code sf} class object.",
+      "i" = "The class of the provided {.arg bbox} is {.val {class(bbox)}}"
+    ),
+    call = call
+  )
 
   bbox
 }
@@ -540,7 +546,7 @@ check_esriUrl <- function(url,
                           token = NULL,
                           from = NULL,
                           to = "feature",
-                          call = parent.frame()) {
+                          call = caller_env()) {
   if (esriUrl_isValidType(url, type = to, call = call)) {
     return(url)
   }
@@ -557,40 +563,38 @@ check_layerTypes <- function(layerInfo,
                              url = NULL,
                              token = NULL,
                              layerTypes = c("Feature Layer", "Table", "Group Layer"),
-                             call = parent.frame()) {
-  if (!rlang::has_name(layerInfo, "type")) {
-    cli::cli_abort(
-      "{.arg url} must be a
+                             call = caller_env()) {
+  cli_abort_ifnot(
+    x = has_name(layerInfo, "type"),
+    message = "{.arg url} must be a
       {.val {cli::cli_vec(layerTypes, style = list(vec_last = ' or '))}} type
       {.emph feature} url, not a
       {.emph {esriUrl_isValidType(url, returnType = TRUE)}} url.",
-      call = call
-    )
-  }
+    call = call
+  )
 
-  if (!is.null(layerInfo$type) & !all(layerInfo$type %in% layerTypes)) {
-    cli::cli_abort(
-      c("The {.arg url} must be for a
+  cli_abort_if(
+    x = !is_null(layerInfo[["type"]]) && !all(layerInfo[["type"]] %in% layerTypes),
+    message = c("The {.arg url} must be for a
         {.val {cli::cli_vec(layerTypes, style = list(vec_last = ' or '))}}.",
-        "i" = "The provided {.arg url} is a {.val {layerInfo$type}} service."
-      ),
-      call = call
-    )
-  }
+      "i" = "The provided {.arg url} is a {.val {layerInfo$type}} service."
+    ),
+    call = call
+  )
 }
 
 #' Helper function to validate if a layer is a Table layer
 #'
 #' @noRd
 is_tableLayer <- function(layerInfo) {
-  !is.null(layerInfo$type) & (layerInfo$type == "Table")
+  !is_null(layerInfo[["type"]]) && (layerInfo[["type"]] == "Table")
 }
 
 #' Helper function to validate if a layer is a Group layer
 #'
 #' @noRd
 is_groupLayer <- function(layerInfo) {
-  !is.null(layerInfo$type) & (layerInfo$type == "Group Layer")
+  !is_null(layerInfo[["type"]]) && (layerInfo[["type"]] == "Group Layer")
 }
 
 #' Helper function to download Group Layers for esri2sf
@@ -657,5 +661,5 @@ esrigroup <- function(layerInfo,
       }
     )
 
-  rlang::set_names(sfdf, layerInfo[["subLayers"]][["name"]])
+  set_names(sfdf, layerInfo[["subLayers"]][["name"]])
 }

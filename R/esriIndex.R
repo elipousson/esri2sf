@@ -75,7 +75,7 @@ esriIndex <- function(url,
       )
   }
 
-  if (is.null(index)) {
+  if (is_null(index)) {
     return(index)
   }
 
@@ -242,7 +242,7 @@ esriIndexLayers <- function(url,
       )
   }
 
-  if (is.null(index)) {
+  if (is_null(index)) {
     return(index)
   }
 
@@ -293,41 +293,54 @@ esriCatalog <- function(url,
                         token = NULL,
                         option = NULL,
                         outSR = NULL,
-                        ...) {
-  f <- match.arg(f, c("json", "html", "kmz", "sitemap", "geositemap"))
-
-  if (f %in% c("html", "kmz")) {
-    cli::cli_abort(
-      "{.fn esriCatalog} does not yet support {.arg f} = {.val {f}}."
+                        ...,
+                        call = caller_env()) {
+  f <- arg_match0(
+    f,
+    c("json", "html", "kmz", "sitemap", "geositemap"),
+    error_call = call
     )
-  }
+
+  cli_abort_if(
+    x = f %in% c("html", "kmz"),
+    message = c(
+      "{.arg f} can't be {.val {f}}.",
+      "i" = '{.fn esriCatalog} only supports {c("json", "sitemap", "geositemap"}'
+    ),
+    call = call
+  )
 
   if (f == "json") {
-    stopifnot(
-      is.null(option) | (option == "footprints"),
-      is.null(outSR) | (!is.null(outSR) && (option == "footprints"))
+    cli_abort_ifnot(
+      x = is_null(option) || option == "footprints",
+      message = "{.arg option} must be {.val footprints} or {.code NULL}.",
+      call = call
     )
 
-    resp <-
-      dplyr::case_when(
-        is.null(option) ~ "catalog",
-        is.null(outSR) ~ "option",
-        !is.null(outSR) ~ "outSR"
-      )
+    cli_abort_ifnot(
+      x = is_null(outSR) || outSR == "footprints",
+      message = "{.arg outSR} must be {.val footprints} or {.code NULL}.",
+      call = call
+    )
+
+    resp <- set_catalog_resp_type(option, outSR)
 
     resp <-
       switch(resp,
         "catalog" = esriRequest(
           url,
-          f = f, token = token, ...
+          f = f, token = token, ...,
+          call = call
         ),
         "option" = esriRequest(
           url,
-          f = f, token = token, option = option, ...
+          f = f, token = token, option = option, ...,
+          call = call
         ),
         "outSR" = esriRequest(
           url,
-          f = f, token = token, option = option, outSR = outSR, ...
+          f = f, token = token, option = option, outSR = outSR, ...,
+          call = call
         )
       )
 
@@ -337,10 +350,11 @@ esriCatalog <- function(url,
   }
 
   if (format %in% c("sitemap", "geositemap")) {
-    rlang::check_installed(
+    check_installed(
       "xml2",
-      reason = "The {.pkg xml2} package must be installed if {.arg format}
-        is {.val sitemap} or {.val geositemap}."
+      reason = "{.pkg xml2} must be installed if {.arg format}
+        is {.val sitemap} or {.val geositemap}.",
+      call = call
     )
 
     sitemap <- httr2::resp_body_xml(resp = resp, ...)
@@ -353,6 +367,23 @@ esriCatalog <- function(url,
   }
 }
 
+
 #' @rdname esriCatalog
 #' @name esricatalog
 esricatalog <- esriCatalog
+
+#' @noRd
+set_catalog_resp_type <- function(option = NULL,
+                                  outSR = NULL) {
+  if (is_null(option)) {
+    return("catalog")
+  }
+
+  if (is_null(outSR)) {
+    return("option")
+  }
+
+  if (!is_null(outSR)) {
+    return("outSR")
+  }
+}

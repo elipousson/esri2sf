@@ -19,7 +19,7 @@ esri2rast <- function(url,
                       format = "jpgpng",
                       adjustAspectRatio = FALSE,
                       ...) {
-  rlang::check_installed(
+  check_installed(
     "terra",
     reason = "{.pkg terra} must be installed to use {.fn esri2rast}."
   )
@@ -65,11 +65,11 @@ esri2rast <- function(url,
 
 #' @noRd
 bbox_transform <- function(x, crs = NULL) {
-  if (is.null(crs)) {
+  if (is_null(crs)) {
     return(sf::st_bbox(x))
   }
 
-  if (inherits(x, "bbox")) {
+  if (is_bbox(x)) {
     x <- sf::st_as_sfc(x)
   }
 

@@ -15,7 +15,7 @@
 #' @rdname esriInfo
 #' @export
 #' @importFrom httr2 resp_body_json resp_body_xml resp_body_raw
-#' @importFrom dplyr as_tibble
+#' @importFrom tibble as_tibble
 #' @importFrom cli cli_abort
 #' @importFrom rlang check_installed
 esriInfo <- function(url, info = NULL, format = NULL, token = NULL, ...) {
@@ -89,7 +89,7 @@ esriInfo <- function(url, info = NULL, format = NULL, token = NULL, ...) {
 
     resp <- httr2::resp_body_json(resp = resp, check_type = FALSE, ...)
 
-    if (!is.null(resp[["extent"]])) {
+    if (!is_null(resp[["extent"]])) {
       resp[["extent"]] <-
         list(
           extent2bbox(
@@ -102,7 +102,7 @@ esriInfo <- function(url, info = NULL, format = NULL, token = NULL, ...) {
     resp[["typeKeywords"]] <- list(resp[["typeKeywords"]])
     resp[["tags"]] <- list(resp[["tags"]])
 
-    return(dplyr::as_tibble(resp))
+    return(tibble::as_tibble(resp))
   }
 
   if (info == "metadata") {
@@ -133,7 +133,7 @@ esriInfo <- function(url, info = NULL, format = NULL, token = NULL, ...) {
 
     resp <- httr2::resp_body_raw(resp = resp)
 
-    rlang::check_installed(
+    check_installed(
       "magick",
       reason = "The {.pkg magick} package must be installed when {.arg info}
         is set to {.val thumbnail}."

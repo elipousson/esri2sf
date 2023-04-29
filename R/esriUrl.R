@@ -16,14 +16,14 @@ esriUrl_isValidType <- function(url,
                                 type = NULL,
                                 displayReason = FALSE,
                                 returnType = FALSE,
-                                call = parent.frame()) {
+                                call = caller_env()) {
   servicesUrl <- grepl("/rest/services", url)
   servicesUrl_types <- c("root", "folder", "service", "feature", "content")
 
   siteUrl <- grepl(".html?", url)
   siteUrl_types <- c("search", "item", "group", "user", "app")
 
-  if (!is.null(type)) {
+  if (!is_null(type)) {
     type <- match.arg(tolower(type), c(servicesUrl_types, siteUrl_types))
   } else if (identical(type, NA_character_)) {
     type <- NULL
@@ -57,14 +57,14 @@ esriUrl_isValidType <- function(url,
   url_types <- names(which(isType))
   out <- FALSE
 
-  if (!is.null(type)) {
+  if (!is_null(type)) {
     out <- any(type %in% url_types)
-  } else if (!is.null(url_types)) {
+  } else if (!is_null(url_types)) {
     out <- !identical(url_types, character(0)) | servicesUrl
   }
 
   if (!out && displayReason) {
-    if (!is.null(type) && !returnType) {
+    if (!is_null(type) && !returnType) {
       reason <-
         switch(type,
           "root" = "A {.val {type}} {.arg url} must end in '/rest/services':",
@@ -86,7 +86,7 @@ esriUrl_isValidType <- function(url,
   }
 
   if (returnType) {
-    if (!out && is.null(type)) {
+    if (!out && is_null(type)) {
       return(NA_character_)
     }
 
@@ -320,13 +320,14 @@ str_extract_id <- function(url) {
 
 #' Convert ESRI item URL to feature URL
 #'
-#' @noRd
+#' @inheritParams rlang::args_error_context
+#' @keywords internal
 #' @importFrom cliExtras cli_menu
 convert_esriUrl <- function(url,
                             token = NULL,
                             from = NULL,
                             to = "feature",
-                            call = parent.frame()) {
+                            call = caller_env()) {
   type <- esriUrl_isValidType(url = url, token = token, returnType = TRUE)
   if (isTRUE(identical(type, to))) {
     return(url)
@@ -334,7 +335,7 @@ convert_esriUrl <- function(url,
 
   from <- from %||% type
 
-  if ((from != "item") & (to == "root")) {
+  if ((from != "item") && (to == "root")) {
     url <- esriUrl_parseUrl(url, token)
     return(
       paste0(
@@ -381,7 +382,7 @@ convert_esriUrl <- function(url,
     layerInfo <- esrimeta(url = url, token = token, call = call)
 
     if (to == "feature") {
-      if ("Singlelayer" %in% layerInfo$typeKeywords | length(layerInfo$url) == 1) {
+      if ("Singlelayer" %in% layerInfo$typeKeywords || has_length(layerInfo$url, 1)) {
         return(paste0(layerInfo$url, "/0"))
       }
     }

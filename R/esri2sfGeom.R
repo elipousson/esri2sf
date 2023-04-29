@@ -23,12 +23,12 @@ esri2sfGeom <- function(jsonFeats,
   atts <-
     lapply(
       lapply(jsonFeats, `[[`, 1),
-      function(att) lapply(att, function(x) ifelse(is.null(x), NA, x))
+      function(att) lapply(att, function(x) ifelse(is_null(x), NA, x))
     )
 
   af <- list_rbind(lapply(atts, as.data.frame.list, stringsAsFactors = FALSE))
 
-  af <- dplyr::as_tibble(af, .name_repair = .name_repair)
+  af <- tibble::as_tibble(af, .name_repair = .name_repair)
   # combine geometry and attributes
   sf::st_sf(geoms, af, crs = crs)
 }
@@ -61,7 +61,7 @@ esri2sfPolygon <- function(features) {
   }
 
   getGeometry <- function(feature) {
-    if (is.null(unlist(feature$geometry$rings))) {
+    if (is_null(unlist(feature$geometry$rings))) {
       sf::st_multipolygon()
     } else {
       rings2multipoly(feature$geometry$rings)
