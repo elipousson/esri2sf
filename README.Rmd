@@ -100,7 +100,7 @@ plot(mi)
 You can download non-spatial tables of the 'Table' layer type using `esri2df()`.
 
 ```{r tables}
-df <- esri2df("https://sampleserver6.arcgisonline.com/arcgis/rest/services/SF311/MapServer/1", objectIds = c(25436238:25436287))
+df <- esri2df("https://sampleserver6.arcgisonline.com/arcgis/rest/services/SF311/MapServer/1", where = "category = 'VEHICLE THEFT'")
 
 df
 ```
@@ -145,15 +145,14 @@ esri2sf(url, where = where, outFields = outFields, crs = NULL)
 
 Since the addition of the `WKT1_ESRI` output from `sf::st_crs()` in sf version 1.0-1, you can enter common CRS format (any that `sf::st_crs()` can handle) into the `crs` parameters and it will be able to convert to the ESRI formatted WKT needed for the outSR field in the REST query.
 
-Below are examples of the variety of input types that you can use with the `crs` parameters. All examples are just different formulations of the ESRI:102690 CRS.
+Below are two examples of the variety of input types that you can use with the `crs` parameters.
 
 ```{r}
 # ESRI Authority Code
 df1 <- esri2sf(url, where = where, outFields = outFields, crs = "ESRI:102690")
-# PROJ string
-df2 <- esri2sf(url, where = where, outFields = outFields, crs = "+proj=lcc +lat_1=42.1 +lat_2=43.66666666666666 +lat_0=41.5 +lon_0=-84.36666666666666 +x_0=4000000 +y_0=0 +datum=NAD83 +units=us-ft +no_defs")
+
 # OGC WKT
-df3 <- esri2sf(url, where = where, outFields = outFields, crs = 'PROJCS["NAD_1983_StatePlane_Michigan_South_FIPS_2113_Feet",GEOGCS["GCS_North_American_1983",DATUM["North_American_Datum_1983",SPHEROID["GRS_1980",6378137,298.257222101]],PRIMEM["Greenwich",0],UNIT["Degree",0.017453292519943295]],PROJECTION["Lambert_Conformal_Conic_2SP"],PARAMETER["False_Easting",13123333.33333333],PARAMETER["False_Northing",0],PARAMETER["Central_Meridian",-84.36666666666666],PARAMETER["Standard_Parallel_1",42.1],PARAMETER["Standard_Parallel_2",43.66666666666666],PARAMETER["Latitude_Of_Origin",41.5],UNIT["Foot_US",0.30480060960121924],AUTHORITY["EPSG","102690"]]')
+df2 <- esri2sf(url, where = where, outFields = outFields, crs = 'PROJCS["NAD_1983_StatePlane_Michigan_South_FIPS_2113_Feet",GEOGCS["GCS_North_American_1983",DATUM["North_American_Datum_1983",SPHEROID["GRS_1980",6378137,298.257222101]],PRIMEM["Greenwich",0],UNIT["Degree",0.017453292519943295]],PROJECTION["Lambert_Conformal_Conic_2SP"],PARAMETER["False_Easting",13123333.33333333],PARAMETER["False_Northing",0],PARAMETER["Central_Meridian",-84.36666666666666],PARAMETER["Standard_Parallel_1",42.1],PARAMETER["Standard_Parallel_2",43.66666666666666],PARAMETER["Latitude_Of_Origin",41.5],UNIT["Foot_US",0.30480060960121924],AUTHORITY["EPSG","102690"]]')
 ```
 
 Their similarity on the output CRS can be proven by the following function that calculates the mean difference in X-Y coordinates at each point. All are very close to 0.
@@ -167,9 +166,8 @@ coord_diff <- function(df1, df2) {
     )
   })
 }
+
 coord_diff(df1, df2)
-coord_diff(df1, df3)
-coord_diff(df2, df3)
 ```
 
 ### Additional functions

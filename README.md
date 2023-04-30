@@ -203,26 +203,26 @@ You can download non-spatial tables of the ‘Table’ layer type using
 `esri2df()`.
 
 ``` r
-df <- esri2df("https://sampleserver6.arcgisonline.com/arcgis/rest/services/SF311/MapServer/1", objectIds = c(25436238:25436287))
+df <- esri2df("https://sampleserver6.arcgisonline.com/arcgis/rest/services/SF311/MapServer/1", where = "category = 'VEHICLE THEFT'")
 #> ── Downloading "SF_Crime_Incidents" from <https://sampleserver6.arcgisonline.com
 #> Layer type: "Table"
 #> 
 
 df
-#> # A tibble: 50 × 10
+#> # A tibble: 1,254 × 10
 #>    objectid incidntnum category      descript   dayofweek date_ time  pddistrict
 #>       <int> <chr>      <chr>         <chr>      <chr>     <chr> <chr> <chr>     
-#>  1 25436238 090866721  ASSAULT       BATTERY    Monday    08/2… 07:30 BAYVIEW   
-#>  2 25436239 090815392  DRUG/NARCOTIC POSSESSIO… Monday    08/1… 20:05 NORTHERN  
-#>  3 25436240 096060947  LARCENY/THEFT GRAND THE… Monday    07/2… 21:00 TARAVAL   
-#>  4 25436241 096060969  LARCENY/THEFT GRAND THE… Tuesday   07/2… 08:00 RICHMOND  
-#>  5 25436242 096060975  LARCENY/THEFT GRAND THE… Monday    07/2… 23:00 RICHMOND  
-#>  6 25436243 090785654  LARCENY/THEFT GRAND THE… Sunday    08/0… 19:30 NORTHERN  
-#>  7 25436244 096061779  LARCENY/THEFT GRAND THE… Wednesday 07/2… 00:15 SOUTHERN  
-#>  8 25436245 096061785  LARCENY/THEFT GRAND THE… Sunday    07/2… 10:00 TENDERLOIN
-#>  9 25436246 096061791  LARCENY/THEFT PETTY THE… Sunday    07/2… 16:00 SOUTHERN  
-#> 10 25436247 096061804  LARCENY/THEFT GRAND THE… Tuesday   07/2… 19:00 SOUTHERN  
-#> # ℹ 40 more rows
+#>  1 25451666 090786072  VEHICLE THEFT STOLEN AU… Sunday    08/0… 23:00 CENTRAL   
+#>  2 25451695 090846466  VEHICLE THEFT STOLEN TR… Wednesday 08/1… 01:08 BAYVIEW   
+#>  3 25451769 090746270  VEHICLE THEFT ATTEMPTED… Wednesday 07/2… 00:01 INGLESIDE 
+#>  4 25451776 090751978  VEHICLE THEFT STOLEN AU… Thursday  07/2… 23:00 INGLESIDE 
+#>  5 25451777 090753413  VEHICLE THEFT STOLEN AU… Thursday  07/2… 18:30 NORTHERN  
+#>  6 25451782 090761046  VEHICLE THEFT STOLEN TR… Sunday    07/2… 18:00 INGLESIDE 
+#>  7 25451783 090764802  VEHICLE THEFT STOLEN AU… Monday    07/2… 21:00 MISSION   
+#>  8 25451785 090766820  VEHICLE THEFT STOLEN AU… Monday    07/2… 18:30 RICHMOND  
+#>  9 25451805 090770718  VEHICLE THEFT STOLEN AU… Tuesday   07/2… 16:00 TARAVAL   
+#> 10 25451807 090771261  VEHICLE THEFT STOLEN AU… Monday    07/2… 19:00 NORTHERN  
+#> # ℹ 1,244 more rows
 #> # ℹ 2 more variables: resolution <chr>, datetime <dbl>
 ```
 
@@ -326,9 +326,8 @@ version 1.0-1, you can enter common CRS format (any that `sf::st_crs()`
 can handle) into the `crs` parameters and it will be able to convert to
 the ESRI formatted WKT needed for the outSR field in the REST query.
 
-Below are examples of the variety of input types that you can use with
-the `crs` parameters. All examples are just different formulations of
-the ESRI:102690 CRS.
+Below are two examples of the variety of input types that you can use
+with the `crs` parameters.
 
 ``` r
 # ESRI Authority Code
@@ -339,16 +338,9 @@ df1 <- esri2sf(url, where = where, outFields = outFields, crs = "ESRI:102690")
 #> Service CRS: "EPSG:4269"
 #> Output CRS: "ESRI:102690"
 #> 
-# PROJ string
-df2 <- esri2sf(url, where = where, outFields = outFields, crs = "+proj=lcc +lat_1=42.1 +lat_2=43.66666666666666 +lat_0=41.5 +lon_0=-84.36666666666666 +x_0=4000000 +y_0=0 +datum=NAD83 +units=us-ft +no_defs")
-#> ── Downloading "Detailed Counties" from <https://sampleserver6.arcgisonline.com/
-#> Layer type: "Feature Layer"
-#> Geometry type: "esriGeometryPolygon"
-#> Service CRS: "EPSG:4269"
-#> Output CRS: NA
-#> 
+
 # OGC WKT
-df3 <- esri2sf(url, where = where, outFields = outFields, crs = 'PROJCS["NAD_1983_StatePlane_Michigan_South_FIPS_2113_Feet",GEOGCS["GCS_North_American_1983",DATUM["North_American_Datum_1983",SPHEROID["GRS_1980",6378137,298.257222101]],PRIMEM["Greenwich",0],UNIT["Degree",0.017453292519943295]],PROJECTION["Lambert_Conformal_Conic_2SP"],PARAMETER["False_Easting",13123333.33333333],PARAMETER["False_Northing",0],PARAMETER["Central_Meridian",-84.36666666666666],PARAMETER["Standard_Parallel_1",42.1],PARAMETER["Standard_Parallel_2",43.66666666666666],PARAMETER["Latitude_Of_Origin",41.5],UNIT["Foot_US",0.30480060960121924],AUTHORITY["EPSG","102690"]]')
+df2 <- esri2sf(url, where = where, outFields = outFields, crs = 'PROJCS["NAD_1983_StatePlane_Michigan_South_FIPS_2113_Feet",GEOGCS["GCS_North_American_1983",DATUM["North_American_Datum_1983",SPHEROID["GRS_1980",6378137,298.257222101]],PRIMEM["Greenwich",0],UNIT["Degree",0.017453292519943295]],PROJECTION["Lambert_Conformal_Conic_2SP"],PARAMETER["False_Easting",13123333.33333333],PARAMETER["False_Northing",0],PARAMETER["Central_Meridian",-84.36666666666666],PARAMETER["Standard_Parallel_1",42.1],PARAMETER["Standard_Parallel_2",43.66666666666666],PARAMETER["Latitude_Of_Origin",41.5],UNIT["Foot_US",0.30480060960121924],AUTHORITY["EPSG","102690"]]')
 #> ── Downloading "Detailed Counties" from <https://sampleserver6.arcgisonline.com/
 #> Layer type: "Feature Layer"
 #> Geometry type: "esriGeometryPolygon"
@@ -370,15 +362,10 @@ coord_diff <- function(df1, df2) {
     )
   })
 }
+
 coord_diff(df1, df2)
-#>         x         y 
-#>  1.356311 -3.104968
-coord_diff(df1, df3)
 #> x y 
 #> 0 0
-coord_diff(df2, df3)
-#>         x         y 
-#> -1.356311  3.104968
 ```
 
 ### Additional functions
