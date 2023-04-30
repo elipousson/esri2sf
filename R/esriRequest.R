@@ -30,8 +30,8 @@
 #' @inheritParams rlang::args_error_context
 #' @export
 #' @importFrom httr2 request req_url_path_append req_url_query req_body_form
-#'   req_user_agent req_cache req_retry req_error resp_body_json req_perform
-#' @importFrom cli cli_warn
+#'   req_user_agent req_retry req_cache req_error resp_body_json req_perform
+#' @importFrom rappdirs user_cache_dir
 esriRequest <- function(url,
                         append = NULL,
                         f = NULL,
@@ -45,7 +45,6 @@ esriRequest <- function(url,
                         .body_form = FALSE,
                         ...,
                         call = caller_env()) {
-  check_required(url, call = call)
   check_string(url, call = call)
 
   # Create request based on url
@@ -137,13 +136,13 @@ esriRequest <- function(url,
 #' form request if needed
 #'
 #' @noRd
+#' @importFrom httr2 req_url_query req_body_form
 req_object_ids <- function(req,
                            f = NULL,
                            format = NULL,
                            objectIds = NULL,
                            token = NULL,
                            ...) {
-
   if (!is_null(objectIds)) {
     objectIds <- I(paste(objectIds, collapse = ","))
   }
