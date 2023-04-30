@@ -131,15 +131,15 @@ getMaxRecordsCount <- function(url,
 
   urlInfo <- esriCatalog(url = url, token = token)
 
-  if (!is_null(urlInfo[["maxRecordCount"]])) {
-    if (urlInfo[["maxRecordCount"]] > 25000 && upperLimit) {
-      return(25000L)
-    }
-
-    return(urlInfo[["maxRecordCount"]])
+  if (is_null(urlInfo[["maxRecordCount"]])) {
+    return(500L)
   }
 
-  500L
+  if (urlInfo[["maxRecordCount"]] > 25000 && upperLimit) {
+    return(25000L)
+  }
+
+  urlInfo[["maxRecordCount"]]
 }
 
 #' Get table for Table layer
@@ -175,7 +175,6 @@ getEsriFeaturesByIds <- function(objectIds = NULL,
                                  simplifyDataFrame = FALSE,
                                  simplifyVector = simplifyDataFrame,
                                  ...) {
-
   fields <- fields %||% c("*")
 
   outFields <- I(paste(fields, collapse = ","))
@@ -210,9 +209,6 @@ getEsriFeaturesByIds <- function(objectIds = NULL,
 #'
 #' @keywords internal
 #' @noRd
-#' @importFrom dplyr case_when
-#' @importFrom jsonlite toJSON
-#' @importFrom sf st_crs
 #' @importFrom cli cli_warn cli_progress_along
 getEsriFeatures <- function(url,
                             fields = NULL,
@@ -225,13 +221,7 @@ getEsriFeatures <- function(url,
                             progress = FALSE,
                             call = caller_env(),
                             ...) {
-  crs <-
-    dplyr::case_when(
-      is_null(crs) ~ "",
-      is.numeric(crs) ~ as.character(crs),
-      isWktID(crs) ~ sub(pattern = "^(EPSG|ESRI):", replacement = "", x = crs),
-      TRUE ~ as.character(jsonlite::toJSON(list("wkt" = WKTunPretty(sf::st_crs(crs)$WKT1_ESRI)), auto_unbox = TRUE))
-    )
+  crs <- set_features_crs(crs)
 
   ids <-
     getObjectIds(
@@ -255,7 +245,7 @@ getEsriFeatures <- function(url,
 
   seq_fn <- seq_along
 
-  # Check if pbapply progress bar can be used
+  # Check if cli_progress_along progress bar can be used
   if (progress) {
     seq_fn <- cli::cli_progress_along
   }
@@ -275,6 +265,27 @@ getEsriFeatures <- function(url,
   )
 
   unlist(results, recursive = FALSE)
+}
+
+#' @keywords internal
+#' @importFrom jsonlite toJSON
+#' @importFrom sf st_crs
+set_features_crs <- function(crs = NULL) {
+  if (is_null(crs)) {
+    return("")
+  }
+
+  if (is.numeric(crs)) {
+    return(as.character(crs))
+  }
+
+  if (isWktID(crs)) {
+    return(sub(pattern = "^(EPSG|ESRI):", replacement = "", x = crs))
+  }
+
+  crs <- jsonlite::toJSON(list("wkt" = WKTunPretty(sf::st_crs(crs)$WKT1_ESRI)), auto_unbox = TRUE)
+
+  as.character(crs)
 }
 
 #' @keywords internal
