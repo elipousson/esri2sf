@@ -282,6 +282,7 @@ esriindex <- esriIndex
 #' @param outSR Output spatial reference of the geometry returned in footprints;
 #'   only supported when `option = "footprints"`.
 #' @inheritParams esriRequest
+#' @inheritParams rlang::args_error_context
 #' @export
 #' @importFrom httr2 request req_url_query req_perform resp_body_json
 #'   resp_body_xml

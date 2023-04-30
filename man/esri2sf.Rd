@@ -87,7 +87,7 @@ frame. Default \code{FALSE}.}
 \item \code{"universal"}: Make the names \code{unique} and syntactic
 \item a function: apply custom name repair (e.g., \code{.name_repair = make.names}
 for names in the style of base R).
-\item A purrr-style anonymous function, see \code{\link[=as_function]{as_function()}}
+\item A purrr-style anonymous function, see \code{\link[rlang:as_function]{rlang::as_function()}}
 }
 
 This argument is passed on as \code{repair} to \code{\link[vctrs:vec_as_names]{vctrs::vec_as_names()}}.
