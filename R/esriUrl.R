@@ -322,7 +322,6 @@ str_extract_id <- function(url) {
 #'
 #' @inheritParams rlang::args_error_context
 #' @keywords internal
-#' @importFrom cliExtras cli_menu
 convert_esriUrl <- function(url,
                             token = NULL,
                             from = NULL,
@@ -352,6 +351,8 @@ convert_esriUrl <- function(url,
     if (nrow(layers) == 1) {
       return(paste0(url, "/", layers[["id"]]))
     }
+
+    check_installed("cliExtras")
 
     id <-
       cliExtras::cli_menu(
