@@ -37,15 +37,9 @@ esrigeocode <- function(url,
                         crs = getOption("esri2sf.crs", 4326),
                         geometry = TRUE,
                         ...) {
-
   cli_abort_ifnot(
     x = grepl("GeocodeServer", url),
     message = "{.arg url} must be a {.val GeocodeServer} url."
-  )
-
-  cli_abort_ifnot(
-    x = !is_null(address) || !is_null(coords),
-    message = "{.arg address} or {.arg coords} must be supplied."
   )
 
   location <- NULL
@@ -55,24 +49,14 @@ esrigeocode <- function(url,
 
   if (is_null(layerInfo$spatialReference)) {
     cli::cli_alert_warning(
-      "Can't find a spatial reference at the provided url."
+      "Can't find a spatial reference at the provided {.arg url}."
     )
     layerCRS <- sf::st_crs(crs)$srid
   } else {
     layerCRS <- getLayerCRS(spatialReference = layerInfo$spatialReference)
   }
 
-  operation <- dplyr::case_when(
-    !is_null(address) && has_length(address, 1) ~ "findAddressCandidates",
-    !is_null(address) ~ "geocodeAddresses",
-    !is_null(coords) ~ "reverseGeocode"
-  )
-
-  cli_abort_ifnot(
-    x = operation != "geocodeAddresses",
-    message = "{.fn esrigeocode} currently only supports length 1
-      character vectors for the {.arg address} argument."
-  )
+  operation <- set_geocode_operation(address, coords)
 
   if (operation == "findAddressCandidates") {
     SingleLine <- address
@@ -82,11 +66,6 @@ esrigeocode <- function(url,
     if (is_sf(coords)) {
       coords <- sf2coords(coords, layerCRS)
     }
-
-    cli_abort_ifnot(
-      x = is.numeric(coords) && has_length(coords, 2),
-      message = "{.arg coords} must be a {.cls sf} object or a length 2 numeric vector."
-    )
 
     location <- paste0(coords, collapse = ",")
   }
@@ -122,14 +101,13 @@ esrigeocode <- function(url,
     }
 
     results <-
-      dplyr::bind_cols(
-        dplyr::select(
-          candidates,
-          -dplyr::any_of(c("location", "attributes", "extent"))
-        ),
-        candidates[["attributes"]],
-        candidates[["extent"]],
-        candidates[["location"]]
+      list_cbind(
+        c(
+          candidates[, !(names(candidates) %in% c("location", "attributes", "extent"))],
+          candidates[["attributes"]],
+          candidates[["extent"]],
+          candidates[["location"]]
+        )
       )
 
     if (!is_null(n)) {
@@ -139,8 +117,8 @@ esrigeocode <- function(url,
 
   if (operation == "reverseGeocode") {
     results <-
-      suppressWarnings(
-        dplyr::bind_cols(
+      list_cbind(
+        c(
           resp[["address"]],
           resp[["location"]]
         )
@@ -156,6 +134,47 @@ esrigeocode <- function(url,
   results
 }
 
+
+#' Set a geocoding operation
+#'
+#' @noRd
+set_geocode_operation <- function(address = NULL,
+                                  coords = NULL,
+                                  call = caller_env()) {
+  if (!is_null(address)) {
+    if (has_length(address, 1)) {
+      check_string(address, call = call)
+      return("findAddressCandidates")
+    }
+
+    cli_abort(
+      message = "{.fn esrigeocode} currently only supports length 1
+      character vectors for the {.arg address} argument.",
+      call = call
+    )
+
+    check_character(address, call = call)
+    return("geocodeAddresses")
+  }
+
+  if (!is_null(coords)) {
+    cli_abort_ifnot(
+      x = (is.numeric(coords) && has_length(coords, 2)) || is_sf(coords),
+      message = "{.arg coords} must be a {.cls sf} object or a
+      numeric coordinate pair.",
+      call = call
+    )
+
+    return("reverseGeocode")
+  }
+
+  cli_abort(
+    "{.arg address} or {.arg coords} must be supplied.",
+    call = call
+  )
+}
+
+
 #' Helper to convert results to an sf object
 #'
 #' @noRd
@@ -163,13 +182,16 @@ esrigeocode <- function(url,
 geocoderesultss2sf <- function(x,
                                coords = NULL,
                                layerCRS = 4326,
-                               crs = NULL) {
+                               crs = NULL,
+                               call = caller_env()) {
   if (is_null(coords)) {
     coords <- c("x", "y")
   }
 
-  stopifnot(
-    all(coords %in% names(x))
+  cli_abort_ifnot(
+    x = all(coords %in% names(x)),
+    message = "{.arg x} must have columns named {.val {coords}}.",
+    call = call
   )
 
   x <-
