@@ -470,11 +470,16 @@ sf2geometryType <- function(x, by_geometry = FALSE, call = caller_env()) {
 
   switch(as.character(geometryType),
     "POINT" = "esriGeometryPoint",
-    "POLYGON" = "esriGeometryPolygon",
-    "MULTIPOLYGON" = "esriGeometryPolygon",
-    "MULTIPOINT" = "esriGeometryMultipoint",
-    "LINESTRING" = "esriGeometryPolyline",
-    "MULTILINESTRING" = "esriGeometryPolyline"
+    "POLYGON" = "esriGeometryEnvelope",
+    "MULTIPOLYGON" = "esriGeometryEnvelope",
+    "MULTIPOINT" = "esriGeometryEnvelope",
+    "LINESTRING" = "esriGeometryEnvelope",
+    "MULTILINESTRING" = "esriGeometryEnvelope"
+    # "POLYGON" = "esriGeometryPolygon",
+    # "MULTIPOLYGON" = "esriGeometryPolygon",
+    # "MULTIPOINT" = "esriGeometryMultipoint",
+    # "LINESTRING" = "esriGeometryPolyline",
+    # "MULTILINESTRING" = "esriGeometryPolyline"
   )
 }
 
@@ -498,7 +503,7 @@ sf2geometry <- function(x, geometryType = NULL, layerCRS = NULL) {
     x <- sf::st_transform(x, layerCRS)
   }
 
-  if (!(sf::st_geometry_type(x, by_geometry = FALSE) == "POINT")) {
+  if (!all(sf::st_geometry_type(x) %in% "POINT")) {
     x <- sf::st_bbox(x)
     geometryType <- "esriGeometryEnvelope"
   }
