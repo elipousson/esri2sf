@@ -314,7 +314,7 @@ esriUrl_parseUrl <- function(url, token = NULL) {
 #' Extract identifier from the url
 #'
 #' @noRd
-str_extract_id <- function(url) {
+parse_id <- function(url) {
   str_extract(url, "(?<=id=)[A-Za-z0-9]+")
 }
 
@@ -373,7 +373,7 @@ convert_esriUrl <- function(url,
     url <-
       paste0(
         "https://www.arcgis.com/sharing/rest/content/items/",
-        str_extract_id(url)
+        parse_id(url)
       )
 
     if (to == "item") {
