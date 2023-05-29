@@ -388,7 +388,7 @@ esrimeta <- function(url,
 }
 
 
-#' Helper function to trigger error if layerInfo returns an erro
+#' Helper function to trigger error if layerInfo returns an error
 #'
 #' @noRd
 #' @importFrom utils hasName
@@ -623,7 +623,10 @@ esrigroup <- function(layerInfo,
                       .name_repair = "check_unique",
                       quiet = FALSE,
                       .fn = esri2sf,
-                      ...) {
+                      ...,
+                      call = caller_env()) {
+
+  check_layerInfo(layerInfo, call = call)
   cli::cli_rule(cli::col_blue("Group sublayers include:"))
   sublayers <- as.character(layerInfo$subLayers$name)
   cli::cli_ol(
