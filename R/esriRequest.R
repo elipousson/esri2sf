@@ -125,7 +125,7 @@ esriRequest <- function(url,
 
   # perform the request if .perform is TRUE
   if (.perform) {
-    return(httr2::req_perform(req = req))
+    return(httr2::req_perform(req = req, error_call = call))
   }
 
   # Otherwise return request
