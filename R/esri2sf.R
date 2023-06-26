@@ -91,11 +91,11 @@ esri2sf <- function(url,
                     ...) {
   cli_quiet(quiet)
 
-  url <- check_esriUrl(url, token)
+  url <- check_esriUrl(url, token = token)
 
   layerInfo <- esrimeta(url = url, token = token)
 
-  check_layerTypes(layerInfo, url, token)
+  check_layerTypes(layerInfo, url = url, token = token)
 
   cli::cli_rule(
     "Downloading {.val {layerInfo$name}} from {.url {url}}"
@@ -552,11 +552,11 @@ check_esriUrl <- function(url,
                           from = NULL,
                           to = "feature",
                           call = caller_env()) {
-  if (esriUrl_isValidType(url, type = to, call = call)) {
+  if (esriUrl_isValidType(url, type = to, token = token, call = call)) {
     return(url)
   }
 
-  convert_esriUrl(url = url, token = token, from = from, to = to, call = call)
+  convert_esriUrl(url = url, from = from, to = to, token = token, call = call)
 }
 
 #' Helper function to abort if layerType is not supported
@@ -574,7 +574,7 @@ check_layerTypes <- function(layerInfo,
     message = "{.arg url} must be a
       {.val {cli::cli_vec(layerTypes, style = list(vec_last = ' or '))}} type
       {.emph feature} url, not a
-      {.emph {esriUrl_isValidType(url, returnType = TRUE)}} url.",
+      {.emph {esriUrl_isValidType(url, returnType = TRUE, token = token)}} url.",
     call = call
   )
 

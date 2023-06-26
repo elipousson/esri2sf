@@ -327,7 +327,13 @@ convert_esriUrl <- function(url,
                             from = NULL,
                             to = "feature",
                             call = caller_env()) {
-  type <- esriUrl_isValidType(url = url, token = token, returnType = TRUE)
+  type <- esriUrl_isValidType(
+    url = url,
+    token = token,
+    returnType = TRUE,
+    call = call
+    )
+
   if (isTRUE(identical(type, to))) {
     return(url)
   }
@@ -345,7 +351,7 @@ convert_esriUrl <- function(url,
   }
 
   if (from == "service") {
-    layerInfo <- esrimeta(url, token)
+    layerInfo <- esrimeta(url, token = token, call = call)
     layers <- layerInfo[["layers"]]
 
     if (nrow(layers) == 1) {
