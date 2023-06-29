@@ -28,7 +28,7 @@ esri2rast <- function(url,
 
   layerCRS <- getLayerCRS(layerInfo$extent$spatialReference)
 
-  bbox_ext <- bbox_transform(bbox, layerCRS)
+  rast_ext <- bbox2extent(bbox, crs = layerCRS)
 
   bbox <-
     sf2geometry(
@@ -58,9 +58,35 @@ esri2rast <- function(url,
       ...
     )
 
-  ras <- terra::set.ext(terra::rast(req$url), as.numeric(bbox_ext))
+  esri_rast <- suppressWarnings(terra::rast(x = req[["url"]]))
 
-  terra::set.crs(ras, layerCRS)
+  terra::crs(esri_rast) <- layerCRS
+  terra::ext(esri_rast) <- rast_ext
+
+  esri_rast
+}
+
+#' @noRd
+bbox2extent <- function(bbox,
+                        ...,
+                        crs = NULL) {
+  check_installed(
+    "terra",
+    call = caller_env()
+  )
+
+  bbox <- bbox_transform(bbox, crs)
+
+  rast_ext <-
+    terra::rast(
+      xmin = bbox[["xmin"]],
+      xmax = bbox[["xmax"]],
+      ymin = bbox[["ymin"]],
+      ymax = bbox[["ymax"]],
+      crs = crs
+    )
+
+  terra::ext(rast_ext)
 }
 
 #' @noRd
