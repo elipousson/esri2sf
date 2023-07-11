@@ -98,7 +98,7 @@ esri2sf <- function(url,
   check_layerTypes(layerInfo, url = url, token = token)
 
   cli::cli_rule(
-    "Downloading {.val {layerInfo$name}} from {.url {url}}"
+    "Downloading {.val {layerInfo[['name']]}} from {.url {url}}"
   )
 
   if (is_groupLayer(layerInfo)) {
@@ -132,7 +132,7 @@ esri2sf <- function(url,
       )
 
       cli::cli_alert_info(
-        "Trying to download with {.fn esri2df}{cli::symbol$ellipsis}"
+        "Trying to download with {.fn esri2df}{cli::symbol[['ellipsis']]}"
       )
 
       df <- esri2df(
@@ -153,12 +153,13 @@ esri2sf <- function(url,
     layerGeomType <- layerInfo[["geometryType"]]
   } else {
     geomType_mismatch <-
-      !is_null(layerInfo[["geometryType"]]) && (layerInfo[["geometryType"]] != geomType)
+      !is_null(layerInfo[["geometryType"]]) &&
+        (layerInfo[["geometryType"]] != geomType)
 
     if (geomType_mismatch) {
       cli::cli_alert_warning(
         "The provided {.arg geomType} value {.val {geomType}} does not
-        match the layer geometryType value {.val {layerInfo$geometryType}}."
+        match the layer geometryType value {.val {layerInfo[['geometryType']]}}."
       )
     }
 
@@ -167,14 +168,16 @@ esri2sf <- function(url,
 
   cli::cli_dl(
     items = c(
-      "Layer type" = "{.val {layerInfo$type}}",
+      "Layer type" = "{.val {layerInfo[['type']]}}",
       "Geometry type" = "{.val {layerGeomType}}"
     )
   )
 
-  if (!is_null(layerInfo$extent$spatialReference)) {
+  if (!is_null(layerInfo[["extent"]][["spatialReference"]])) {
     layerCRS <-
-      getLayerCRS(spatialReference = layerInfo$extent$spatialReference)
+      getLayerCRS(
+        spatialReference = layerInfo[["extent"]][["spatialReference"]]
+      )
 
     cli::cli_dl(
       c("Service CRS" = "{.val {sf::st_crs(layerCRS)$srid}}")
@@ -279,7 +282,9 @@ esri2sf <- function(url,
 #'
 #' @noRd
 is_missing_geomType <- function(layerInfo) {
-  any(c(is_null(layerInfo$geometryType), (layerInfo$geometryType == "")))
+  any(
+    c(is_null(layerInfo[["geometryType"]]), (layerInfo[["geometryType"]] == ""))
+  )
 }
 
 #' @describeIn esri2sf Retrieve table object (no spatial data).
@@ -304,11 +309,11 @@ esri2df <- function(url,
 
   if (!is_tableLayer(layerInfo)) {
     cli::cli_alert_warning(
-      "The layer {.var {layerInfo$name}} must be a {.val 'Table'} service to
+      "The layer {.var {layerInfo[['name']]}} must be a {.val 'Table'} service to
       use {.fn esri2df}."
     )
 
-    cli::cli_alert_info("Trying to download with {.fn esri2sf} {cli::symbol$ellipsis}")
+    cli::cli_alert_info("Trying to download with {.fn esri2sf} {cli::symbol[['ellipsis']]}")
     sfdf <- esri2sf(
       url = url,
       outFields = outFields,
@@ -323,11 +328,11 @@ esri2df <- function(url,
   }
 
   cli::cli_rule(
-    "Downloading {.val {layerInfo$name}} from {.url {url}}"
+    "Downloading {.val {layerInfo[['name']]}} from {.url {url}}"
   )
 
   cli::cli_dl(
-    items = c("Layer type" = "{.val {layerInfo$type}}")
+    items = c("Layer type" = "{.val {layerInfo[['type']]}}")
   )
   cli::cli_par()
 
@@ -508,6 +513,8 @@ sf2geometry <- function(x, geometryType = NULL, layerCRS = NULL) {
     geometryType <- "esriGeometryEnvelope"
   }
 
+  # TODO: Explore how arcpullr handles prep for filter geometries:
+  # https://github.com/pfrater/arcpullr/blob/d68bb800ba6bea54c814630c8b3404b566a5ad09/R/utilities.R#L22
   switch(geometryType,
     "esriGeometryEnvelope" = paste0(
       unlist(as.list(x), use.names = FALSE),
@@ -569,23 +576,26 @@ check_layerTypes <- function(layerInfo,
                              token = NULL,
                              layerTypes = c("Feature Layer", "Table", "Group Layer"),
                              call = caller_env()) {
-  cli_abort_ifnot(
-    x = has_name(layerInfo, "type"),
-    message = "{.arg url} must be a
-      {.val {cli::cli_vec(layerTypes, style = list(vec_last = ' or '))}} type
+  style <- list("vec-last" = ", or ")
+
+  if (!has_name(layerInfo, "type")) {
+    cli::cli_abort(
+      "{.arg url} must be a {.val {cli::cli_vec(layerTypes, style = style)}}
       {.emph feature} url, not a
       {.emph {esriUrl_isValidType(url, returnType = TRUE, token = token)}} url.",
-    call = call
-  )
+      call = call
+    )
+  }
 
-  cli_abort_if(
-    x = !is_null(layerInfo[["type"]]) && !all(layerInfo[["type"]] %in% layerTypes),
-    message = c("The {.arg url} must be for a
-        {.val {cli::cli_vec(layerTypes, style = list(vec_last = ' or '))}}.",
-      "i" = "The provided {.arg url} is a {.val {layerInfo$type}} service."
-    ),
-    call = call
-  )
+  if (!is_null(layerInfo[["type"]]) && !all(layerInfo[["type"]] %in% layerTypes)) {
+    cli::cli_abort(
+      c("{.arg url} must be a {.val {cli::cli_vec(layerTypes, style = style)}}
+        {.emph feature} url.",
+        "i" = "Supplied {.arg url} is a {.val {layerInfo[['type']]}} service."
+      ),
+      call = call
+    )
+  }
 }
 
 #' Helper function to validate if a layer is a Table layer
@@ -625,7 +635,6 @@ esrigroup <- function(layerInfo,
                       .fn = esri2sf,
                       ...,
                       call = caller_env()) {
-
   check_layerInfo(layerInfo, call = call)
   cli::cli_rule(cli::col_blue("Group sublayers include:"))
   sublayers <- as.character(layerInfo$subLayers$name)
@@ -646,7 +655,7 @@ esrigroup <- function(layerInfo,
     lapply(
       cli::cli_progress_along(
         url,
-        format = "{cli::symbol$info} Downloading {.val {sublayers[[cli::pb_current]]}} | {cli::pb_bar} {cli::pb_percent}",
+        format = "{cli::symbol[['info']]} Downloading {.val {sublayers[[cli::pb_current]]}} | {cli::pb_bar} {cli::pb_percent}",
         total = length(url)
       ),
       function(x) {
