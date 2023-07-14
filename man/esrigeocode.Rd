@@ -14,7 +14,8 @@ esrigeocode(
   token = NULL,
   crs = getOption("esri2sf.crs", 4326),
   geometry = TRUE,
-  ...
+  ...,
+  call = caller_env()
 )
 }
 \arguments{
@@ -40,6 +41,11 @@ accuracy score or greater Default: 0.95}
 \code{FALSE}, return a data frame.}
 
 \item{...}{Additional parameters passed to \code{\link[=esriRequest]{esriRequest()}}.}
+
+\item{call}{The execution environment of a currently
+running function, e.g. \code{caller_env()}. The function will be
+mentioned in error messages as the source of the error. See the
+\code{call} argument of \code{\link[rlang:abort]{abort()}} for more information.}
 }
 \description{
 This function allows the use of an ArcGIS GeocodeServer url to support the

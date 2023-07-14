@@ -26,7 +26,7 @@ esriUrl_isValidFeature(url, token = NULL, displayReason = FALSE)
 
 esriUrl_ServerUrl(url, token = NULL)
 
-esriUrl_serviceUrl(url, token = NULL)
+esriUrl_serviceUrl(url, token = NULL, call = caller_env())
 
 esriUrl_parseUrl(url, token = NULL)
 }

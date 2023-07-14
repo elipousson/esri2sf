@@ -7,7 +7,8 @@
 esrihub(
   url,
   format = c("dcat-us", "dcat-ap", "rss", "definition"),
-  simplifyVector = TRUE
+  simplifyVector = TRUE,
+  call = caller_env()
 )
 }
 \arguments{
@@ -19,6 +20,11 @@ for more information. Default: \code{c("dcat-us", "dcat-ap", "rss", "definition"
 
 \item{simplifyVector}{Passed to \code{\link[httr2:resp_body_raw]{httr2::resp_body_json()}} if format is not
 rss. Default: \code{TRUE}}
+
+\item{call}{The execution environment of a currently
+running function, e.g. \code{caller_env()}. The function will be
+mentioned in error messages as the source of the error. See the
+\code{call} argument of \code{\link[rlang:abort]{abort()}} for more information.}
 }
 \value{
 A list of metadata for the public content on the ArcGIS Hub site.

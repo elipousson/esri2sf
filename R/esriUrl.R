@@ -3,6 +3,32 @@ serviceTypes <- c(
   "GeometryServer", "ImageServer"
 )
 
+
+#' Check if x is a URL
+#'
+#' Requires standalone types-check from rlang
+#'
+#' @noRd
+check_url <- function(x,
+                      allow_null = FALSE,
+                      arg = caller_arg(x),
+                      call = caller_env()) {
+  if (allow_null && is_null(x)) {
+    return(invisible(NULL))
+  }
+
+  if (is_url(x)) {
+    return(invisible(NULL))
+  }
+
+  stop_input_type(
+    x,
+    what = "a valid URL",
+    arg = arg,
+    call = call
+  )
+}
+
 #' Is the ESRI url a valid type?
 #'
 #' Confirms if the url is an ESRI URL and optionally returns the URL type or, if
@@ -218,7 +244,7 @@ esriUrl_ServerUrl <- function(url, token = NULL) {
 
 #' @describeIn esriUrl Retrieve Map/Feature Server URL
 #' @export
-esriUrl_serviceUrl <- function(url, token = NULL) {
+esriUrl_serviceUrl <- function(url, token = NULL, call = caller_env()) {
   # Cut off layerID if present
   urlNoLayerID <- sub("/[[:digit:]]+/?$|/$", "", url)
 
@@ -231,7 +257,7 @@ esriUrl_serviceUrl <- function(url, token = NULL) {
       )
     },
     message = function(m) {
-      cli::cli_abort(m$message)
+      cli::cli_abort(m$message, call = call)
     }
   )
 
@@ -327,6 +353,8 @@ convert_esriUrl <- function(url,
                             from = NULL,
                             to = "feature",
                             call = caller_env()) {
+  check_url(url, call = call)
+
   type <- esriUrl_isValidType(
     url = url,
     token = token,

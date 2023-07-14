@@ -14,13 +14,23 @@
 #' @param url The url for the Map/Feature server. If given a url specifying a
 #' layer or table ID it will truncate it.
 #' @param returnDomainNames If `TRUE`, the REST API response does not include
-#'   the full domain information for each layer (only the domain names). Defaults to `TRUE`.
-#' @param returnUpdates If `TRUE`, updated features will be returned; defaults to `NULL`.
+#'   the full domain information for each layer (only the domain names).
+#'   Defaults to `TRUE`.
+#' @param returnUpdates If `TRUE`, updated features will be returned; defaults
+#'   to `NULL`.
 #' @param ... Additional parameters passed to [httr2::resp_body_json]
+#' @inheritParams rlang::args_error_context
 #' @return A list from the JSON return.
 #' @export
 #' @importFrom httr2 resp_body_json
-esriLayers <- function(url, token = NULL, returnUpdates = NULL, returnDomainNames = TRUE, ...) {
+esriLayers <- function(url,
+                       token = NULL,
+                       returnUpdates = NULL,
+                       returnDomainNames = TRUE,
+                       ...,
+                       call = caller_env()) {
+  check_url(url, call = call)
+
   # Format url (remove layer.table ID and check it is valid)
   urlServer <- esriUrl_serviceUrl(url, token = token)
 

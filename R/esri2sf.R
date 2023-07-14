@@ -559,6 +559,8 @@ check_esriUrl <- function(url,
                           from = NULL,
                           to = "feature",
                           call = caller_env()) {
+  check_url(url, call = call)
+
   if (esriUrl_isValidType(url, type = to, token = token, call = call)) {
     return(url)
   }

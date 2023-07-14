@@ -9,7 +9,8 @@ esriLayers(
   token = NULL,
   returnUpdates = NULL,
   returnDomainNames = TRUE,
-  ...
+  ...,
+  call = caller_env()
 )
 }
 \arguments{
@@ -18,12 +19,19 @@ layer or table ID it will truncate it.}
 
 \item{token}{String for authentication token; defaults to \code{NULL}.}
 
-\item{returnUpdates}{If \code{TRUE}, updated features will be returned; defaults to \code{NULL}.}
+\item{returnUpdates}{If \code{TRUE}, updated features will be returned; defaults
+to \code{NULL}.}
 
 \item{returnDomainNames}{If \code{TRUE}, the REST API response does not include
-the full domain information for each layer (only the domain names). Defaults to \code{TRUE}.}
+the full domain information for each layer (only the domain names).
+Defaults to \code{TRUE}.}
 
 \item{...}{Additional parameters passed to \link[httr2:resp_body_raw]{httr2::resp_body_json}}
+
+\item{call}{The execution environment of a currently
+running function, e.g. \code{caller_env()}. The function will be
+mentioned in error messages as the source of the error. See the
+\code{call} argument of \code{\link[rlang:abort]{abort()}} for more information.}
 }
 \value{
 A list from the JSON return.

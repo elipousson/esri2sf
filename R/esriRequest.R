@@ -45,7 +45,7 @@ esriRequest <- function(url,
                         .body_form = FALSE,
                         ...,
                         call = caller_env()) {
-  check_string(url, call = call)
+  check_url(url, call = call)
 
   # Create request based on url
   req <- httr2::request(url)

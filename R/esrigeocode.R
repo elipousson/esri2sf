@@ -23,6 +23,7 @@
 #' @param geometry If `TRUE` (default), return a simple feature object. If
 #'   `FALSE`, return a data frame.
 #' @param ... Additional parameters passed to [esriRequest()].
+#' @inheritParams rlang::args_error_context
 #' @export
 #' @importFrom cli cli_alert_warning
 #' @importFrom sf st_crs
@@ -36,7 +37,10 @@ esrigeocode <- function(url,
                         token = NULL,
                         crs = getOption("esri2sf.crs", 4326),
                         geometry = TRUE,
-                        ...) {
+                        ...,
+                        call = caller_env()) {
+  check_url(url, call = call)
+
   cli_abort_ifnot(
     x = grepl("GeocodeServer", url),
     message = "{.arg url} must be a {.val GeocodeServer} url."

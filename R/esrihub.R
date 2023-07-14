@@ -10,6 +10,7 @@
 #'   "definition")`.
 #' @param simplifyVector Passed to [httr2::resp_body_json()] if format is not
 #'   rss. Default: `TRUE`
+#' @inheritParams rlang::args_error_context
 #' @return A list of metadata for the public content on the ArcGIS Hub site.
 #' @rdname esrihub
 #' @export
@@ -18,8 +19,9 @@
 #'   resp_body_xml
 esrihub <- function(url,
                     format = c("dcat-us", "dcat-ap", "rss", "definition"),
-                    simplifyVector = TRUE) {
-  rlang::check_required(url)
+                    simplifyVector = TRUE,
+                    call = caller_env()) {
+  check_url(url, call = call)
 
   format <- match.arg(format)
 
@@ -33,7 +35,7 @@ esrihub <- function(url,
     )
   )
 
-  resp <- httr2::req_perform(req)
+  resp <- httr2::req_perform(req, error_call = call)
 
   if (!format == "rss") {
     httr2::resp_body_json(resp, simplifyVector = simplifyVector)
