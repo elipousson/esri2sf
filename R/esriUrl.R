@@ -3,6 +3,19 @@ serviceTypes <- c(
   "GeometryServer", "ImageServer"
 )
 
+#' Is this a URL?
+#'
+#' @noRd
+is_url <- function(x) {
+  if (is_empty(x)) {
+    return(FALSE)
+  }
+
+  grepl(
+    "http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+",
+    x
+  )
+}
 
 #' Check if x is a URL
 #'
@@ -257,7 +270,7 @@ esriUrl_serviceUrl <- function(url, token = NULL, call = caller_env()) {
       )
     },
     message = function(m) {
-      cli::cli_abort(m$message, call = call)
+      cli::cli_abort(m[["message"]], call = call)
     }
   )
 
@@ -283,14 +296,14 @@ parse_url_instance <- function(url, host = NULL, scheme = NULL) {
 
 #' @describeIn esriUrl Parse Url into parts.
 #' @export
-esriUrl_parseUrl <- function(url, token = NULL) {
+esriUrl_parseUrl <- function(url, token = NULL, call = caller_env()) {
   # make sure url is valid and error otherwise
   tryCatch(
     {
       esriUrl_isValid(url = url, token = token, displayReason = TRUE)
     },
     message = function(m) {
-      cli::cli_abort(m$message)
+      cli::cli_abort(m[["message"]], call = call)
     }
   )
 
@@ -369,7 +382,7 @@ convert_esriUrl <- function(url,
   from <- from %||% type
 
   if ((from != "item") && (to == "root")) {
-    url <- esriUrl_parseUrl(url, token)
+    url <- esriUrl_parseUrl(url, token, call = call)
     return(
       paste0(
         url["scheme"],
@@ -386,16 +399,16 @@ convert_esriUrl <- function(url,
       return(paste0(url, "/", layers[["id"]]))
     }
 
-    check_installed("cliExtras")
+    check_installed("cliExtras", call = call)
 
     id <-
       cliExtras::cli_menu(
         choices = layers[["name"]],
         title = c(
-          "i" = "{.val {layerInfo$serviceDescription}} is a service with
+          "i" = "{.val {layerInfo[['serviceDescription']]}} is a service with
           {nrow(layers)} layer{?s}:"
         ),
-        message = "{cli::symbol$tick} Enter your selection or press {.kbd 0} to exit.",
+        message = "{cli::symbol[['tick']]} Enter your selection or press {.kbd 0} to exit.",
         prompt = "? Select a layer to download:",
         ind = TRUE
       )
@@ -417,11 +430,11 @@ convert_esriUrl <- function(url,
     layerInfo <- esrimeta(url = url, token = token, call = call)
 
     if (to == "feature") {
-      if ("Singlelayer" %in% layerInfo$typeKeywords || has_length(layerInfo$url, 1)) {
-        return(paste0(layerInfo$url, "/0"))
+      if ("Singlelayer" %in% layerInfo[["typeKeywords"]] || has_length(layerInfo[["url"]], 1)) {
+        return(paste0(layerInfo[["url"]], "/0"))
       }
     }
 
-    layerInfo$url
+    layerInfo[["url"]]
   }
 }

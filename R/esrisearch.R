@@ -55,29 +55,29 @@ esrisearch <- function(query = NULL,
                        sort = NULL,
                        desc = FALSE,
                        quiet = FALSE) {
-  if (is_null(query) && is_null(bbox)) {
-    cli::cli_abort(
-      "{.arg query} or {.arg bbox} must be provided."
-    )
-  }
-
   cli_quiet(quiet)
 
-  if (!is_null(bbox)) {
-    bbox <-
-      sf2geometry(bbox, geometryType = "esriGeometryEnvelope", layerCRS = 4326)
-  }
-
-  if (is_null(url)) {
-    url <- "https://www.arcgis.com"
-  } else if (!is_url(url)) {
+  if (is_null(query) && is_null(bbox)) {
     cli::cli_abort(
-      "{.arg url} must be a valid url and {.val {url}} is not."
+      "{.arg query} or {.arg bbox} must be supplied."
     )
   }
 
+  if (!is_null(bbox)) {
+    bbox <- sf2geometry(
+      bbox,
+      geometryType = "esriGeometryEnvelope",
+      layerCRS = 4326
+    )
+  }
+
+  url <- url %||% "https://www.arcgis.com"
+  check_url(url)
+  check_number_whole(start, min = 1)
+  check_number_whole(num)
+
   if (num > 100 || num < 1) {
-    cli::cli_alert_warning(
+    cli::cli_warn(
       "{.arg num} must be a positive number between 1 and 100,
       not {.val {num}}.",
       " " = "Setting {.arg num} to default value {.val 50}.",
@@ -87,13 +87,9 @@ esrisearch <- function(query = NULL,
     num <- 50
   }
 
-  if (start < 1) {
-    cli::cli_alert_warning(
-      "{.arg num} must be a positive number.",
-      " " = "Setting {.arg start} to default value {.val 1}."
-    )
-
-    start <- 1
+  if (!is_null(query)) {
+    check_character(query)
+    query <- gsub("\\s+", "+", paste(query, collapse = " "))
   }
 
   if (!is_null(category_filter)) {
@@ -104,14 +100,13 @@ esrisearch <- function(query = NULL,
   sortOrder <- NULL
 
   if (!is_null(sort)) {
-    sort <-
-      match.arg(
-        sort,
-        c(
-          "modified", "title", "created", "type", "owner",
-          "avgrating", "numratings", "numcomments", "numviews"
-        )
+    sort <- match.arg(
+      sort,
+      c(
+        "modified", "title", "created", "type", "owner",
+        "avgrating", "numratings", "numcomments", "numviews"
       )
+    )
 
     if (desc) {
       sortOrder <- "desc"
@@ -120,40 +115,49 @@ esrisearch <- function(query = NULL,
     }
   }
 
-  resp <-
-    esriRequest(
-      url = url,
-      append = "sharing/rest/search",
-      f = "json",
-      q = gsub("\\s+", "+", paste(query, collapse = " ")),
-      bbox = bbox,
-      num = num,
-      sortField = sort,
-      sortOrder = sortOrder,
-      categoryFilters = category_filter
-    )
+  resp <- esriRequest(
+    url = url,
+    append = "sharing/rest/search",
+    f = "json",
+    q = query,
+    bbox = bbox,
+    num = num,
+    sortField = sort,
+    sortOrder = sortOrder,
+    categoryFilters = category_filter
+  )
 
   resp <- httr2::resp_body_json(resp, simplifyVector = TRUE)
 
-  total <- resp$total
+  if (is_empty(resp[["results"]])) {
+    cli::cli_bullets(
+      c("!" = "Search completed with no results found")
+    )
+
+    return(tibble::as_tibble(data.frame()))
+  }
+
+  total <- resp[["total"]]
+
+  msg <- "Search completed"
+
+  if (!is_null(resp[["query"]])) {
+    msg <- "Search completed for {.val {query}} at {.url {url}}"
+  } else if (!is_null(bbox)) {
+    msg <- "Search completed with supplied {.arg bbox} at {.url {url}}"
+  }
+
+  if (total < num) {
+    results_msg <- "{total} items found"
+  } else if (total >= num) {
+    results_msg <- "Returning {num} results out of {total} total"
+  }
 
   if (total >= 10000) {
     total <- "10000+"
   }
 
-  if (!is_null(resp$query)) {
-    msg <- "Search completed for {.val {resp$query}} at {.url {url}}."
-  } else if (!is_null(bbox)) {
-    msg <- "Search completed with provided {.arg bbox} at {.url {url}}."
-  }
-
-  cli::cli_bullets(
-    c(
-      "v" = msg,
-      " " = "Returning {.val {num}} results ({.val {resp$start}} to
-      {.val {resp$nextStart - 1}}) out of {total} total."
-    )
-  )
+  cli::cli_bullets(c("v" = msg, "i" = results_msg))
 
   results <-
     tibble::as_tibble(
@@ -161,48 +165,30 @@ esrisearch <- function(query = NULL,
     )
 
   if (all(c("created", "modified") %in% names(results))) {
-    results <-
-      dplyr::mutate(
-        results,
-        dplyr::across(
-          c("created", "modified"),
-          ~ fmt_epoch_date(.x)
-        )
+    results <- dplyr::mutate(
+      results,
+      dplyr::across(
+        c("created", "modified", "lastViewed"),
+        ~ fmt_epoch_date(.x)
       )
+    )
   }
 
   results
 }
 
-#' Is this a URL?
-#'
-#' @noRd
-is_url <- function(x) {
-  if (is_empty(x)) {
-    return(FALSE)
-  }
-
-  grepl(
-    "http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+",
-    x
-  )
-}
-
 #' Check if the provided category_filter is valid
 #'
 #' @noRd
-check_category_filter <- function(category_filter) {
-  if (!is.character(category_filter)) {
-    cli::cli_abort(
-      "{.arg category_filter} must be a character vector.",
-      "i" = "{.arg category_filter} is {.cls {class(category_filter)}}."
-    )
-  }
+check_category_filter <- function(category_filter, call = caller_env()) {
+  check_character(category_filter, call = call)
 
-  if (length(category_filter) > 3) {
+  filter_len <- length(category_filter)
+  if (filter_len > 3) {
     cli::cli_abort(
       "{.arg category_filter} must have length 3 or less.",
-      "i" = "{.arg category_filter} is length {.val {length(category_filter)}}."
+      "i" = "{.arg category_filter} is length {.val {filter_len}}.",
+      call = call
     )
   }
 }
