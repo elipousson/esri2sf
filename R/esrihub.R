@@ -37,7 +37,7 @@ esrihub <- function(url,
 
   resp <- httr2::req_perform(req, error_call = call)
 
-  if (!format == "rss") {
+  if (format != "rss") {
     httr2::resp_body_json(resp, simplifyVector = simplifyVector)
   } else {
     body <- httr2::resp_body_xml(resp)
