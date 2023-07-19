@@ -28,7 +28,7 @@ esriUrl_ServerUrl(url, token = NULL)
 
 esriUrl_serviceUrl(url, token = NULL, call = caller_env())
 
-esriUrl_parseUrl(url, token = NULL)
+esriUrl_parseUrl(url, token = NULL, call = caller_env())
 }
 \arguments{
 \item{url}{The url for a Map/Feature server or for a layer/table in a
