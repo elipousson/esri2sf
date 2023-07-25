@@ -104,19 +104,18 @@ esriUrl_isValidType <- function(url,
 
   if (!out && displayReason) {
     if (!is_null(type) && !returnType) {
-      reason <-
-        switch(type,
-          "root" = "A {.val {type}} {.arg url} must end in '/rest/services':",
-          "folder" = "A {.val {type}} {.arg url} must be a 'Folder' endpoint:",
-          "service" = "A {.val {type}} {.arg url} must end in one of the supported service types ({serviceTypes}):",
-          "feature" = "A {.val {type}} {.arg url} must end in a feature ID:",
-          "content" = "A {.val {type}} {.arg url} must include '/content/':",
-          "search" = "A {.val {type}} {.arg url} must include '/home/search.html?q=':",
-          "item" = "An {.val {type}} {.arg url} must include '/home/item.html?id=':",
-          "group" = "A {.val {type}} {.arg url} must include '/home/group.html?id=':",
-          "user" = "A {.val {type}} {.arg url} must include '/home/user.html?user=':",
-          "app" = "An {.val {type}} {.arg url} must include '/index.html?appid=':"
-        )
+      reason <- switch(type,
+        "root" = "A {.val {type}} {.arg url} must end in '/rest/services':",
+        "folder" = "A {.val {type}} {.arg url} must be a 'Folder' endpoint:",
+        "service" = "A {.val {type}} {.arg url} must end in one of the supported service types ({serviceTypes}):",
+        "feature" = "A {.val {type}} {.arg url} must end in a feature ID:",
+        "content" = "A {.val {type}} {.arg url} must include '/content/':",
+        "search" = "A {.val {type}} {.arg url} must include '/home/search.html?q=':",
+        "item" = "An {.val {type}} {.arg url} must include '/home/item.html?id=':",
+        "group" = "A {.val {type}} {.arg url} must include '/home/group.html?id=':",
+        "user" = "A {.val {type}} {.arg url} must include '/home/user.html?user=':",
+        "app" = "An {.val {type}} {.arg url} must include '/index.html?appid=':"
+      )
 
       cli::cli_bullets(c("!" = reason, " " = "{.url {url}}"))
     }
@@ -373,13 +372,23 @@ convert_esriUrl <- function(url,
     token = token,
     returnType = TRUE,
     call = call
-    )
+  )
 
   if (isTRUE(identical(type, to))) {
     return(url)
   }
 
   from <- from %||% type
+
+  if (is.na(from)) {
+    cli_abort(
+      "{.arg url} is not a valid {to} url and can't be converted.",
+      call = call
+    )
+  }
+
+  check_string(from, call = call)
+  check_string(to, call = call)
 
   if ((from != "item") && (to == "root")) {
     url <- esriUrl_parseUrl(url, token, call = call)
@@ -430,7 +439,8 @@ convert_esriUrl <- function(url,
     layerInfo <- esrimeta(url = url, token = token, call = call)
 
     if (to == "feature") {
-      if ("Singlelayer" %in% layerInfo[["typeKeywords"]] || has_length(layerInfo[["url"]], 1)) {
+      if ("Singlelayer" %in% layerInfo[["typeKeywords"]] ||
+        has_length(layerInfo[["url"]], 1)) {
         return(paste0(layerInfo[["url"]], "/0"))
       }
     }

@@ -21,25 +21,21 @@
 esriInfo <- function(url, info = NULL, format = NULL, token = NULL, ...) {
   info <- match.arg(info, c("info", "item", "metadata", "thumbnail"))
 
-  append <-
-    switch(info,
+  append <- switch(info,
       "info" = "info",
       "item" = "info/iteminfo",
       "metadata" = "info/metadata",
       "thumbnail" = "info/thumbnail"
     )
 
-
   if (info == "info") {
-    url <-
-      convert_esriUrl(
+    url <- convert_esriUrl(
         url = url,
         token = token,
         to = "root"
       )
 
-    resp <-
-      esriRequest(
+    resp <- esriRequest(
         url = url,
         f = "json",
         token = token
@@ -79,8 +75,7 @@ esriInfo <- function(url, info = NULL, format = NULL, token = NULL, ...) {
   }
 
   if (info == "item") {
-    resp <-
-      esriRequest(
+    resp <- esriRequest(
         url = url,
         append = append,
         f = "json",
@@ -110,8 +105,7 @@ esriInfo <- function(url, info = NULL, format = NULL, token = NULL, ...) {
 
     # Specifies metadata style.
     # The default is item description metadata style.
-    resp <-
-      esriRequest(
+    resp <- esriRequest(
         url = url,
         append = append,
         format = format,
@@ -123,8 +117,7 @@ esriInfo <- function(url, info = NULL, format = NULL, token = NULL, ...) {
   }
 
   if (info == "thumbnail") {
-    resp <-
-      esriRequest(
+    resp <- esriRequest(
         url = url,
         append = append,
         format = format,

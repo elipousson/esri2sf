@@ -198,8 +198,7 @@ geocoderesultss2sf <- function(x,
     call = call
   )
 
-  x <-
-    sf::st_as_sf(
+  x <- sf::st_as_sf(
       x,
       coords = coords,
       crs = layerCRS

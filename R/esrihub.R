@@ -27,11 +27,11 @@ esrihub <- function(url,
 
   req <- httr2::req_url_path_append(
     httr2::request(url),
-    switch (format,
-            "dcat-us" = "/api/feed/dcat-us/1.1",
-            "dcat-ap" = "/api/feed/dcat-ap/2.0.1",
-            "rss" = "/api/feed/rss/2.0",
-            "definition" = "/api/feed/search/definition"
+    switch(format,
+      "dcat-us" = "/api/feed/dcat-us/1.1",
+      "dcat-ap" = "/api/feed/dcat-ap/2.0.1",
+      "rss" = "/api/feed/rss/2.0",
+      "definition" = "/api/feed/search/definition"
     )
   )
 
@@ -45,6 +45,3 @@ esrihub <- function(url,
     xml2::as_list(body)
   }
 }
-
-
-
