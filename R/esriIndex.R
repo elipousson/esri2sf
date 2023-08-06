@@ -29,78 +29,71 @@ esriIndex <- function(url,
   index <- NULL
   urlIndex <- url
 
-  urlbase <-
-    regmatches(
-      urlIndex,
-      regexpr(pattern = ".+(?=/)", text = urlIndex, perl = TRUE)
-    )
+  urlbase <- regmatches(
+    urlIndex,
+    regexpr(pattern = ".+(?=/)", text = urlIndex, perl = TRUE)
+  )
 
 
   if (!!length(esriResp[["folders"]])) {
-    folders <-
-      list_cbind(
-        list(
-          "name" = unlist(esriResp[["folders"]]),
-          "urlType" = "folder",
-          "type" = NA
-        )
+    folders <- list_cbind(
+      list(
+        "name" = unlist(esriResp[["folders"]]),
+        "urlType" = "folder",
+        "type" = NA
       )
+    )
 
-    index <-
-      list_rbind(
-        list(
-          index,
-          folders
-        )
+    index <- list_rbind(
+      list(
+        index,
+        folders
       )
+    )
   }
 
   if (!!length(esriResp[["services"]])) {
     services <- dplyr::bind_rows(esriResp[["services"]])
 
-    services <-
-      list_cbind(
-        list(
-          services,
-          "urlType" = "service"
-        )
+    services <- list_cbind(
+      list(
+        services,
+        "urlType" = "service"
       )
+    )
 
-    index <-
-      list_rbind(
-        list(
-          index,
-          services
-        )
+    index <- list_rbind(
+      list(
+        index,
+        services
       )
+    )
   }
 
   if (is_null(index)) {
     return(index)
   }
 
-  index <-
-    dplyr::mutate(
-      index,
-      url = NULL,
-      url = dplyr::if_else(
-        grepl(pattern = "/", x = name),
-        urlbase,
-        urlIndex
-      )
+  index <- dplyr::mutate(
+    index,
+    url = NULL,
+    url = dplyr::if_else(
+      grepl(pattern = "/", x = name),
+      urlbase,
+      urlIndex
     )
+  )
 
   na_type <- all(sapply(index[["type"]], is.na))
 
-  index <-
-    dplyr::mutate(
-      index,
-      url = dplyr::case_when(
-        (urlType == "folder") ~ paste0(url, "/", name),
-        !na_type ~ paste0(url, "/", name, "/", type),
-        TRUE ~ url
-      )
+  index <- dplyr::mutate(
+    index,
+    url = dplyr::case_when(
+      (urlType == "folder") ~ paste0(url, "/", name),
+      !na_type ~ paste0(url, "/", name, "/", type),
+      TRUE ~ url
     )
+  )
 
   index <- list_cbind(
     list(
@@ -114,55 +107,54 @@ esriIndex <- function(url,
     folderIndex <- subset(index, urlType == "folder")
 
     if (nrow(folderIndex) > 0) {
-      folderIndex <-
-        list_rbind(
-          map2(
-            folderIndex[["url"]],
-            folderIndex[["name"]],
-            ~ esriIndex(
-              url = .x,
-              folderPath = .y,
+      folderIndex <- list_rbind(
+        map2(
+          folderIndex[["url"]],
+          folderIndex[["name"]],
+          function(x, y) {
+            esriIndex(
+              url = x,
+              folderPath = y,
               serviceName = serviceName,
               recurse = TRUE
             )
-          )
-        )
-
-      index <-
-        list_rbind(
-          list(
-            index,
-            folderIndex
-          )
-        )
-    }
-
-    layerIndex <-
-      subset(
-        index,
-        type %in% c(
-          "MapServer", "FeatureServer", "ImageServer",
-          "GeocodeServer", "GeometryServer", "GPServer"
+          }
         )
       )
 
+      index <- list_rbind(
+        list(
+          index,
+          folderIndex
+        )
+      )
+    }
+
+    layerIndex <- subset(
+      index,
+      type %in% c(
+        "MapServer", "FeatureServer", "ImageServer",
+        "GeocodeServer", "GeometryServer", "GPServer"
+      )
+    )
+
     if (nrow(layerIndex) > 0) {
-      layerIndex <-
-        list_rbind(
-          map2(
-            layerIndex[["url"]],
-            layerIndex[["name"]],
-            ~ esriIndexLayers(
-              url = .x,
+      layerIndex <- list_rbind(
+        map2(
+          layerIndex[["url"]],
+          layerIndex[["name"]],
+          function(x, y) {
+            esriIndexLayers(
+              url = x,
               folderPath = folderPath,
-              serviceName = .y,
+              serviceName = y,
               recurse = TRUE
             )
-          )
+          }
         )
+      )
 
-      index <-
-        list_rbind(
+      index <- list_rbind(
           list(
             index,
             layerIndex
@@ -171,18 +163,17 @@ esriIndex <- function(url,
     }
   }
 
-  index <-
-    dplyr::mutate(
-      index,
-      serviceType = dplyr::case_when(
-        grepl("FeatureServer", url) ~ "FeatureServer",
-        grepl("MapServer", url) ~ "MapServer",
-        grepl("ImageServer", url) ~ "ImageServer",
-        grepl("GeocodeServer", url) ~ "GeocodeServer",
-        grepl("GeometryServer", url) ~ "GeometryServer",
-        grepl("GPServer", url) ~ "GPServer"
-      )
+  index <- dplyr::mutate(
+    index,
+    serviceType = dplyr::case_when(
+      grepl("FeatureServer", url) ~ "FeatureServer",
+      grepl("MapServer", url) ~ "MapServer",
+      grepl("ImageServer", url) ~ "ImageServer",
+      grepl("GeocodeServer", url) ~ "GeocodeServer",
+      grepl("GeometryServer", url) ~ "GeometryServer",
+      grepl("GPServer", url) ~ "GPServer"
     )
+  )
 
   dplyr::relocate(
     index,
@@ -207,39 +198,35 @@ esriIndexLayers <- function(url,
   index <- NULL
 
   if (!!length(esriResp[["layers"]])) {
-    layers <-
-      list_cbind(
-        list(
-          dplyr::bind_rows(esriResp$layers),
-          "urlType" = "layer"
-        )
+    layers <- list_cbind(
+      list(
+        dplyr::bind_rows(esriResp[["layers"]]),
+        "urlType" = "layer"
       )
+    )
 
-    index <-
-      list_rbind(
-        list(
-          index,
-          layers
-        )
+    index <- list_rbind(
+      list(
+        index,
+        layers
       )
+    )
   }
 
   if (!!length(esriResp[["tables"]])) {
-    tables <-
-      list_cbind(
-        list(
-          dplyr::bind_rows(esriResp$tables),
-          "urlType" = "table"
-        )
+    tables <- list_cbind(
+      list(
+        dplyr::bind_rows(esriResp[["tables"]]),
+        "urlType" = "table"
       )
+    )
 
-    index <-
-      list_rbind(
-        list(
-          index,
-          tables
-        )
+    index <- list_rbind(
+      list(
+        index,
+        tables
       )
+    )
   }
 
   if (is_null(index)) {
