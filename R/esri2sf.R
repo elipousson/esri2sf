@@ -6,7 +6,6 @@
 #'   <https://sampleserver6.arcgisonline.com/arcgis/rest/services/Census/MapServer/2>
 #'    or an ArcGIS Online item url if the item contains a single feature or
 #'   table layer.
-#'
 #' @param outFields vector of fields you want to include. default is `NULL` for
 #'   all fields.
 #' @param where string for where condition. Default is `NULL` (equivalent to
@@ -123,43 +122,40 @@ esri2sf <- function(url,
     return(sf_list)
   }
 
-  # Get the layer geometry type
-  if (is_null(geomType)) {
-    if (is_tableLayer(layerInfo) || is_missing_geomType(layerInfo)) {
-      cli::cli_alert_warning(
-        "{.arg geomType} is {.val NULL} and a layer geometry type
+  if (is_null(geomType) &&
+    (is_tableLayer(layerInfo) || is_missing_geomType(layerInfo))) {
+    cli::cli_alert_warning(
+      "{.arg geomType} is {.val NULL} and a layer geometry type
           can't be found for this url."
-      )
+    )
 
-      cli::cli_alert_info(
-        "Trying to download with {.fn esri2df}{cli::symbol[['ellipsis']]}"
-      )
+    cli::cli_alert_info(
+      "Trying to download with {.fn esri2df}{cli::symbol[['ellipsis']]}"
+    )
 
-      df <- esri2df(
-        url = url,
-        outFields = outFields,
-        where = where,
-        token = token,
-        progress = progress,
-        replaceDomainInfo = replaceDomainInfo,
-        .name_repair = .name_repair,
-        quiet = quiet,
-        ...
-      )
+    df <- esri2df(
+      url = url,
+      outFields = outFields,
+      where = where,
+      token = token,
+      progress = progress,
+      replaceDomainInfo = replaceDomainInfo,
+      .name_repair = .name_repair,
+      quiet = quiet,
+      ...
+    )
 
-      return(df)
-    }
+    return(df)
+  }
 
-    layerGeomType <- layerInfo[["geometryType"]]
-  } else {
-    geomType_mismatch <-
-      !is_null(layerInfo[["geometryType"]]) &&
-        (layerInfo[["geometryType"]] != geomType)
+  layerGeomType <- layerInfo[["geometryType"]]
 
-    if (geomType_mismatch) {
+  # Get the layer geometry type
+  if (!is_null(geomType)) {
+    if (!is_null(layerGeomType) && (layerGeomType != geomType)) {
       cli::cli_alert_warning(
         "The provided {.arg geomType} value {.val {geomType}} does not
-        match the layer geometryType value {.val {layerInfo[['geometryType']]}}."
+        match the layer geometryType value {.val {layerGeomType}}."
       )
     }
 
@@ -174,10 +170,9 @@ esri2sf <- function(url,
   )
 
   if (!is_null(layerInfo[["extent"]][["spatialReference"]])) {
-    layerCRS <-
-      getLayerCRS(
-        spatialReference = layerInfo[["extent"]][["spatialReference"]]
-      )
+    layerCRS <- getLayerCRS(
+      spatialReference = layerInfo[["extent"]][["spatialReference"]]
+    )
 
     cli::cli_dl(
       c("Service CRS" = "{.val {sf::st_crs(layerCRS)$srid}}")
@@ -214,60 +209,50 @@ esri2sf <- function(url,
 
   if (!is_null(geometry)) {
     # Set geometryType based on geometry type of simple feature
-    geometryType <-
-      sf2geometryType(
-        x = geometry
-      )
+    geometryType <- sf2geometryType(x = geometry)
 
-    geometry <-
-      sf2geometry(
-        x = geometry,
-        geometryType = geometryType,
-        layerCRS = layerCRS
-      )
+    geometry <- sf2geometry(
+      x = geometry,
+      geometryType = geometryType,
+      layerCRS = layerCRS
+    )
 
     if (!is_null(spatialRel)) {
-      spatialRel_opts <-
+      spatialRel <- match.arg(
+        spatialRel,
         c(
           "esriSpatialRelIntersects", "esriSpatialRelContains",
           "esriSpatialRelCrosses", "esriSpatialRelEnvelopeIntersects",
           "esriSpatialRelIndexIntersects", "esriSpatialRelOverlaps",
           "esriSpatialRelTouches", "esriSpatialRelWithin"
         )
-
-      spatialRel <-
-        match.arg(
-          spatialRel,
-          spatialRel_opts
-        )
+      )
     }
   }
 
   cli::cli_par()
 
   # Get layer features
-  esriFeatures <-
-    getEsriFeatures(
-      url = url,
-      fields = outFields,
-      where = where,
-      geometry = geometry,
-      geometryType = geometryType,
-      token = token,
-      crs = crs,
-      progress = progress,
-      spatialRel = spatialRel,
-      ...
-    )
+  esriFeatures <- getEsriFeatures(
+    url = url,
+    fields = outFields,
+    where = where,
+    geometry = geometry,
+    geometryType = geometryType,
+    token = token,
+    crs = crs,
+    progress = progress,
+    spatialRel = spatialRel,
+    ...
+  )
 
   # Convert geometry to simple features
-  sfdf <-
-    esri2sfGeom(
-      jsonFeats = esriFeatures,
-      layerGeomType = layerGeomType,
-      crs = crs,
-      .name_repair = .name_repair
-    )
+  sfdf <- esri2sfGeom(
+    jsonFeats = esriFeatures,
+    layerGeomType = layerGeomType,
+    crs = crs,
+    .name_repair = .name_repair
+  )
 
   check_bool(replaceDomainInfo)
 
@@ -309,8 +294,9 @@ esri2df <- function(url,
 
   if (!is_tableLayer(layerInfo)) {
     cli::cli_alert_warning(
-      "The layer {.var {layerInfo[['name']]}} must be a {.val 'Table'} service to
-      use {.fn esri2df}."
+      "The layer {.var {layerInfo[['name']]}} must be a {.val 'Table'} service
+      to use {.fn esri2df}.",
+      wrap = TRUE
     )
 
     cli::cli_alert_info("Trying to download with {.fn esri2sf} {cli::symbol[['ellipsis']]}")
@@ -327,24 +313,18 @@ esri2df <- function(url,
     return(sfdf)
   }
 
-  cli::cli_rule(
-    "Downloading {.val {layerInfo[['name']]}} from {.url {url}}"
-  )
-
-  cli::cli_dl(
-    items = c("Layer type" = "{.val {layerInfo[['type']]}}")
-  )
+  cli::cli_rule("Downloading {.val {layerInfo[['name']]}} from {.url {url}}")
+  cli::cli_dl(items = c("Layer type" = "{.val {layerInfo[['type']]}}"))
   cli::cli_par()
 
-  esriFeatures <-
-    getEsriFeatures(
-      url = url,
-      fields = outFields,
-      where = where,
-      token = token,
-      progress = progress,
-      ...
-    )
+  esriFeatures <- getEsriFeatures(
+    url = url,
+    fields = outFields,
+    where = where,
+    token = token,
+    progress = progress,
+    ...
+  )
 
   df <- getEsriTable(esriFeatures, .name_repair = .name_repair)
 
@@ -404,13 +384,13 @@ check_layerInfo <- function(layerInfo, call = caller_env()) {
   }
 
   message <- paste0(
-    layerInfo$error$message,
-    " - code: ", layerInfo$error$code
+    layerInfo[["error"]][["message"]],
+    " - code: ", layerInfo[["error"]][["code"]]
   )
 
-  if (utils::hasName(layerInfo$error, "details") &&
-    !identical(layerInfo$error$details, layerInfo$error$message)) {
-    message <- c(message, "i" = as.character(layerInfo$error$details))
+  if (utils::hasName(layerInfo[["error"]], "details") &&
+    !identical(layerInfo[["error"]][["details"]], layerInfo[["error"]][["message"]])) {
+    message <- c(message, "i" = as.character(layerInfo[["error"]][["details"]]))
   }
 
   cli::cli_abort(
@@ -428,11 +408,11 @@ check_layerInfo <- function(layerInfo, call = caller_env()) {
 getLayerCRS <- function(spatialReference, layerCRS = NULL, call = caller_env()) {
   # Get the layer CRS from the layer spatial reference
   if (has_name(spatialReference, "latestWkid")) {
-    layerCRS <- spatialReference$latestWkid
+    layerCRS <- spatialReference[["latestWkid"]]
   } else if (has_name(spatialReference, "wkid")) {
-    layerCRS <- spatialReference$wkid
+    layerCRS <- spatialReference[["wkid"]]
   } else if (has_name(spatialReference, "wkt")) {
-    layerCRS <- spatialReference$wkt
+    layerCRS <- spatialReference[["wkt"]]
   }
 
   # Format CRS (from esri2sfGeom)
@@ -534,7 +514,7 @@ sf2geometry <- function(x, geometryType = NULL, layerCRS = NULL) {
 #' @importFrom cli cli_abort
 bbox2geometry <- function(bbox, call = caller_env()) {
   # convert sf class bbox to bbox class
-  if (is_sf(bbox)) {
+  if (!is_bbox(bbox)) {
     bbox <- sf::st_bbox(bbox)
   }
 
@@ -589,7 +569,8 @@ check_layerTypes <- function(layerInfo,
     )
   }
 
-  if (!is_null(layerInfo[["type"]]) && !all(layerInfo[["type"]] %in% layerTypes)) {
+  if (!is_null(layerInfo[["type"]]) &&
+    !all(layerInfo[["type"]] %in% layerTypes)) {
     cli::cli_abort(
       c("{.arg url} must be a {.val {cli::cli_vec(layerTypes, style = style)}}
         {.emph feature} url.",
@@ -639,7 +620,7 @@ esrigroup <- function(layerInfo,
                       call = caller_env()) {
   check_layerInfo(layerInfo, call = call)
   cli::cli_rule(cli::col_blue("Group sublayers include:"))
-  sublayers <- as.character(layerInfo$subLayers$name)
+  sublayers <- as.character(layerInfo[["subLayers"]][["name"]])
   cli::cli_ol(
     sublayers
   )
@@ -653,32 +634,31 @@ esrigroup <- function(layerInfo,
     NA_character_
   )
 
-  sfdf <-
-    lapply(
-      cli::cli_progress_along(
-        url,
-        format = "{cli::symbol[['info']]} Downloading {.val {sublayers[[cli::pb_current]]}} | {cli::pb_bar} {cli::pb_percent}",
-        total = length(url)
-      ),
-      function(x) {
-        .fn(
-          url = url[[x]],
-          outFields = outFields,
-          where = where,
-          geometry = geometry,
-          bbox = bbox,
-          token = token,
-          crs = crs,
-          progress = progress,
-          geomType = geomType,
-          spatialRel = spatialRel,
-          replaceDomainInfo = replaceDomainInfo,
-          quiet = TRUE,
-          .name_repair = .name_repair,
-          ...
-        )
-      }
-    )
+  sfdf <- lapply(
+    cli::cli_progress_along(
+      url,
+      format = "{cli::symbol[['info']]} Downloading {.val {sublayers[[cli::pb_current]]}} | {cli::pb_bar} {cli::pb_percent}",
+      total = length(url)
+    ),
+    function(x) {
+      .fn(
+        url = url[[x]],
+        outFields = outFields,
+        where = where,
+        geometry = geometry,
+        bbox = bbox,
+        token = token,
+        crs = crs,
+        progress = progress,
+        geomType = geomType,
+        spatialRel = spatialRel,
+        replaceDomainInfo = replaceDomainInfo,
+        quiet = TRUE,
+        .name_repair = .name_repair,
+        ...
+      )
+    }
+  )
 
   set_names(sfdf, layerInfo[["subLayers"]][["name"]])
 }
