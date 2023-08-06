@@ -22,24 +22,24 @@ esriInfo <- function(url, info = NULL, format = NULL, token = NULL, ...) {
   info <- match.arg(info, c("info", "item", "metadata", "thumbnail"))
 
   append <- switch(info,
-      "info" = "info",
-      "item" = "info/iteminfo",
-      "metadata" = "info/metadata",
-      "thumbnail" = "info/thumbnail"
-    )
+    "info" = "info",
+    "item" = "info/iteminfo",
+    "metadata" = "info/metadata",
+    "thumbnail" = "info/thumbnail"
+  )
 
   if (info == "info") {
     url <- convert_esriUrl(
-        url = url,
-        token = token,
-        to = "root"
-      )
+      url = url,
+      token = token,
+      to = "root"
+    )
 
     resp <- esriRequest(
-        url = url,
-        f = "json",
-        token = token
-      )
+      url = url,
+      f = "json",
+      token = token
+    )
 
     body <- httr2::resp_body_json(resp = resp, ...)
 
@@ -76,11 +76,11 @@ esriInfo <- function(url, info = NULL, format = NULL, token = NULL, ...) {
 
   if (info == "item") {
     resp <- esriRequest(
-        url = url,
-        append = append,
-        f = "json",
-        token = token
-      )
+      url = url,
+      append = append,
+      f = "json",
+      token = token
+    )
 
     resp <- httr2::resp_body_json(resp = resp, check_type = FALSE, ...)
 
@@ -106,23 +106,23 @@ esriInfo <- function(url, info = NULL, format = NULL, token = NULL, ...) {
     # Specifies metadata style.
     # The default is item description metadata style.
     resp <- esriRequest(
-        url = url,
-        append = append,
-        format = format,
-        token = token,
-        output = "html"
-      )
+      url = url,
+      append = append,
+      format = format,
+      token = token,
+      output = "html"
+    )
 
     return(httr2::resp_body_xml(resp = resp, check_type = FALSE, ...))
   }
 
   if (info == "thumbnail") {
     resp <- esriRequest(
-        url = url,
-        append = append,
-        format = format,
-        token = token
-      )
+      url = url,
+      append = append,
+      format = format,
+      token = token
+    )
 
     resp <- httr2::resp_body_raw(resp = resp)
 

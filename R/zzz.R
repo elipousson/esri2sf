@@ -98,19 +98,18 @@ getObjectIds <- function(url,
                          geometry = NULL,
                          geometryType = NULL,
                          ...) {
-  resp <-
-    esriRequest(
-      url = url,
-      append = "query",
-      token = token,
-      f = "json",
-      objectIds = objectIds,
-      where = where %||% "1=1",
-      geometryType = geometryType,
-      geometry = geometry,
-      returnIdsOnly = TRUE,
-      ...
-    )
+  resp <- esriRequest(
+    url = url,
+    append = "query",
+    token = token,
+    f = "json",
+    objectIds = objectIds,
+    where = where %||% "1=1",
+    geometryType = geometryType,
+    geometry = geometry,
+    returnIdsOnly = TRUE,
+    ...
+  )
 
   resp <- httr2::resp_body_json(resp = resp, check_type = FALSE)
 
@@ -179,27 +178,25 @@ getEsriFeaturesByIds <- function(objectIds = NULL,
 
   outFields <- I(paste(fields, collapse = ","))
 
-  resp <-
-    esriRequest(
-      url,
-      append = "query",
-      f = "json",
-      objectIds = objectIds,
-      outFields = outFields,
-      outSR = crs,
-      token = token,
-      ...
-    )
+  resp <- esriRequest(
+    url,
+    append = "query",
+    f = "json",
+    objectIds = objectIds,
+    outFields = outFields,
+    outSR = crs,
+    token = token,
+    ...
+  )
 
-  resp <-
-    httr2::resp_body_json(
-      resp,
-      check_type = FALSE,
-      # Additional parameters passed to jsonlite::fromJSON
-      digits = NA,
-      simplifyDataFrame = simplifyDataFrame,
-      simplifyVector = simplifyVector,
-    )
+  resp <- httr2::resp_body_json(
+    resp,
+    check_type = FALSE,
+    # Additional parameters passed to jsonlite::fromJSON
+    digits = NA,
+    simplifyDataFrame = simplifyDataFrame,
+    simplifyVector = simplifyVector,
+  )
 
   resp[["features"]]
 }
@@ -223,16 +220,15 @@ getEsriFeatures <- function(url,
                             ...) {
   crs <- set_features_crs(crs)
 
-  ids <-
-    getObjectIds(
-      url = url,
-      where = where,
-      geometry = geometry,
-      geometryType = geometryType,
-      token = token,
-      objectIds = objectIds,
-      ...
-    )
+  ids <- getObjectIds(
+    url = url,
+    where = where,
+    geometry = geometry,
+    geometryType = geometryType,
+    token = token,
+    objectIds = objectIds,
+    ...
+  )
 
   if (is_null(ids)) {
     cli::cli_warn("No records match the search criteria.")

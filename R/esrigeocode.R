@@ -199,10 +199,10 @@ geocoderesultss2sf <- function(x,
   )
 
   x <- sf::st_as_sf(
-      x,
-      coords = coords,
-      crs = layerCRS
-    )
+    x,
+    coords = coords,
+    crs = layerCRS
+  )
 
   if (is_null(crs)) {
     return(x)

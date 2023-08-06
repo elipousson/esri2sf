@@ -246,15 +246,14 @@ esriIndexLayers <- function(url,
     return(index)
   }
 
-  index <-
-    list_cbind(
-      list(
-        index,
-        "url" = paste0(gsub("/$", "", url), "/", index$id),
-        "folderPath" = folderPath,
-        "serviceName" = serviceName
-      )
+  index <- list_cbind(
+    list(
+      index,
+      "url" = paste0(gsub("/$", "", url), "/", index$id),
+      "folderPath" = folderPath,
+      "serviceName" = serviceName
     )
+  )
 
   dplyr::distinct(
     index,
@@ -300,7 +299,7 @@ esriCatalog <- function(url,
     f,
     c("json", "html", "kmz", "sitemap", "geositemap"),
     error_call = call
-    )
+  )
 
   cli_abort_if(
     x = f %in% c("html", "kmz"),
@@ -326,24 +325,23 @@ esriCatalog <- function(url,
 
     resp <- set_catalog_resp_type(option, outSR)
 
-    resp <-
-      switch(resp,
-        "catalog" = esriRequest(
-          url,
-          f = f, token = token, ...,
-          call = call
-        ),
-        "option" = esriRequest(
-          url,
-          f = f, token = token, option = option, ...,
-          call = call
-        ),
-        "outSR" = esriRequest(
-          url,
-          f = f, token = token, option = option, outSR = outSR, ...,
-          call = call
-        )
+    resp <- switch(resp,
+      "catalog" = esriRequest(
+        url,
+        f = f, token = token, ...,
+        call = call
+      ),
+      "option" = esriRequest(
+        url,
+        f = f, token = token, option = option, ...,
+        call = call
+      ),
+      "outSR" = esriRequest(
+        url,
+        f = f, token = token, option = option, outSR = outSR, ...,
+        call = call
       )
+    )
 
     resp <- httr2::resp_body_json(resp = resp, check_type = FALSE, ...)
 

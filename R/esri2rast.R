@@ -30,21 +30,19 @@ esri2rast <- function(url,
 
   rast_ext <- bbox2extent(bbox, crs = layerCRS)
 
-  bbox <-
-    sf2geometry(
-      x = bbox,
-      geometryType = "esriEnvelope",
-      layerCRS = layerCRS
-    )
+  bbox <- sf2geometry(
+    x = bbox,
+    geometryType = "esriEnvelope",
+    layerCRS = layerCRS
+  )
 
-  format <-
-    match.arg(
-      tolower(format),
-      c(
-        "jpgpng", "png", "png8", "png24", "jpg", "bmp",
-        "gif", "tiff", "png32", "bip", "bsq", "lerc"
-      )
+  format <- match.arg(
+    tolower(format),
+    c(
+      "jpgpng", "png", "png8", "png24", "jpg", "bmp",
+      "gif", "tiff", "png32", "bip", "bsq", "lerc"
     )
+  )
 
   req <-
     esriRequest(
@@ -69,22 +67,19 @@ esri2rast <- function(url,
 #' @noRd
 bbox2extent <- function(bbox,
                         ...,
-                        crs = NULL) {
-  check_installed(
-    "terra",
-    call = caller_env()
-  )
+                        crs = NULL,
+                        call = caller_env()) {
+  check_installed("terra", call = call)
 
   bbox <- bbox_transform(bbox, crs)
 
-  rast_ext <-
-    terra::rast(
-      xmin = bbox[["xmin"]],
-      xmax = bbox[["xmax"]],
-      ymin = bbox[["ymin"]],
-      ymax = bbox[["ymax"]],
-      crs = crs
-    )
+  rast_ext <- terra::rast(
+    xmin = bbox[["xmin"]],
+    xmax = bbox[["xmax"]],
+    ymin = bbox[["ymin"]],
+    ymax = bbox[["ymax"]],
+    crs = crs
+  )
 
   terra::ext(rast_ext)
 }

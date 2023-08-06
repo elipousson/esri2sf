@@ -12,5 +12,4 @@ test_that("esrigeocode works", {
     esrigeocode(url, coords = test_geocode),
     "data.frame"
   )
-
 })
