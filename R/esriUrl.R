@@ -7,7 +7,7 @@ serviceTypes <- c(
 #'
 #' @noRd
 is_url <- function(x) {
-  if (is_empty(x)) {
+  if (!is_vector(x) || is_empty(x)) {
     return(FALSE)
   }
 
