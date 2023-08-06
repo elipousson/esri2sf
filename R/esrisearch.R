@@ -192,11 +192,3 @@ check_category_filter <- function(category_filter, call = caller_env()) {
     )
   }
 }
-
-#' Convert epoch dates to POSIXct dates
-#'
-#' @param x Numeric value corresponding to epoch date
-#' @noRd
-fmt_epoch_date <- function(x) {
-  as.POSIXct(x / 1000, origin = "1970-01-01")
-}
