@@ -41,8 +41,9 @@ fmt_epoch_dates <- function(x, tz = "") {
 #' @importFrom DBI ANSI
 #' @importFrom glue glue_sql
 glue_ansi_sql <- function(...,
-                          .con = DBI::ANSI()) {
-  glue_sql(..., .con = .con)
+                          .con = DBI::ANSI(),
+                          .envir = parent.frame()) {
+  glue_sql(..., .con = .con, .envir = .envir)
 }
 
 

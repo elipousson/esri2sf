@@ -5,7 +5,7 @@
 \alias{glue_sql_bbox}
 \title{Helpers for creating ANSI SQL queries}
 \usage{
-glue_ansi_sql(..., .con = DBI::ANSI())
+glue_ansi_sql(..., .con = DBI::ANSI(), .envir = parent.frame())
 
 glue_sql_bbox(bbox, coords = c("longitude", "latitude"), crs = 4326)
 }
@@ -14,6 +14,10 @@ glue_sql_bbox(bbox, coords = c("longitude", "latitude"), crs = 4326)
 
 \item{.con}{[\code{DBIConnection}]: A DBI connection object obtained from
 \code{\link[DBI:dbConnect]{DBI::dbConnect()}}.}
+
+\item{.envir}{[\code{environment}: \code{parent.frame()}]\cr Environment to evaluate each expression in. Expressions are
+evaluated from left to right. If \code{.x} is an environment, the expressions are
+evaluated in that environment and \code{.envir} is ignored. If \code{NULL} is passed, it is equivalent to \code{\link[=emptyenv]{emptyenv()}}.}
 
 \item{bbox}{A \code{bbox}, \code{sfc}, or \code{sf} object to use as bounding box.}
 
