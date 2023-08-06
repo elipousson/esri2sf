@@ -212,41 +212,31 @@ df
 #> # A tibble: 1,254 × 10
 #>    objectid incidntnum category      descript   dayofweek date_ time  pddistrict
 #>       <int> <chr>      <chr>         <chr>      <chr>     <chr> <chr> <chr>     
-#>  1 25451666 090786072  VEHICLE THEFT STOLEN AU… Sunday    08/0… 23:00 CENTRAL   
-#>  2 25451695 090846466  VEHICLE THEFT STOLEN TR… Wednesday 08/1… 01:08 BAYVIEW   
-#>  3 25451769 090746270  VEHICLE THEFT ATTEMPTED… Wednesday 07/2… 00:01 INGLESIDE 
-#>  4 25451776 090751978  VEHICLE THEFT STOLEN AU… Thursday  07/2… 23:00 INGLESIDE 
-#>  5 25451777 090753413  VEHICLE THEFT STOLEN AU… Thursday  07/2… 18:30 NORTHERN  
-#>  6 25451782 090761046  VEHICLE THEFT STOLEN TR… Sunday    07/2… 18:00 INGLESIDE 
-#>  7 25451783 090764802  VEHICLE THEFT STOLEN AU… Monday    07/2… 21:00 MISSION   
-#>  8 25451785 090766820  VEHICLE THEFT STOLEN AU… Monday    07/2… 18:30 RICHMOND  
-#>  9 25451805 090770718  VEHICLE THEFT STOLEN AU… Tuesday   07/2… 16:00 TARAVAL   
-#> 10 25451807 090771261  VEHICLE THEFT STOLEN AU… Monday    07/2… 19:00 NORTHERN  
+#>  1 26961944 090786072  VEHICLE THEFT STOLEN AU… Sunday    08/0… 23:00 CENTRAL   
+#>  2 26961973 090846466  VEHICLE THEFT STOLEN TR… Wednesday 08/1… 01:08 BAYVIEW   
+#>  3 26962047 090746270  VEHICLE THEFT ATTEMPTED… Wednesday 07/2… 00:01 INGLESIDE 
+#>  4 26962054 090751978  VEHICLE THEFT STOLEN AU… Thursday  07/2… 23:00 INGLESIDE 
+#>  5 26962055 090753413  VEHICLE THEFT STOLEN AU… Thursday  07/2… 18:30 NORTHERN  
+#>  6 26962060 090761046  VEHICLE THEFT STOLEN TR… Sunday    07/2… 18:00 INGLESIDE 
+#>  7 26962061 090764802  VEHICLE THEFT STOLEN AU… Monday    07/2… 21:00 MISSION   
+#>  8 26962063 090766820  VEHICLE THEFT STOLEN AU… Monday    07/2… 18:30 RICHMOND  
+#>  9 26962083 090770718  VEHICLE THEFT STOLEN AU… Tuesday   07/2… 16:00 TARAVAL   
+#> 10 26962085 090771261  VEHICLE THEFT STOLEN AU… Monday    07/2… 19:00 NORTHERN  
 #> # ℹ 1,244 more rows
 #> # ℹ 2 more variables: resolution <chr>, datetime <dbl>
 ```
 
 In some cases, tables may include coordinates as numeric attribute
 columns but no geometry. If this is the case, you can create a bounding
-box filter condition using the following format:
+box filter condition using the `glue_sql_bbox()` helper function:
 
 ``` r
 # Using the Michigan sf data to create a bbox
 bbox <- sf::st_bbox(mi)
 coords <- c("longitude", "latitude")
 
-where <- paste0(
-  c(
-    sprintf("(%s >= %s)", coords[1], bbox$xmin),
-    sprintf("(%s <= %s)", coords[1], bbox$xmax),
-    sprintf("(%s >= %s)", coords[2], bbox$ymin),
-    sprintf("(%s <= %s)", coords[2], bbox$ymax)
-  ),
-  collapse = " AND "
-)
-
-where
-#> [1] "(longitude >= -90.4181359945804) AND (longitude <= -82.4183959883841) AND (latitude >= 41.6960880241431) AND (latitude <= 48.1895339877034)"
+glue_sql_bbox(bbox, coords)
+#> <SQL> (longitude >= -90.4181359945804) AND (longitude <= -82.4183959883841) AND (latitude >= 41.6960880241431) AND (latitude <= 48.1895339877034)
 ```
 
 ### Using the `crs` parameter
@@ -321,6 +311,51 @@ esri2sf(url, where = where, outFields = outFields, crs = NULL)
 #> 10   15998   18565       46.0       53.4 MULTIPOLYGON (((-86.25824 4...
 ```
 
+The `glue_ansi_sql()` helper is useful when building queries with
+vectors of possible values:
+
+``` r
+states <- c("Alabama", "Michigan")
+
+where <- glue_ansi_sql("STATE_NAME", " IN ({states*})")
+
+esri2sf(url, where = where, outFields = c("STATE_NAME", outFields))
+#> ── Downloading "Detailed Counties" from <https://sampleserver6.arcgisonline.com/
+#> Layer type: "Feature Layer"
+#> Geometry type: "esriGeometryPolygon"
+#> Service CRS: "EPSG:4269"
+#> Output CRS: "EPSG:4326"
+#> 
+#> Simple feature collection with 150 features and 5 fields
+#> Geometry type: MULTIPOLYGON
+#> Dimension:     XY
+#> Bounding box:  xmin: -90.41814 ymin: 30.22331 xmax: -82.4184 ymax: 48.18953
+#> Geodetic CRS:  WGS 84
+#> First 10 features:
+#>    STATE_NAME POP2000 POP2007 POP00_SQMI POP07_SQMI
+#> 1     Alabama   43671   49541       72.3       82.0
+#> 2     Alabama  140415  175513       84.9      106.1
+#> 3     Alabama   29038   28992       32.1       32.1
+#> 4     Alabama   20826   21911       33.3       35.0
+#> 5     Alabama   51024   55496       78.4       85.3
+#> 6     Alabama   11714   11519       18.7       18.4
+#> 7     Alabama   21399   20888       27.5       26.9
+#> 8     Alabama  112249  112267      183.3      183.3
+#> 9     Alabama   36583   35245       60.7       58.4
+#> 10    Alabama   23988   25160       40.0       41.9
+#>                             geoms
+#> 1  MULTIPOLYGON (((-86.90477 3...
+#> 2  MULTIPOLYGON (((-88.0222 30...
+#> 3  MULTIPOLYGON (((-85.74825 3...
+#> 4  MULTIPOLYGON (((-87.4212 32...
+#> 5  MULTIPOLYGON (((-86.96314 3...
+#> 6  MULTIPOLYGON (((-85.9992 32...
+#> 7  MULTIPOLYGON (((-86.90894 3...
+#> 8  MULTIPOLYGON (((-86.14556 3...
+#> 9  MULTIPOLYGON (((-85.59365 3...
+#> 10 MULTIPOLYGON (((-85.84166 3...
+```
+
 Since the addition of the `WKT1_ESRI` output from `sf::st_crs()` in sf
 version 1.0-1, you can enter common CRS format (any that `sf::st_crs()`
 can handle) into the `crs` parameters and it will be able to convert to
@@ -379,7 +414,7 @@ to return a list of folders and layers.
 ``` r
 url <- "https://sampleserver6.arcgisonline.com/ArcGIS/rest/services"
 
-esriCatalog(url)
+esriCatalog(url)[1:5]
 #> $currentVersion
 #> [1] 10.91
 #> 
@@ -919,6 +954,14 @@ esriCatalog(url)
 #> 
 #> $services[[62]]$type
 #> [1] "MapServer"
+#> 
+#> 
+#> 
+#> $<NA>
+#> NULL
+#> 
+#> $<NA>
+#> NULL
 ```
 
 `esriIndex()` wraps `esriCatalog()` but returns a data frame with added
@@ -947,23 +990,6 @@ includes all available services.
 
 ``` r
 esriIndex(url, recurse = TRUE)
-#> # A tibble: 668 × 15
-#>    name             type  url   urlType folderPath serviceName serviceType    id
-#>    <chr>            <chr> <chr> <chr>   <chr>      <chr>       <chr>       <int>
-#>  1 AGP              <NA>  http… folder  <NA>       <NA>        <NA>           NA
-#>  2 Elevation        <NA>  http… folder  <NA>       <NA>        <NA>           NA
-#>  3 Energy           <NA>  http… folder  <NA>       <NA>        <NA>           NA
-#>  4 LocalGovernment  <NA>  http… folder  <NA>       <NA>        <NA>           NA
-#>  5 Locators         <NA>  http… folder  <NA>       <NA>        <NA>           NA
-#>  6 NetworkAnalysis  <NA>  http… folder  <NA>       <NA>        <NA>           NA
-#>  7 Oblique          <NA>  http… folder  <NA>       <NA>        <NA>           NA
-#>  8 OsoLandslide     <NA>  http… folder  <NA>       <NA>        <NA>           NA
-#>  9 ScientificData   <NA>  http… folder  <NA>       <NA>        <NA>           NA
-#> 10 SpatioTemporalA… <NA>  http… folder  <NA>       <NA>        <NA>           NA
-#> # ℹ 658 more rows
-#> # ℹ 7 more variables: parentLayerId <int>, defaultVisibility <lgl>,
-#> #   minScale <dbl>, maxScale <int>, geometryType <chr>,
-#> #   supportsDynamicLegends <lgl>, subLayerIds <list>
 ```
 
 Similarly, the new `esrigeocode()` provides support for the [Find

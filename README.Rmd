@@ -105,24 +105,14 @@ df <- esri2df("https://sampleserver6.arcgisonline.com/arcgis/rest/services/SF311
 df
 ```
 
-In some cases, tables may include coordinates as numeric attribute columns but no geometry. If this is the case, you can create a bounding box filter condition using the following format:
+In some cases, tables may include coordinates as numeric attribute columns but no geometry. If this is the case, you can create a bounding box filter condition using the `glue_sql_bbox()` helper function:
 
 ```{r}
 # Using the Michigan sf data to create a bbox
 bbox <- sf::st_bbox(mi)
 coords <- c("longitude", "latitude")
 
-where <- paste0(
-  c(
-    sprintf("(%s >= %s)", coords[1], bbox$xmin),
-    sprintf("(%s <= %s)", coords[1], bbox$xmax),
-    sprintf("(%s >= %s)", coords[2], bbox$ymin),
-    sprintf("(%s <= %s)", coords[2], bbox$ymax)
-  ),
-  collapse = " AND "
-)
-
-where
+glue_sql_bbox(bbox, coords)
 ```
 
 ### Using the `crs` parameter
@@ -141,6 +131,16 @@ esri2sf(url, where = where, outFields = outFields)
 
 # No transformation (recommended)
 esri2sf(url, where = where, outFields = outFields, crs = NULL)
+```
+
+The `glue_ansi_sql()` helper is useful when building queries with vectors of possible values:
+
+```{r}
+states <- c("Alabama", "Michigan")
+
+where <- glue_ansi_sql("STATE_NAME", " IN ({states*})")
+
+esri2sf(url, where = where, outFields = c("STATE_NAME", outFields))
 ```
 
 Since the addition of the `WKT1_ESRI` output from `sf::st_crs()` in sf version 1.0-1, you can enter common CRS format (any that `sf::st_crs()` can handle) into the `crs` parameters and it will be able to convert to the ESRI formatted WKT needed for the outSR field in the REST query.
@@ -177,7 +177,7 @@ The `esriRequest()` function has also made it easier to build new functions for 
 ```{r}
 url <- "https://sampleserver6.arcgisonline.com/ArcGIS/rest/services"
 
-esriCatalog(url)
+esriCatalog(url)[1:5]
 ```
 
 `esriIndex()` wraps `esriCatalog()` but returns a data frame with added columns to differentiate between folder, service, and layer URLs.
@@ -188,7 +188,7 @@ esriIndex(url)
 
 Set `recurse = TRUE` to loop through folders and ensure the data frame includes all available services.
 
-```{r}
+```{r, eval=FALSE}
 esriIndex(url, recurse = TRUE)
 ```
 
