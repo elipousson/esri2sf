@@ -1,4 +1,4 @@
-# esri2sf (development)
+# esri2sf (development version)
 
 * Added `glue_ansi_sql()`, `glue_sql_bbox()`, `fmt_epoch_date()`, and `fmt_epoch_dates()` helper functions.
 

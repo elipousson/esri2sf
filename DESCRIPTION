@@ -1,7 +1,7 @@
 Type: Package
 Package: esri2sf
 Title: Create Simple Features from ArcGIS Server REST API
-Version: 0.2.0
+Version: 0.2.0.9000
 Authors@R: c(
     person("Hwang", "Yongha", , "yongha.hwang@gmail.com", role = c("aut", "cre")),
     person("Kevin", "Cazelles", role = c("aut", "ctb")),
