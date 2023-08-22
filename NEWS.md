@@ -1,6 +1,7 @@
 # esri2sf (development version)
 
 * Added `glue_ansi_sql()`, `glue_sql_bbox()`, `fmt_epoch_date()`, and `fmt_epoch_dates()` helper functions.
+* Allow input `url` values that contain a trailing query. This query is stripped from the input URL by default.
 
 # esri2sf 0.2.0 (2023-07-19)
 

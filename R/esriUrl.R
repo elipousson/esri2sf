@@ -55,12 +55,15 @@ esriUrl_isValidType <- function(url,
                                 type = NULL,
                                 displayReason = FALSE,
                                 returnType = FALSE,
+                                allow_query = TRUE,
                                 call = caller_env()) {
   servicesUrl <- grepl("/rest/services", url)
   servicesUrl_types <- c("root", "folder", "service", "feature", "content")
 
   siteUrl <- grepl(".html?", url)
   siteUrl_types <- c("search", "item", "group", "user", "app")
+
+  url <- suppressMessages(check_esriUrl_query(url, allow_query = allow_query))
 
   if (!is_null(type)) {
     type <- match.arg(tolower(type), c(servicesUrl_types, siteUrl_types))

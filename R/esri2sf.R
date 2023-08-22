@@ -518,6 +518,8 @@ bbox2geometry <- function(bbox, call = caller_env()) {
     bbox <- sf::st_bbox(bbox)
   }
 
+  # FIXME: This error can't be triggered. st_bbox errors first if bbox is not a
+  # bbox. Consider wrapping st_bbox with try_catch
   cli_abort_ifnot(
     x = is_bbox(bbox),
     message = c(
@@ -538,14 +540,36 @@ check_esriUrl <- function(url,
                           token = NULL,
                           from = NULL,
                           to = "feature",
+                          allow_query = TRUE,
                           call = caller_env()) {
   check_url(url, call = call)
+
+  url <- check_esriUrl_query(url, allow_query = allow_query, call = call)
 
   if (esriUrl_isValidType(url, type = to, token = token, call = call)) {
     return(url)
   }
 
   convert_esriUrl(url = url, from = from, to = to, token = token, call = call)
+}
+
+#' Check if url has a trailing query and remove it if allow_query is FALSE
+#'
+#' @noRd
+check_esriUrl_query <- function(url, allow_query = TRUE, call = caller_env()) {
+  if (grepl("/query\\?", url)) {
+    if (!allow_query) {
+      cli::cli_abort(
+        "{.arg url} contains a trailing query after the feature layer ID.",
+        call = call
+      )
+    }
+
+    cli::cli_alert_warning("Removing query from the end of {.arg url}")
+    url <- sub("/query\\?.+$", "",  url)
+  }
+
+  url
 }
 
 #' Helper function to abort if layerType is not supported
@@ -556,6 +580,7 @@ check_esriUrl <- function(url,
 check_layerTypes <- function(layerInfo,
                              url = NULL,
                              token = NULL,
+                             allow_query = FALSE,
                              layerTypes = c("Feature Layer", "Table", "Group Layer"),
                              call = caller_env()) {
   style <- list("vec-last" = ", or ")
