@@ -38,7 +38,7 @@ is_esri_app_url <- function(x) {
 #'
 #' [esricontent()] provides partial support from the ArcGIS Content API.
 #'
-#' @param type "data", "info", or "metadata"
+#' @param type "data", "info", "metadata", "config" (app URLs only)
 #' @param destfile Destination file used to download item if data is a PDF file.
 #' @inheritParams httr2::resp_body_json
 #' @inheritDotParams httr2::resp_body_xml
@@ -49,18 +49,19 @@ esricontent <- function(url,
                         destfile = tempfile(fileext = "pdf"),
                         simplifyVector = TRUE,
                         ...) {
-  if (!is_esri_content_url(url)) {
+  if ((type != "config") && !is_esri_content_url(url)) {
     cli_warn(
       "{.arg url} must be an ESRI content URL."
     )
   }
 
-  type <- arg_match(type, c("data", "info", "metadata"))
+  type <- arg_match(type, c("data", "info", "metadata", "config"))
 
   append <- switch(type,
     "data" = "/data",
     "info" = "/info/iteminfo.xml",
-    "metadata" = "/info/metadata/metadata.xml"
+    "metadata" = "/info/metadata/metadata.xml",
+    "config" = "config.json"
   )
 
   f <- switch (type,
@@ -69,8 +70,12 @@ esricontent <- function(url,
     NULL
   )
 
+  if (type != "config") {
+    url <- build_esri_content_url(url)
+  }
+
   resp <- esriRequest(
-    url = build_esri_content_url(url),
+    url = url,
     append = append,
     f = f,
     format = f,
@@ -103,7 +108,7 @@ esricontent <- function(url,
   resp
 }
 
-#' Get
+#' Get ESRI user information
 #'
 #' @param user_id ESRI user ID
 #' @name esriuser
@@ -117,3 +122,5 @@ esriuser <- function(url = NULL,
 
   httr2::resp_body_json(resp)
 }
+
+

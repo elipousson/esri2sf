@@ -2,7 +2,7 @@
 % Please edit documentation in R/esricontent.R
 \name{esriuser}
 \alias{esriuser}
-\title{Get}
+\title{Get ESRI user information}
 \usage{
 esriuser(url = NULL, user_id = NULL)
 }
@@ -10,5 +10,5 @@ esriuser(url = NULL, user_id = NULL)
 \item{user_id}{ESRI user ID}
 }
 \description{
-Get
+Get ESRI user information
 }

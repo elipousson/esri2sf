@@ -13,7 +13,7 @@ esricontent(
 )
 }
 \arguments{
-\item{type}{"data", "info", or "metadata"}
+\item{type}{"data", "info", "metadata", "config" (app URLs only)}
 
 \item{destfile}{Destination file used to download item if data is a PDF file.}
 
