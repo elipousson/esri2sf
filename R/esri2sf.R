@@ -130,7 +130,7 @@ esri2sf <- function(url,
     )
 
     cli::cli_alert_info(
-      "Trying to download with {.fn esri2df}{cli::symbol[['ellipsis']]}"
+      "Attempting download with {.fn esri2df} {cli::symbol[['ellipsis']]}"
     )
 
     df <- esri2df(
@@ -268,7 +268,8 @@ esri2sf <- function(url,
 #' @noRd
 is_missing_geomType <- function(layerInfo) {
   any(
-    c(is_null(layerInfo[["geometryType"]]), (layerInfo[["geometryType"]] == ""))
+    c(is_null(layerInfo[["geometryType"]]),
+      (layerInfo[["geometryType"]] == ""))
   )
 }
 
@@ -299,7 +300,7 @@ esri2df <- function(url,
       wrap = TRUE
     )
 
-    cli::cli_alert_info("Trying to download with {.fn esri2sf} {cli::symbol[['ellipsis']]}")
+    cli::cli_alert_info("Attempting download with {.fn esri2sf} {cli::symbol[['ellipsis']]}")
     sfdf <- esri2sf(
       url = url,
       outFields = outFields,
@@ -376,10 +377,9 @@ esrimeta <- function(url,
 #' Helper function to trigger error if layerInfo returns an error
 #'
 #' @noRd
-#' @importFrom utils hasName
 #' @importFrom cli cli_abort
 check_layerInfo <- function(layerInfo, call = caller_env()) {
-  if (!utils::hasName(layerInfo, "error")) {
+  if (!has_name(layerInfo, "error")) {
     return(invisible())
   }
 
@@ -388,7 +388,7 @@ check_layerInfo <- function(layerInfo, call = caller_env()) {
     " - code: ", layerInfo[["error"]][["code"]]
   )
 
-  if (utils::hasName(layerInfo[["error"]], "details") &&
+  if (has_name(layerInfo[["error"]], "details") &&
     !identical(layerInfo[["error"]][["details"]], layerInfo[["error"]][["message"]])) {
     message <- c(message, "i" = as.character(layerInfo[["error"]][["details"]]))
   }
@@ -542,6 +542,10 @@ check_esriUrl <- function(url,
                           to = "feature",
                           allow_query = TRUE,
                           call = caller_env()) {
+  if (is.character(url)) {
+    url <- trimws(url)
+  }
+
   check_url(url, call = call)
 
   url <- check_esriUrl_query(url, allow_query = allow_query, call = call)

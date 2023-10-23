@@ -84,7 +84,7 @@ esriIndex <- function(url,
     )
   )
 
-  na_type <- all(sapply(index[["type"]], is.na))
+  na_type <- all(vapply(index[["type"]], is.na, logical(0)))
 
   index <- dplyr::mutate(
     index,
@@ -165,15 +165,8 @@ esriIndex <- function(url,
 
   index <- dplyr::mutate(
     index,
-    serviceType = dplyr::case_when(
-      grepl("FeatureServer", url) ~ "FeatureServer",
-      grepl("MapServer", url) ~ "MapServer",
-      grepl("ImageServer", url) ~ "ImageServer",
-      grepl("GeocodeServer", url) ~ "GeocodeServer",
-      grepl("GeometryServer", url) ~ "GeometryServer",
-      grepl("GPServer", url) ~ "GPServer"
+    serviceType = esriurl_servicetype(url)
     )
-  )
 
   dplyr::relocate(
     index,

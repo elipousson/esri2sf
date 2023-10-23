@@ -49,7 +49,7 @@ esrigeocode <- function(url,
   location <- NULL
   SingleLine <- NULL
 
-  layerInfo <- esrimeta(url)
+  layerInfo <- esrimeta(url, call = call)
 
   if (is_null(layerInfo$spatialReference)) {
     cli::cli_alert_warning(
@@ -57,7 +57,10 @@ esrigeocode <- function(url,
     )
     layerCRS <- sf::st_crs(crs)$srid
   } else {
-    layerCRS <- getLayerCRS(spatialReference = layerInfo$spatialReference)
+    layerCRS <- getLayerCRS(
+      spatialReference = layerInfo[["spatialReference"]],
+      call = call
+    )
   }
 
   operation <- set_geocode_operation(address, coords)
@@ -74,22 +77,21 @@ esrigeocode <- function(url,
     location <- paste0(coords, collapse = ",")
   }
 
-  resp <-
-    esriRequest(
-      url = url,
-      append = operation,
-      f = "json",
-      token = token,
-      SingleLine = SingleLine,
-      location = location,
-      ...
-    )
+  resp <- esriRequest(
+    url = url,
+    append = operation,
+    f = "json",
+    token = token,
+    SingleLine = SingleLine,
+    location = location,
+    ...,
+    call = call
+  )
 
-  resp <-
-    httr2::resp_body_json(
-      resp,
-      simplifyVector = TRUE
-    )
+  resp <- httr2::resp_body_json(
+    resp,
+    simplifyVector = TRUE
+  )
 
   if (operation == "findAddressCandidates") {
     candidates <- resp[["candidates"]]
@@ -104,15 +106,14 @@ esrigeocode <- function(url,
       candidates <- candidates[candidates[["score"]] >= score, ]
     }
 
-    results <-
-      list_cbind(
-        c(
-          candidates[, !(names(candidates) %in% c("location", "attributes", "extent"))],
-          candidates[["attributes"]],
-          candidates[["extent"]],
-          candidates[["location"]]
-        )
+    results <- list_cbind(
+      c(
+        candidates[, !(names(candidates) %in% c("location", "attributes", "extent"))],
+        candidates[["attributes"]],
+        candidates[["extent"]],
+        candidates[["location"]]
       )
+    )
 
     if (!is_null(n)) {
       results <- results[seq(n), ]
@@ -120,13 +121,12 @@ esrigeocode <- function(url,
   }
 
   if (operation == "reverseGeocode") {
-    results <-
-      list_cbind(
-        c(
-          resp[["address"]],
-          resp[["location"]]
-        )
+    results <- list_cbind(
+      c(
+        resp[["address"]],
+        resp[["location"]]
       )
+    )
   }
 
   check_bool(geometry)

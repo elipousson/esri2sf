@@ -108,10 +108,10 @@ esrisearch <- function(query = NULL,
       )
     )
 
+    sortOrder <- "asc"
+
     if (desc) {
       sortOrder <- "desc"
-    } else {
-      sortOrder <- "asc"
     }
   }
 
@@ -147,9 +147,9 @@ esrisearch <- function(query = NULL,
     msg <- "Search completed with supplied {.arg bbox} at {.url {url}}"
   }
 
-  if (total < num) {
-    results_msg <- "{total} items found"
-  } else if (total >= num) {
+  results_msg <- "{total} items found"
+
+  if (total >= num) {
     results_msg <- "Returning {num} results out of {total} total"
   }
 

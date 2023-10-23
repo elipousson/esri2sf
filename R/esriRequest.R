@@ -55,72 +55,65 @@ esriRequest <- function(url,
     req <- httr2::req_url_path_append(req, append)
   }
 
-  req <-
-    httr2::req_url_query(
-      req,
-      # Add f, format, and any additional query parameters
-      f = f,
-      format = format,
-      # Set token to required default
-      token = token %||% "",
-      ...
-    )
+  req <- httr2::req_url_query(
+    req,
+    # Add f, format, and any additional query parameters
+    f = f,
+    format = format,
+    # Set token to required default
+    token = token %||% "",
+    ...
+  )
 
   if (!is_null(objectIds)) {
     # Add objectIds
-    req <-
-      req_object_ids(
-        req,
-        objectIds = objectIds,
-        f = f,
-        format = format,
-        token = token,
-        ...
-      )
+    req <- req_object_ids(
+      req,
+      objectIds = objectIds,
+      f = f,
+      format = format,
+      token = token,
+      ...
+    )
   } else if (.body_form) {
-    req <-
-      httr2::req_body_form(
-        req,
-        f = f,
-        format = format,
-        token = token,
-        ...
-      )
+    req <- httr2::req_body_form(
+      req,
+      f = f,
+      format = format,
+      token = token,
+      ...
+    )
   }
 
-  req <-
-    httr2::req_user_agent(
-      req,
-      string = "esri2sf (https://github.com/elipousson/esri2sf)"
-    )
+  req <- httr2::req_user_agent(
+    req,
+    string = "esri2sf (https://github.com/elipousson/esri2sf)"
+  )
 
-  req <-
-    httr2::req_retry(
-      req = req,
-      max_seconds = .max_seconds
-    )
+  req <- httr2::req_retry(
+    req = req,
+    max_seconds = .max_seconds
+  )
 
   # Check if rappdirs::user_cache_dir can be used
   if (.cache) {
-    req <-
-      httr2::req_cache(
-        req,
-        path = rappdirs::user_cache_dir("esri2sf")
-      )
+    req <- httr2::req_cache(
+      req,
+      path = rappdirs::user_cache_dir("esri2sf")
+    )
   }
 
   # Pass .is_error = FALSE to use httr2::req_error
   if (!.is_error) {
-    req <-
-      httr2::req_error(
-        req,
-        is_error = function(resp) {
-          .is_error
-        },
-        body = function(resp) {
-          httr2::resp_body_json(resp)$error
-        }
-      )
+    req <- httr2::req_error(
+      req,
+      is_error = function(resp) {
+        .is_error
+      },
+      body = function(resp) {
+        httr2::resp_body_json(resp)$error
+      }
+    )
   }
 
   # perform the request if .perform is TRUE
@@ -147,11 +140,10 @@ req_object_ids <- function(req,
     objectIds <- I(paste(objectIds, collapse = ","))
   }
 
-  req_ids <-
-    httr2::req_url_query(
-      req,
-      objectIds = objectIds
-    )
+  req_ids <- httr2::req_url_query(
+    req,
+    objectIds = objectIds
+  )
 
   if (nchar(req_ids$url) <= 2048) {
     return(req_ids)
