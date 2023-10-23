@@ -352,13 +352,6 @@ esriUrl_parseUrl <- function(url, token = NULL, call = caller_env()) {
   )
 }
 
-#' Extract identifier from the url
-#'
-#' @noRd
-parse_id <- function(url) {
-  str_extract(url, "(?<=id=)[A-Za-z0-9]+")
-}
-
 #' Convert ESRI item URL to feature URL
 #'
 #' @inheritParams rlang::args_error_context
@@ -413,8 +406,7 @@ convert_esriUrl <- function(url,
 
     check_installed("cliExtras", call = call)
 
-    id <-
-      cliExtras::cli_menu(
+    id <- cliExtras::cli_menu(
         choices = layers[["name"]],
         title = c(
           "i" = "{.val {layerInfo[['serviceDescription']]}} is a service with
@@ -429,11 +421,7 @@ convert_esriUrl <- function(url,
   }
 
   if (from == "item") {
-    url <-
-      paste0(
-        "https://www.arcgis.com/sharing/rest/content/items/",
-        parse_id(url)
-      )
+    url <- build_esri_content_url(url)
 
     if (to == "item") {
       return(url)
@@ -450,4 +438,94 @@ convert_esriUrl <- function(url,
 
     layerInfo[["url"]]
   }
+}
+
+#' Build an ESRI item URL for the content or community API
+#'
+#' @keywords internal
+build_esri_content_url <- function(url,
+                                   base_url = "https://www.arcgis.com/sharing/rest/content/",
+                                   type = "items",
+                                   item_id = NULL,
+                                   sep = "/") {
+  if (type == "items") {
+    item_id <- item_id %||% extract_esri_item_id(url)
+  }
+
+  paste(base_url, type, item_id, sep = sep)
+}
+
+#' Build a ArcGIS Community API URL
+#'
+#' @keywords internal
+build_esri_community_url <- function(url,
+                                     user_id = NULL,
+                                     base_url = "https://www.arcgis.com/sharing/rest/community",
+                                     type = "users",
+                                     sep = "/") {
+  if (type == "users") {
+    if (!is_url(url)) {
+      user_id <- url
+    } else if (is.null(user_id)) {
+      user_id <- extract_esri_user_id(url)
+    }
+  }
+
+  paste(base_url, type, user_id, sep = sep)
+}
+
+
+#' Extract an ESRI item or user id from a url
+#'
+#' [extract_esri_item_id()] extract a id or appid value from a URL. If a group
+#' url is supplied a group ID is extracted.
+#'
+#' @rdname extract_esri_id
+#' @name extract_esri_item_id
+extract_esri_item_id <- function(url,
+                                 pattern = c("(?<=id=)[A-Za-z0-9]+",
+                                             "(?<=appid=)[A-Za-z0-9]+"),
+                                 collapse = "|") {
+  str_extract_collapse(url, pattern, collapse)
+}
+
+#' Extract identifier from an ESRI url
+#'
+#' [extract_esri_user_id()] extracts a user id from a profile URL or owner id
+#' from a search URL.
+#'
+#' @rdname extract_esri_id
+#' @name extract_esri_user_id
+extract_esri_user_id <- function(url,
+                         pattern = c("(?<=user=)[A-Za-z0-9\\._\\-]+",
+                                     "(?<=owner%3A%22)[A-Za-z0-9\\._\\-]+"),
+                         collapse = "|") {
+  str_extract_collapse(url, pattern, collapse)
+}
+
+#' @noRd
+str_extract_collapse <-  function(string, pattern, collapse = NULL) {
+  if (!is.null(collapse)) {
+    pattern <- paste0(pattern, collapse = collapse)
+  }
+
+  str_extract(string, pattern)
+}
+
+#' Get a service type for ESRI url
+#'
+#' @param url An ESRI url matched to "MapServer", "FeatureServer",
+#'   "ImageServer", "GeocodeServer", "GeometryServer", or "GPServer" type.
+#' @keywords internal
+#' @importFrom dplyr case_when
+esriurl_servicetype <- function(url) {
+  dplyr::case_when(
+    grepl("FeatureServer", url) ~ "FeatureServer",
+    grepl("MapServer", url) ~ "MapServer",
+    grepl("ImageServer", url) ~ "ImageServer",
+    grepl("GeocodeServer", url) ~ "GeocodeServer",
+    grepl("GeometryServer", url) ~ "GeometryServer",
+    grepl("GPServer", url) ~ "GPServer",
+    TRUE ~ NA_character_
+  )
 }
