@@ -1,6 +1,6 @@
 # esri2sf (development version)
 
-* Added `esricontent()` and `esiruser()` functions supporting content and community APIs. (2023-10-23)
+* Added `esriitem()` and `esiruser()` functions supporting content and community APIs. (2023-10-23)
 * Added `glue_ansi_sql()`, `glue_sql_bbox()`, `fmt_epoch_date()`, and `fmt_epoch_dates()` helper functions. (2023-08-05)
 * Allow input `url` values that contain a trailing query. This query is stripped from the input URL by default. (2023-08-22) Also add `trimws()` to support URLs with trailing or leading white space. (2023-10-23)
 

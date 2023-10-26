@@ -36,15 +36,15 @@ is_esri_app_url <- function(x) {
 
 #' Get ESRI item data or metadata
 #'
-#' [esricontent()] provides partial support from the ArcGIS Content API.
+#' [esriitem()] provides partial support from the ArcGIS Content API.
 #'
 #' @param type "data", "info", "metadata", "config" (app URLs only)
 #' @param destfile Destination file used to download item if data is a PDF file.
 #' @inheritParams httr2::resp_body_json
 #' @inheritDotParams httr2::resp_body_xml
 #' @returns A list, a xml document, or the response object from the request.
-#' @name esricontent
-esricontent <- function(url,
+#' @name esriitem
+esriitem <- function(url,
                         type = "data",
                         destfile = tempfile(fileext = "pdf"),
                         simplifyVector = TRUE,
@@ -107,20 +107,3 @@ esricontent <- function(url,
 
   resp
 }
-
-#' Get ESRI user information
-#'
-#' @param user_id ESRI user ID
-#' @name esriuser
-esriuser <- function(url = NULL,
-                     user_id = NULL) {
-  resp <- esriRequest(
-    url = build_esri_community_url(url, user_id = user_id),
-    f = "json",
-    .perform = TRUE
-  )
-
-  httr2::resp_body_json(resp)
-}
-
-
