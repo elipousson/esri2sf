@@ -7,7 +7,7 @@
 #' @param format Format of data to return, See
 #'   <https://doc.arcgis.com/en/hub/content/federate-data-with-external-catalogs.htm>
 #'   for more information. Default: `c("dcat-us", "dcat-ap", "rss",
-#'   "definition")`.
+#'   "ogc")`.
 #' @param simplifyVector Passed to [httr2::resp_body_json()] if format is not
 #'   rss. Default: `TRUE`
 #' @inheritParams rlang::args_error_context
@@ -18,7 +18,7 @@
 #' @importFrom httr2 req_url_path_append request req_perform resp_body_json
 #'   resp_body_xml
 esrihub <- function(url,
-                    format = c("dcat-us", "dcat-ap", "rss", "definition"),
+                    format = c("dcat-us", "dcat-ap", "rss", "ogc"),
                     simplifyVector = TRUE,
                     call = caller_env()) {
   check_url(url, call = call)
@@ -31,7 +31,7 @@ esrihub <- function(url,
       "dcat-us" = "/api/feed/dcat-us/1.1",
       "dcat-ap" = "/api/feed/dcat-ap/2.0.1",
       "rss" = "/api/feed/rss/2.0",
-      "definition" = "/api/feed/search/definition"
+      "ogc" = "/api/feed/search/definition"
     )
   )
 

@@ -6,7 +6,7 @@
 \usage{
 esrihub(
   url,
-  format = c("dcat-us", "dcat-ap", "rss", "definition"),
+  format = c("dcat-us", "dcat-ap", "rss", "ogc"),
   simplifyVector = TRUE,
   call = caller_env()
 )
@@ -16,7 +16,7 @@ esrihub(
 
 \item{format}{Format of data to return, See
 \url{https://doc.arcgis.com/en/hub/content/federate-data-with-external-catalogs.htm}
-for more information. Default: \code{c("dcat-us", "dcat-ap", "rss", "definition")}.}
+for more information. Default: \code{c("dcat-us", "dcat-ap", "rss", "ogc")}.}
 
 \item{simplifyVector}{Passed to \code{\link[httr2:resp_body_raw]{httr2::resp_body_json()}} if format is not
 rss. Default: \code{TRUE}}
