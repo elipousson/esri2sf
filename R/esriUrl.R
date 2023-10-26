@@ -515,7 +515,8 @@ str_extract_collapse <-  function(string, pattern, collapse = NULL) {
 #' Get a service type for ESRI url
 #'
 #' @param url An ESRI url matched to "MapServer", "FeatureServer",
-#'   "ImageServer", "GeocodeServer", "GeometryServer", or "GPServer" type.
+#'   "ImageServer", "GeocodeServer", "GeometryServer", "GPServer",
+#'   "GeoDataServer", "WFSServer", or "WFCServer" type.
 #' @keywords internal
 #' @importFrom dplyr case_when
 esriurl_servicetype <- function(url) {
@@ -526,6 +527,12 @@ esriurl_servicetype <- function(url) {
     grepl("GeocodeServer", url) ~ "GeocodeServer",
     grepl("GeometryServer", url) ~ "GeometryServer",
     grepl("GPServer", url) ~ "GPServer",
+    grepl("GeoDataServer", url) ~ "GeoDataServer",
+    grepl("WFSServer", url) ~ "WFSServer",
+    # FIXME: from the examples it appears this can be combined with other server
+    # types? https://enterprise.arcgis.com/en/server/latest/publish-services/windows/wcs-services.htm
+    grepl("WCSServer", url) ~ "WCSServer",
+    # TODO: Review types of services and update documentation https://enterprise.arcgis.com/en/server/latest/publish-services/windows/what-types-of-services-can-you-publish.htm
     TRUE ~ NA_character_
   )
 }

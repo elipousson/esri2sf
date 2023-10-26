@@ -8,7 +8,8 @@ esriurl_servicetype(url)
 }
 \arguments{
 \item{url}{An ESRI url matched to "MapServer", "FeatureServer",
-"ImageServer", "GeocodeServer", "GeometryServer", or "GPServer" type.}
+"ImageServer", "GeocodeServer", "GeometryServer", "GPServer",
+"GeoDataServer", "WFSServer", or "WFCServer" type.}
 }
 \description{
 Get a service type for ESRI url

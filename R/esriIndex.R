@@ -84,7 +84,7 @@ esriIndex <- function(url,
     )
   )
 
-  na_type <- all(vapply(index[["type"]], is.na, logical(0)))
+  na_type <- all(vapply(index[["type"]], is.na, TRUE))
 
   index <- dplyr::mutate(
     index,
@@ -133,8 +133,8 @@ esriIndex <- function(url,
     layerIndex <- subset(
       index,
       type %in% c(
-        "MapServer", "FeatureServer", "ImageServer",
-        "GeocodeServer", "GeometryServer", "GPServer"
+        "MapServer", "FeatureServer", "ImageServer", "GeoDataServer",
+        "GeocodeServer", "GeometryServer", "GPServer", "WFSServer", "WFCServer"
       )
     )
 
