@@ -2,13 +2,15 @@
 % Please edit documentation in R/esriuser.R
 \name{esriuser}
 \alias{esriuser}
-\title{Get ESRI user information}
+\title{Get ArcGIS Online user information}
 \usage{
 esriuser(url = NULL, user_id = NULL)
 }
 \arguments{
-\item{user_id}{ESRI user ID}
+\item{url}{An ArcGIS Online community URL with a user ID. Optional if user_id is supplied.}
+
+\item{user_id}{An ArcGIS Online user ID. Optional if url is supplied.}
 }
 \description{
-Get ESRI user information
+Get ArcGIS Online user information
 }

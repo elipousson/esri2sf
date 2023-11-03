@@ -38,12 +38,13 @@ is_esri_app_url <- function(x) {
 #'
 #' [esriitem()] provides partial support from the ArcGIS Content API.
 #'
+#' @name esriitem
 #' @param type "data", "info", "metadata", "config" (app URLs only)
 #' @param destfile Destination file used to download item if data is a PDF file.
 #' @inheritParams httr2::resp_body_json
 #' @inheritDotParams httr2::resp_body_xml
 #' @returns A list, a xml document, or the response object from the request.
-#' @name esriitem
+#' @export
 esriitem <- function(url,
                         type = "data",
                         destfile = tempfile(fileext = "pdf"),

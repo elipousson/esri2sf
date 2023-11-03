@@ -4,7 +4,6 @@
 #' API
 #' <https://developers.arcgis.com/rest/services-reference/enterprise/export-image.htm>
 #'
-#' @noRd
 #' @param url ImageServer url
 #' @param bbox Bounding box for image to return; defaults to `NULL`.
 #' @param token defaults to `NULL`.
@@ -12,6 +11,7 @@
 #'   "png24", "jpg", "bmp", "gif", "tiff", "png32", "bip", "bsq", and "lerc"
 #' @param adjustAspectRatio defaults to `FALSE`
 #' @return SpatRaster object from `terra::rast`
+#' @export
 #' @importFrom rlang check_installed
 esri2rast <- function(url,
                       bbox = NULL,
@@ -36,16 +36,17 @@ esri2rast <- function(url,
     layerCRS = layerCRS
   )
 
-  format <- match.arg(
-    tolower(format),
+  format <- tolower(format)
+
+  format <- arg_match0(
+    format,
     c(
       "jpgpng", "png", "png8", "png24", "jpg", "bmp",
       "gif", "tiff", "png32", "bip", "bsq", "lerc"
     )
   )
 
-  req <-
-    esriRequest(
+  req <- esriRequest(
       url = url,
       append = "exportImage",
       bbox = bbox,

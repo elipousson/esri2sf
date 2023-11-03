@@ -3,6 +3,7 @@
 \name{esri2sf}
 \alias{esri2sf}
 \alias{esri2df}
+\alias{esrigroup}
 \title{Get data or metadata from an ArcGIS MapServer or FeatureServer}
 \usage{
 esri2sf(
@@ -32,6 +33,26 @@ esri2df(
   .name_repair = "check_unique",
   quiet = FALSE,
   ...
+)
+
+esrigroup(
+  url,
+  layerInfo = NULL,
+  outFields = NULL,
+  where = NULL,
+  geometry = NULL,
+  bbox = NULL,
+  token = NULL,
+  crs = getOption("esri2sf.crs", 4326),
+  progress = TRUE,
+  geomType = NULL,
+  spatialRel = NULL,
+  replaceDomainInfo = FALSE,
+  .name_repair = "check_unique",
+  quiet = FALSE,
+  .fn = esri2sf,
+  ...,
+  call = caller_env()
 )
 }
 \arguments{

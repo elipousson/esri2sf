@@ -624,14 +624,14 @@ is_groupLayer <- function(layerInfo) {
   !is_null(layerInfo[["type"]]) && (layerInfo[["type"]] == "Group Layer")
 }
 
-#' Helper function to download Group Layers for esri2sf
-#'
-#' @noRd
+#' @rdname esri2sf
+#' @name esrigroup
+#' @export
 #' @importFrom cli cli_rule cli_ol cli_par cli_progress_along symbol pb_current
 #'   pb_bar pb_percent
 #' @importFrom rlang set_names
-esrigroup <- function(layerInfo,
-                      url,
+esrigroup <- function(url,
+                      layerInfo = NULL,
                       outFields = NULL,
                       where = NULL,
                       geometry = NULL,
@@ -647,6 +647,16 @@ esrigroup <- function(layerInfo,
                       .fn = esri2sf,
                       ...,
                       call = caller_env()) {
+  if (is.null(layerInfo)) {
+    layerInfo <- esrimeta(url = url, token = token, call = call)
+
+    check_layerTypes(layerInfo, url = url, token = token)
+
+    cli::cli_rule(
+      "Downloading {.val {layerInfo[['name']]}} from {.url {url}}"
+    )
+  }
+
   check_layerInfo(layerInfo, call = call)
   cli::cli_rule(cli::col_blue("Group sublayers include:"))
   sublayers <- as.character(layerInfo[["subLayers"]][["name"]])

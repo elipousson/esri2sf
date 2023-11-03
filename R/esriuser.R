@@ -1,7 +1,9 @@
-#' Get ESRI user information
+#' Get ArcGIS Online user information
 #'
-#' @param user_id ESRI user ID
+#' @param url An ArcGIS Online community URL with a user ID. Optional if user_id is supplied.
+#' @param user_id An ArcGIS Online user ID. Optional if url is supplied.
 #' @name esriuser
+#' @export
 esriuser <- function(url = NULL,
                      user_id = NULL) {
   resp <- esriRequest(
