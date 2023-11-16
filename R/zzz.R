@@ -195,7 +195,7 @@ getEsriFeaturesByIds <- function(objectIds = NULL,
     # Additional parameters passed to jsonlite::fromJSON
     digits = NA,
     simplifyDataFrame = simplifyDataFrame,
-    simplifyVector = simplifyVector,
+    simplifyVector = simplifyVector
   )
 
   resp[["features"]]
