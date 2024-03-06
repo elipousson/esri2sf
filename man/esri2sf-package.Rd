@@ -3,7 +3,6 @@
 \docType{package}
 \name{esri2sf-package}
 \alias{esri2sf-package}
-\alias{_PACKAGE}
 \title{esri2sf: Create Simple Features from ArcGIS Server REST API}
 \description{
 This package enables you to scrape geographic features directly from ArcGIS servers REST API into R as simple features.
