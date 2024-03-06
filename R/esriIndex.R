@@ -10,7 +10,8 @@
 #'   internally (not intended for user).
 #' @param recurse If `TRUE`, recursively check folders and services to return an
 #'   index that includes services in folders, subfolders, layers, and tables.
-#'   Defaults to `FALSE`.
+#'   Defaults to `FALSE`. If `url` starts with "https://services.arcgis.com",
+#'   emit a warning and recurse is set to `FALSE`.
 #' @inheritParams esriRequest
 #' @param ... Additional parameters passed to [esriCatalog()] (not typically
 #'   required)
@@ -91,7 +92,7 @@ esriIndex <- function(url,
     url = dplyr::case_when(
       (urlType == "folder") ~ paste0(url, "/", name),
       !na_type ~ paste0(url, "/", name, "/", type),
-      TRUE ~ url
+      .default = url
     )
   )
 
@@ -304,6 +305,8 @@ esriCatalog <- function(url,
     )
 
     resp <- set_catalog_resp_type(option, outSR)
+
+    url <- utils::URLencode(url)
 
     resp <- switch(resp,
       "catalog" = esriRequest(
