@@ -34,7 +34,8 @@ internally (not intended for user).}
 
 \item{recurse}{If \code{TRUE}, recursively check folders and services to return an
 index that includes services in folders, subfolders, layers, and tables.
-Defaults to \code{FALSE}.}
+Defaults to \code{FALSE}. If \code{url} starts with "https://services.arcgis.com",
+emit a warning and recurse is set to \code{FALSE}.}
 
 \item{token}{String for authentication token; defaults to \code{NULL}.}
 
