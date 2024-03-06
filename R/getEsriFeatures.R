@@ -9,7 +9,7 @@ WKTunPretty <- function(wkt) {
 }
 
 #' @keywords internal
-#' @importFrom yyjsonr write_json_str
+#' @importFrom jsonlite toJSON
 #' @importFrom sf st_crs
 set_features_crs <- function(crs = NULL) {
   if (is_null(crs)) {
@@ -24,10 +24,9 @@ set_features_crs <- function(crs = NULL) {
     return(sub(pattern = "^(EPSG|ESRI):", replacement = "", x = crs))
   }
 
-  # FIXME: Unsure how to test this refactoring
-  crs <- yyjsonr::write_json_str(
-    list("wkt" = WKTunPretty(sf::st_crs(crs)$WKT1_ESRI))#,
-    # auto_unbox = TRUE
+  crs <- jsonlite::toJSON(
+    list("wkt" = WKTunPretty(sf::st_crs(crs)$WKT1_ESRI)),
+    auto_unbox = TRUE
   )
 
   as.character(crs)
