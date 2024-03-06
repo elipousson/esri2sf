@@ -55,13 +55,20 @@ esriRequest <- function(url,
     req <- httr2::req_url_path_append(req, append)
   }
 
+  # Set token to required default
+  if (is_installed("arcgisutils")) {
+    # FIXME: This is a potentially frustrating or breaking pattern
+    token <- token %||% arcgisutils::arc_token() %||% ""
+  } else {
+    token <- token %||% ""
+  }
+
   req <- httr2::req_url_query(
     req,
     # Add f, format, and any additional query parameters
     f = f,
     format = format,
-    # Set token to required default
-    token = token %||% "",
+    token = token,
     ...
   )
 
