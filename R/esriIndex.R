@@ -23,6 +23,15 @@ esriIndex <- function(url,
                       recurse = FALSE,
                       token = NULL,
                       ...) {
+  check_url(url)
+
+  if (!grepl(url, "rest/services")) {
+    cli::cli_abort(
+      "{.arg url} must be a ArcGIS REST API URL with the text {.str rest/services},
+      not {.url {url}}"
+    )
+  }
+
   esriResp <- esriCatalog(url, token = token, ...)
 
   # check_layerInfo(esriResp)
@@ -282,14 +291,15 @@ esriCatalog <- function(url,
     error_call = call
   )
 
-  cli_abort_if(
-    x = f %in% c("html", "kmz"),
-    message = c(
-      "{.arg f} can't be {.val {f}}.",
-      "i" = '{.fn esriCatalog} only supports {c("json", "sitemap", "geositemap"}'
-    ),
-    call = call
-  )
+  if (f %in% c("html", "kmz")) {
+    cli_abort(
+      message = c(
+        "{.arg f} can't be {.val {f}}.",
+        "i" = '{.fn esriCatalog} only supports {c("json", "sitemap", "geositemap"}'
+      ),
+      call = call
+    )
+  }
 
   if (f == "json") {
     cli_abort_ifnot(
