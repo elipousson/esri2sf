@@ -25,7 +25,7 @@ esriIndex <- function(url,
                       ...) {
   check_url(url)
 
-  if (!grepl(url, "rest/services")) {
+  if (!grepl("rest/services", url)) {
     cli::cli_abort(
       "{.arg url} must be a ArcGIS REST API URL with the text {.str rest/services},
       not {.url {url}}"
