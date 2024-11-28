@@ -121,6 +121,16 @@ messages about the requested layer. Defaults to \code{FALSE}.}
 \item{...}{additional named parameters to pass to the query. (e.g.
 \code{"resultRecordCount = 3"}). See the \href{https://developers.arcgis.com/rest/services-reference/enterprise/query-map-service-layer-.htm}{ArcGIS REST APIs documentation}
 for more information on all supported parameters.}
+
+\item{layerInfo}{Layer information from \code{\link[=esrimeta]{esrimeta()}}.}
+
+\item{.fn}{Function used to read items from a group layer. Defaults to
+\code{\link[=esri2sf]{esri2sf()}}.}
+
+\item{call}{The execution environment of a currently
+running function, e.g. \code{caller_env()}. The function will be
+mentioned in error messages as the source of the error. See the
+\code{call} argument of \code{\link[rlang:abort]{abort()}} for more information.}
 }
 \value{
 simple feature (\code{esri2sf}) or tibble (\code{esri2df}) or list or

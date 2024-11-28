@@ -10,6 +10,7 @@
 #' @param format defaults to "jpgpng". Options include "jpgpng", "png", "png8",
 #'   "png24", "jpg", "bmp", "gif", "tiff", "png32", "bip", "bsq", and "lerc"
 #' @param adjustAspectRatio defaults to `FALSE`
+#' @inheritDotParams esriRequest -f -append -.perform
 #' @return SpatRaster object from `terra::rast`
 #' @export
 #' @importFrom rlang check_installed

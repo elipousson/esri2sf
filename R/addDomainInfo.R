@@ -5,12 +5,12 @@
 #' dataframe. This is especially important for the codedValue type domains that
 #' are essentially factors and you loose information without replacing the data.
 #'
-#' @param df The returned (sf) df from esri2sf/esri2df.
+#' @param df The returned (sf) df from [esri2sf()] or [esri2df()].
 #' @param url The url for the Map/Feature server layer/table.
 #' @param token string for authentication token (if needed).
 #' @inheritParams esrimeta
 #'
-#' @return An {sf} dataframe
+#' @return An `sf` data frame.
 addDomainInfo <- function(df, url, token = NULL, call = caller_env()) {
   # Get Field Metadata
   layerTableFields <- esrimeta(url, token = token, fields = TRUE, call = call)

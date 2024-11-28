@@ -12,6 +12,9 @@ is_esri_item_url(x)
 
 is_esri_app_url(x)
 }
+\arguments{
+\item{x}{A object to test as URL.}
+}
 \description{
 Is URL an ESRI content url?
 }

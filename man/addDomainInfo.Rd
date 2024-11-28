@@ -7,7 +7,7 @@
 addDomainInfo(df, url, token = NULL, call = caller_env())
 }
 \arguments{
-\item{df}{The returned (sf) df from esri2sf/esri2df.}
+\item{df}{The returned (sf) df from \code{\link[=esri2sf]{esri2sf()}} or \code{\link[=esri2df]{esri2df()}}.}
 
 \item{url}{The url for the Map/Feature server layer/table.}
 
@@ -19,7 +19,7 @@ mentioned in error messages as the source of the error. See the
 \code{call} argument of \code{\link[rlang:abort]{abort()}} for more information.}
 }
 \value{
-An {sf} dataframe
+An \code{sf} data frame.
 }
 \description{
 Uses the esrimeta function to get information about the field

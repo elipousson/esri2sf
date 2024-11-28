@@ -24,6 +24,28 @@ esri2rast(
 "png24", "jpg", "bmp", "gif", "tiff", "png32", "bip", "bsq", and "lerc"}
 
 \item{adjustAspectRatio}{defaults to \code{FALSE}}
+
+\item{...}{
+  Arguments passed on to \code{\link[=esriRequest]{esriRequest}}
+  \describe{
+    \item{\code{objectIds}}{Parameter used for layer query requests. The addition of
+objectIds to the query often leads the url length to exceed the 2048
+character maximum. In those cases, the query is added to the body of the
+request with \link[httr2:req_body]{httr2::req_body_form}}
+    \item{\code{.cache}}{If \code{TRUE}, pass a cache folder path created with
+\link[rappdirs:user_cache_dir]{rappdirs::user_cache_dir} and \code{esri2sf} package to the path parameter of
+\link[httr2:req_cache]{httr2::req_cache}.}
+    \item{\code{.max_seconds}}{Passed to max_seconds parameter of \link[httr2:req_retry]{httr2::req_retry}}
+    \item{\code{.is_error}}{If \code{FALSE}, .is_error is passed to the is_error parameter of
+\link[httr2:req_error]{httr2::req_error} function. If \code{TRUE}, the request does not use
+\link[httr2:req_error]{httr2::req_error}.}
+    \item{\code{.body_form}}{If objectIds is \code{NULL} and .body_form is \code{TRUE}, generate
+the request using \code{\link[httr2:req_body]{httr2::req_body_form()}}. Defaults to \code{FALSE}.}
+    \item{\code{call}}{The execution environment of a currently
+running function, e.g. \code{caller_env()}. The function will be
+mentioned in error messages as the source of the error. See the
+\code{call} argument of \code{\link[rlang:abort]{abort()}} for more information.}
+  }}
 }
 \value{
 SpatRaster object from \code{terra::rast}

@@ -481,6 +481,9 @@ build_esri_community_url <- function(url,
 #' url is supplied a group ID is extracted.
 #'
 #' @rdname extract_esri_id
+#' @param url A url used to extract an item ID or user ID.
+#' @param pattern Regular expression pattern passed to [stringr::str_extract()].
+#' @param collapse String used to collapse pattern character vector.
 #' @name extract_esri_item_id
 extract_esri_item_id <- function(url,
                                  pattern = c("(?<=id=)[A-Za-z0-9]+",

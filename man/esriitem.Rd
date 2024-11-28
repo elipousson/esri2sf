@@ -13,6 +13,8 @@ esriitem(
 )
 }
 \arguments{
+\item{url}{A URL to use for the item.}
+
 \item{type}{"data", "info", "metadata", "config" (app URLs only)}
 
 \item{destfile}{Destination file used to download item if data is a PDF file.}
@@ -23,7 +25,7 @@ booleans, numbers, and strings) be caused to atomic vectors?}
 \item{...}{
   Arguments passed on to \code{\link[httr2:resp_body_raw]{httr2::resp_body_xml}}
   \describe{
-    \item{\code{resp}}{A response object.}
+    \item{\code{resp}}{A httr2 \link[httr2]{response} object, created by \code{\link[httr2:req_perform]{req_perform()}}.}
     \item{\code{check_type}}{Check that response has expected content type? Set to
 \code{FALSE} to suppress the automated check}
   }}

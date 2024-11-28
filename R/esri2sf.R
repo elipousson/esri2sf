@@ -626,6 +626,10 @@ is_groupLayer <- function(layerInfo) {
 
 #' @rdname esri2sf
 #' @name esrigroup
+#' @param layerInfo Layer information from [esrimeta()].
+#' @param .fn Function used to read items from a group layer. Defaults to
+#'   [esri2sf()].
+#' @inheritParams esrimeta
 #' @export
 #' @importFrom cli cli_rule cli_ol cli_par cli_progress_along symbol pb_current
 #'   pb_bar pb_percent

@@ -18,6 +18,13 @@ extract_esri_user_id(
   collapse = "|"
 )
 }
+\arguments{
+\item{url}{A url used to extract an item ID or user ID.}
+
+\item{pattern}{Regular expression pattern passed to \code{\link[stringr:str_extract]{stringr::str_extract()}}.}
+
+\item{collapse}{String used to collapse pattern character vector.}
+}
 \description{
 \code{\link[=extract_esri_item_id]{extract_esri_item_id()}} extract a id or appid value from a URL. If a group
 url is supplied a group ID is extracted.
